@@ -1,9 +1,10 @@
 <template>
 	<view class="page" @touchstart="touchStart" @touchend="touchEnd">
+		<free-nav-bar title="发表动态" :showBack="true" :showRight="false"></free-nav-bar>
 		<form>
 			<view class="uni-textarea">
 				<textarea placeholder="这一刻的想法..." v-model="input_content" />
-				</view>
+			</view>
 			<view class="uni-list list-pd">
 				<view class="uni-list-cell cell-pd">
 					<view class="uni-uploader">
@@ -36,6 +37,7 @@
 </template>
 
 <script>
+	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
 	import image from '@/common/image.js';
 	
 	var sourceType = [
@@ -49,6 +51,9 @@
 		['compressed', 'original']
 	]
 	export default {
+		components: {
+			freeNavBar,
+		},
 		data() {
 			return {
 				// title: 'choose/previewImage',

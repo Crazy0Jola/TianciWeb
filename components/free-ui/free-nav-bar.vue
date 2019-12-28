@@ -9,7 +9,7 @@
 				<view class="flex align-center">
 					<!-- 返回按钮 -->
 					<free-icon-button v-if="showBack" @click="back"
-					:icon="'\ue60d'"></free-icon-button>
+					:icon="'\ue645'"></free-icon-button>
 					<!-- 标题 -->
 					<text v-if="title" class="font-md ml-3">{{getTitle}}</text>
 				</view>
@@ -17,9 +17,9 @@
 				<view class="flex align-center" v-if="showRight">
 					<slot name="right">
 						<free-icon-button @click="search" 
-						:icon="'\ue6e3'"></free-icon-button>
+						:icon="'\ue607'"></free-icon-button>
 						<free-icon-button @click="openExtend"
-						:icon="'\ue682'"></free-icon-button>
+						:icon="'\ue636'"></free-icon-button>
 					</slot>
 				</view>
 			</view>
@@ -28,10 +28,10 @@
 		<view v-if="fixed" :style="fixedStyle"></view>
 		
 		<!-- 扩展菜单 -->
-		<free-popup v-if="showRight" ref="extend" :bodyWidth="320" :bodyHeight="525"
+		<free-popup v-if="showRight" ref="extend" :bodyWidth="320" :bodyHeight="205"
 		bodyBgColor="bg-dark" transformOrigin="right top">
 			<view class="flex flex-column" 
-			style="width: 320rpx;height: 525rpx;">
+			style="width: 320rpx;height: 205rpx;">
 				<view class="flex-1 flex align-center" 
 				hover-class="bg-hover-dark"
 				v-for="(item,index) in menus"
@@ -89,27 +89,12 @@
 					{
 						name:"发起群聊",
 						event:"",
-						icon:"\ue633"
+						icon:"\ue600"
 					},
 					{
 						name:"添加好友",
 						event:"",
-						icon:"\ue65d"
-					},
-					{
-						name:"扫一扫",
-						event:"",
-						icon:"\ue614"
-					},
-					{
-						name:"收付款",
-						event:"",
-						icon:"\ue66c"
-					},
-					{
-						name:"帮助与反馈",
-						event:"",
-						icon:"\ue66c"
+						icon:"\ue6a5"
 					}
 				],
 			}
@@ -126,7 +111,7 @@
 			},
 			getTitle(){
 				let noreadnum = this.noreadnum > 0 ? '('+this.noreadnum+')' : ''
-				return this.title + noreadnum
+				return this.title
 			},
 			getClass(){
 				let fixed = this.fixed?'fixed-top':''

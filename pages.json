@@ -84,6 +84,17 @@
 				"navigationBarTitleText" : "发表"
 			}
 		}
+		, {
+		    "path": "pages/login/login",
+		    "style": {}
+		}
+		, {
+            "path": "pages/login/forget",
+            "style": {}
+        }, {
+            "path": "pages/login/register",
+            "style": {}
+        } 
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

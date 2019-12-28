@@ -2,9 +2,9 @@
 	<view>
 
 		<!-- 导航栏 -->
-		<free-nav-bar title="帝莎编程学院" :noreadnum="1" showBack>
+		<free-nav-bar :title="nickname" :noreadnum="1" showBack>
 			<free-icon-button slot="right" 
-			:icon="'\ue6fd'"
+			:icon="'\ue636'"
 			@click="openChatSet"></free-icon-button>
 		</free-nav-bar>
 		
@@ -30,7 +30,7 @@
 		<!-- 底部输入框 -->
 		<view class="position-fixed left-0 right-0 border-top flex align-center" style="background-color: #F7F7F6;height: 105rpx;" 
 		:style="'bottom:'+KeyboardHeight+'px;'">
-			<free-icon-button :icon="(mode === 'audio') ? '\ue607':'\ue606'" @click="changeVoiceOrText"></free-icon-button>
+			<free-icon-button :icon="(mode === 'audio') ? '\ue618':'\ue656'" @click="changeVoiceOrText"></free-icon-button>
 			<view class="flex-1">
 				<view v-if="mode === 'audio'" class="rounded flex align-center justify-center" style="height: 80rpx;" :class="isRecording?'bg-hover-light':'bg-white'" @touchstart="voiceTouchStart" @touchend="voiceTouchEnd" @touchcancel="voiceTouchCancel" @touchmove="voiceTouchMove">
 					<text class="font">{{isRecording ? '松开 结束':'按住 说话'}}</text>
@@ -39,11 +39,11 @@
 				<textarea v-else fixed class="bg-white rounded p-2 font-md" style="height: 75rpx;" :adjust-position="false" v-model="text" @focus="mode = 'text'"/>
 			</view>
 			<!-- 表情 -->
-			<free-icon-button :icon="'\ue605'"
+			<free-icon-button :icon="'\ue60d'"
 			@click="openActionOrEmoticon('emoticon')"></free-icon-button>
 			<template v-if="text.length === 0">
 				<!-- 扩展菜单 -->
-				<free-icon-button :icon="'\ue603'" 
+				<free-icon-button :icon="'\ue636'" 
 				@click="openActionOrEmoticon('action')"></free-icon-button>
 			</template>
 			<template v-else>
@@ -115,6 +115,8 @@
 	
 	import { mapState,mapMutations } from 'vuex'
 	
+	var _this;
+	
 	export default {
 		components: {
 			freeNavBar,
@@ -127,6 +129,8 @@
 			return {
 				// 模式 text输入文字，emoticon表情，action操作，audio音频
 				mode:"audio",
+				username:"",
+				nickname:"",
 				// 扩展菜单列表
 				actionList:[
 					[{
@@ -266,6 +270,11 @@
 				// 取消录音
 				unRecord:false
 			}
+		},
+		onLoad:function(e){
+			_this=this;
+			_this.username = e.username;
+			_this.nickname = e.nickname;
 		},
 		mounted() {
 			// #ifdef APP-PLUS-NVUE

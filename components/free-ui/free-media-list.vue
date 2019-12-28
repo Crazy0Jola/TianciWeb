@@ -1,19 +1,19 @@
 <template>
-	<view :class="item.istop ? 'bg-light' : 'bg-white'" hover-class="bg-light">
-	<div class="flex align-stretch" @click="onClick" @longpress="long">
+	<view :class="item.extras.istop ? 'bg-light' : 'bg-white'" hover-class="bg-light">
+	<div class="flex align-stretch" @tap="onClick" :username="item.username" :nickname="item.nickName" @longpress="long">
 		<view class="flex align-center justify-center position-relative"
 		style="width: 145rpx;">
-			<free-avater :src="item.avatar" size="92"></free-avater>
+			<free-avater :src="item.avatar?item.avatar:'/static/images/demo/demo6.jpg'" size="92"></free-avater>
 			<free-badge badgeClass="position-absolute"
 			badgeStyle="top:15rpx;right:15rpx"
-			v-if="item.noreadnum" :value="item.noreadnum"></free-badge>
+			v-if="item.unread_msg_count" :value="item.unread_msg_count"></free-badge>
 		</view>
 		<view class="flex flex-column border-bottom flex-1 py-3 pr-3 border-light-secondary">
 			<view class="flex align-center justify-between mb-1">
-				<text class="font-md">{{item.nickname}}</text>
-				<text class="font-sm text-light-muted">{{item.update_time|formatTime}}</text>
+				<text class="font-md">{{item.nickName}}</text>
+				<text class="font-sm text-light-muted">{{item.mtime|formatTime}}</text>
 			</view>
-			<text class="font text-ellipsis text-light-muted">{{item.data}}</text>
+			<text class="font text-ellipsis text-light-muted">{{item.extras.latest_msg}}</text>
 		</view>
 	</div>
 	</view>
@@ -35,9 +35,12 @@
 			index:Number
 		},
 		methods:{
-			onClick(){
+			onClick(e){
+				console.log(e)
+				var username = e.currentTarget.attr.username;
+				var nickname = e.currentTarget.attr.nickname;
 				uni.navigateTo({
-					url: '/pages/chat/chat/chat',
+					url: '/pages/chat/chat/chat?username='+username+'&nickname='+nickname,
 				});
 			},
 			long(e){
