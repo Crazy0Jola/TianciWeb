@@ -6,7 +6,7 @@
 			<text class="font-sm text-light-muted">{{showTime}}</text>
 		</view>
 		<!-- 撤回消息 -->
-		<view v-if="item.isremove" ref="isremove"
+		<view v-if="item.msg_body.extras.isremove" ref="isremove"
 		class="flex align-center justify-center pb-4 pt-1 chat-animate">
 			<text class="font-sm text-light-muted">你撤回了一条信息</text>
 		</view>

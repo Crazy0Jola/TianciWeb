@@ -387,10 +387,8 @@
 			},
 			// 判断是否操作本人信息
 			isdoSelf(){
-				// 获取本人id（假设拿到了）
-				let id = 1
-				let user_id = this.propIndex > -1 ? this.list[this.propIndex].user_id : 0
-				return user_id === id
+				let target_id = _this.propIndex > -1 ? _this.list[_this.propIndex].target_id : 0
+				return target_id !== _this.myUsername
 			},
 			// 获取操作菜单
 			menusList(){
@@ -404,6 +402,7 @@
 			},
 			// 聊天区域bottom
 			chatBodyBottom(){
+				console.log(this.KeyboardHeight)
 				return `bottom:${uni.upx2px(105) + this.KeyboardHeight}px;top:${this.navBarHeight}px;`
 			},
 			// 获取操作或者表情列表
@@ -465,6 +464,7 @@
 				
 				uni.hideKeyboard()
 				this.KeyboardHeight = uni.upx2px(580)
+				console.log(this.KeyboardHeight)
 			},
 			// 发送
 			send(type, data = '',options = {}){

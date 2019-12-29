@@ -9,13 +9,13 @@
 		
 		<!-- 置顶列表 -->
 		<block v-for="(item,index) in list" :key="index">
-			<free-media-list v-if="item.extras.istop&&!item.extras.del" :item="item" :index="index"
+			<free-media-list v-if="isTop(item.username)&&!item.extras.del" :item="item" :index="index"
 			@long="long"></free-media-list>
 		</block>
 		
 		<!-- 非置顶列表 -->
 		<block v-for="(item,index) in list" :key="index">
-			<free-media-list v-if="!item.extras.istop&&!item.extras.del" :item="item" :index="index"
+			<free-media-list v-if="!isTop(item.username)&&!item.extras.del" :item="item" :index="index"
 			@long="long"></free-media-list>
 		</block>
 		
@@ -82,7 +82,10 @@
 				//获取会话列表
 				JIM.getConversation().onSuccess(function(data) {
 					console.log('success:Conversation222222===========' + JSON.stringify(data));
-					_this.list=data.conversations;
+					_this.list=[];
+					for(var i=data.conversations.length-1;i>=0;i--){
+						_this.list.push(data.conversations[i])
+					}
 					uni.hideLoading()
 				}).onFail(function(data) {
 					console.log('error:' + JSON.stringify(data));
@@ -107,16 +110,23 @@
 			// 获取菜单的样式
 			getMenusStyle(){
 				return `height: ${this.getMenusHeight}rpx;`
+			},
+			isTop(){
+				return function(username){
+					if(uni.getStorageSync(username+"isTop")){
+						return uni.getStorageSync(username+"isTop")
+					}else{
+						return false;
+					}
+				}
 			}
 		},
 		mounted() {
 			_this= this;
 			uni.$on("JIMinit",function(){
-				console.log("hhhhhhhhhhhhhhhJIMinit")
 				_this.isLogin();
 			})
 			uni.$on("reInit",function(){
-				console.log("zzzzzzzzzzzzzreInit")
 				_this.isLogin();
 			})
 		},
@@ -142,7 +152,7 @@
 							}
 							JIM.updateConversation({
 							   'username' : username,
-							   'extras' : {'istop':false,'del':false,'latest_msg':latest_msg}
+							   'extras' : {'latest_msg':latest_msg}
 							});
 							var list = uni.getStorageSync(username);
 							if(list){
@@ -156,7 +166,10 @@
 						//获取会话列表
 						JIM.getConversation().onSuccess(function(data) {
 							console.log('success:Conversation33333333===========' + JSON.stringify(data));
-							_this.list=data.conversations;
+							_this.list=[];
+							for(var i=data.conversations.length-1;i>=0;i--){
+								_this.list.push(data.conversations[i])
+							}
 							uni.hideLoading()
 						}).onFail(function(data) {
 							console.log('error:' + JSON.stringify(data));
@@ -182,20 +195,25 @@
 				        	}
 				        	JIM.updateConversation({
 				        	   'username' : username,
-				        	   'extras' : {'istop':false,'del':false,'latest_msg':latest_msg}
+				        	   'extras' : {'latest_msg':latest_msg}
 				        	});
 				        	var list = uni.getStorageSync(username);
-				        	for(var j=0;j<data[i].msgs.length;j++){
-				        		list.push(data[i].msgs[j].content);
-				        	}
-				        	uni.setStorageSync(username,list);							
+							if(list){
+								for(var j=0;j<data[i].msgs.length;j++){
+									list.push(data[i].msgs[j].content);
+								}
+								uni.setStorageSync(username,list);	
+							}
 				        }
 						
 						var conversationTimer = setTimeout(()=>{
 							//获取会话列表
 							JIM.getConversation().onSuccess(function(data) {
 								console.log('success:Conversation3333===========' + JSON.stringify(data));
-								_this.list=data.conversations;
+								_this.list=[];
+								for(var i=data.conversations.length-1;i>=0;i--){
+									_this.list.push(data.conversations[i])
+								}
 								uni.hideLoading()
 							}).onFail(function(data) {
 								console.log('error:' + JSON.stringify(data));
@@ -237,7 +255,10 @@
 					//获取会话列表
 					JIM.getConversation().onSuccess(function(data) {
 						console.log('success:Conversation===========' + JSON.stringify(data));
-						_this.list=data.conversations;
+						_this.list=[];
+						for(var i=data.conversations.length-1;i>=0;i--){
+							_this.list.push(data.conversations[i])
+						}
 						uni.hideLoading()
 					}).onFail(function(data) {
 						console.log('error:' + JSON.stringify(data));
@@ -281,8 +302,9 @@
 				this.propIndex = index
 				// 拿到当前对象
 				let item = this.list[index]
+				var isTop = uni.getStorageSync(item.username+"isTop")||false;
 				// 判断之前是否处于置顶状态
-				this.menus[0].name = item.extras.istop ? '取消置顶' : '设为置顶'
+				this.menus[0].name = isTop ? '取消置顶' : '设为置顶'
 				
 				this.$refs.extend.show(x,y)
 			},
@@ -310,11 +332,18 @@
 			// 置顶/取消置顶会话
 			setTop(){
 				let item = this.list[this.propIndex]
-				item.extras.istop = !item.extras.istop
-				console.log(JSON.stringify(item))
-				JIM.updateConversation({
-				   'username' : item.username,
-				   'extras' : {'istop':item.extras.istop,'latest_msg':item.extras.latest_msg}
+				var isTop = uni.getStorageSync(item.username+"isTop")||false;
+				uni.setStorageSync(item.username+"isTop",!isTop);
+				//获取会话列表
+				JIM.getConversation().onSuccess(function(data) {
+					console.log('success:Conversation222222===========' + JSON.stringify(data));
+					_this.list=[];
+					for(var i=data.conversations.length-1;i>=0;i--){
+						_this.list.push(data.conversations[i])
+					}
+					uni.hideLoading()
+				}).onFail(function(data) {
+					console.log('error:' + JSON.stringify(data));
 				});
 			}
 		}

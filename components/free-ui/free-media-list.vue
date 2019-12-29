@@ -1,5 +1,5 @@
 <template>
-	<view :class="item.extras.istop ? 'bg-light' : 'bg-white'" >
+	<view :class="istop ? 'bg-light' : 'bg-white'" >
 	<div class="flex align-stretch" @tap="onClick" :username="item.username" :nickname="item.nickName" @longpress="long">
 		<view class="flex align-center justify-center position-relative"
 		style="width: 145rpx;">
@@ -24,11 +24,18 @@
 	
 	import freeAvater from "@/components/free-ui/free-avater.vue"
 	import freeBadge from "@/components/free-ui/free-badge.vue"
+	
+	var _this;
 	export default {
 		mixins:[freeBase],
 		components: {
 			freeAvater,
 			freeBadge
+		},
+		data(){
+			return {
+				istop:uni.getStorageSync(this.item.username+"isTop")||false
+			}
 		},
 		props: {
 			item: Object,

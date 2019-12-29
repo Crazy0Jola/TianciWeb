@@ -87,7 +87,7 @@
 							}
 							JIM.updateConversation({
 							   'username' : username,
-							   'extras' : {'istop':false,'del':false,'latest_msg':latest_msg}
+							   'extras' : {'del':false,'latest_msg':latest_msg}
 							});
 							var list = uni.getStorageSync(username);
 							if(list){
@@ -117,7 +117,7 @@
 							}
 							JIM.updateConversation({
 							   'username' : username,
-							   'extras' : {'istop':false,'del':false,'latest_msg':latest_msg}
+							   'extras' : {'del':false,'latest_msg':latest_msg}
 							});
 							var list = uni.getStorageSync(username);
 							for(var j=0;j<data[i].msgs.length;j++){
