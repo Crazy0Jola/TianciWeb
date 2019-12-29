@@ -1072,7 +1072,6 @@ __WXML_GLOBAL__.ops_cached.$gwx_2=[];
 Z([3,'__e'])
 Z([3,'flex align-center justify-center'])
 Z([[4],[[5],[[4],[[5],[[5],[1,'tap']],[[4],[[5],[[4],[[5],[[5],[1,'$emit']],[[4],[[5],[1,'click']]]]]]]]]]])
-Z([3,'bg-hover-light'])
 Z([3,'height:90rpx;width:90rpx;'])
 Z([3,'iconfont font-md'])
 Z([a,[[7],[3,'icon']]])
@@ -1085,13 +1084,12 @@ __WXML_GLOBAL__.ops_cached.$gwx_3=[];
 Z([3,'__e'])
 Z([3,'bg-white flex align-stretch'])
 Z([[4],[[5],[[4],[[5],[[5],[1,'tap']],[[4],[[5],[[4],[[5],[[5],[1,'$emit']],[[4],[[5],[1,'click']]]]]]]]]]])
-Z([3,'bg-light'])
 Z([[7],[3,'showLeftIcon']])
 Z([3,'flex align-center justify-center py-2 pl-3'])
 Z([3,'icon'])
 Z([[7],[3,'cover']])
 Z([3,'widthFix'])
-Z(z[7])
+Z(z[6])
 Z([[7],[3,'coverStyle']])
 Z([[4],[[5],[[5],[1,'flex-1 flex align-center justify-between pr-3 py-3 pl-3']],[[2,'?:'],[[7],[3,'border']],[1,'border-bottom'],[1,'']]]])
 Z([[6],[[7],[3,'$slots']],[3,'default']])
@@ -1158,7 +1156,6 @@ Z(z[42])
 Z(z[7])
 Z([3,'flex-1 flex align-center'])
 Z([[4],[[5],[[4],[[5],[[5],[1,'tap']],[[4],[[5],[[4],[[5],[[5],[[5],[1,'clickEvent']],[[4],[[5],[1,'$0']]]],[[4],[[5],[[4],[[5],[[4],[[5],[[5],[[5],[[5],[1,'menus']],[1,'']],[[7],[3,'index']]],[1,'event']]]]]]]]]]]]]]])
-Z([3,'bg-hover-dark'])
 Z([3,'iconfont pl-3 pr-2 font-md text-white'])
 Z([a,[[6],[[7],[3,'item']],[3,'icon']]])
 Z([3,'font-md text-white'])
@@ -1636,10 +1633,10 @@ e_[x[0]]={f:m0,j:[],i:[],ti:[],ic:[]}
 d_[x[1]]={}
 var m1=function(e,s,r,gg){
 var z=gz$gwx_2()
-var oD=_mz(z,'view',['bindtap',0,'class',1,'data-event-opts',1,'hoverClass',2,'style',3],[],e,s,gg)
+var oD=_mz(z,'view',['bindtap',0,'class',1,'data-event-opts',1,'style',2],[],e,s,gg)
 var fE=_n('text')
-_rz(z,fE,'class',5,e,s,gg)
-var cF=_oz(z,6,e,s,gg)
+_rz(z,fE,'class',4,e,s,gg)
+var cF=_oz(z,5,e,s,gg)
 _(fE,cF)
 _(oD,fE)
 _(r,oD)
@@ -1649,53 +1646,53 @@ e_[x[1]]={f:m1,j:[],i:[],ti:[],ic:[]}
 d_[x[2]]={}
 var m2=function(e,s,r,gg){
 var z=gz$gwx_3()
-var oH=_mz(z,'view',['bindtap',0,'class',1,'data-event-opts',1,'hoverClass',2],[],e,s,gg)
+var oH=_mz(z,'view',['bindtap',0,'class',1,'data-event-opts',1],[],e,s,gg)
 var cI=_v()
 _(oH,cI)
-if(_oz(z,4,e,s,gg)){cI.wxVkey=1
+if(_oz(z,3,e,s,gg)){cI.wxVkey=1
 var oJ=_n('view')
-_rz(z,oJ,'class',5,e,s,gg)
+_rz(z,oJ,'class',4,e,s,gg)
 var aL=_n('slot')
-_rz(z,aL,'name',6,e,s,gg)
+_rz(z,aL,'name',5,e,s,gg)
 _(oJ,aL)
 var lK=_v()
 _(oJ,lK)
-if(_oz(z,7,e,s,gg)){lK.wxVkey=1
-var tM=_mz(z,'image',['mode',8,'src',1,'style',2],[],e,s,gg)
+if(_oz(z,6,e,s,gg)){lK.wxVkey=1
+var tM=_mz(z,'image',['mode',7,'src',1,'style',2],[],e,s,gg)
 _(lK,tM)
 }
 lK.wxXCkey=1
 _(cI,oJ)
 }
 var eN=_n('view')
-_rz(z,eN,'class',11,e,s,gg)
+_rz(z,eN,'class',10,e,s,gg)
 var bO=_v()
 _(eN,bO)
-if(_oz(z,12,e,s,gg)){bO.wxVkey=1
+if(_oz(z,11,e,s,gg)){bO.wxVkey=1
 var xQ=_n('slot')
 _(bO,xQ)
 }
 else{bO.wxVkey=2
 var oR=_n('text')
-_rz(z,oR,'class',13,e,s,gg)
-var fS=_oz(z,14,e,s,gg)
+_rz(z,oR,'class',12,e,s,gg)
+var fS=_oz(z,13,e,s,gg)
 _(oR,fS)
 _(bO,oR)
 }
 var oP=_v()
 _(eN,oP)
-if(_oz(z,15,e,s,gg)){oP.wxVkey=1
+if(_oz(z,14,e,s,gg)){oP.wxVkey=1
 var cT=_n('view')
-_rz(z,cT,'class',16,e,s,gg)
+_rz(z,cT,'class',15,e,s,gg)
 var oV=_n('slot')
-_rz(z,oV,'name',17,e,s,gg)
+_rz(z,oV,'name',16,e,s,gg)
 _(cT,oV)
 var hU=_v()
 _(cT,hU)
-if(_oz(z,18,e,s,gg)){hU.wxVkey=1
+if(_oz(z,17,e,s,gg)){hU.wxVkey=1
 var cW=_n('text')
-_rz(z,cW,'class',19,e,s,gg)
-var oX=_oz(z,20,e,s,gg)
+_rz(z,cW,'class',18,e,s,gg)
+var oX=_oz(z,19,e,s,gg)
 _(cW,oX)
 _(hU,cW)
 }
@@ -1782,15 +1779,15 @@ var oJB=_mz(z,'view',['class',40,'style',1],[],e,s,gg)
 var fKB=_v()
 _(oJB,fKB)
 var cLB=function(oNB,hMB,cOB,gg){
-var lQB=_mz(z,'view',['bindtap',46,'class',1,'data-event-opts',2,'hoverClass',3],[],oNB,hMB,gg)
+var lQB=_mz(z,'view',['bindtap',46,'class',1,'data-event-opts',2],[],oNB,hMB,gg)
 var aRB=_n('text')
-_rz(z,aRB,'class',50,oNB,hMB,gg)
-var tSB=_oz(z,51,oNB,hMB,gg)
+_rz(z,aRB,'class',49,oNB,hMB,gg)
+var tSB=_oz(z,50,oNB,hMB,gg)
 _(aRB,tSB)
 _(lQB,aRB)
 var eTB=_n('text')
-_rz(z,eTB,'class',52,oNB,hMB,gg)
-var bUB=_oz(z,53,oNB,hMB,gg)
+_rz(z,eTB,'class',51,oNB,hMB,gg)
+var bUB=_oz(z,52,oNB,hMB,gg)
 _(eTB,bUB)
 _(lQB,eTB)
 _(cOB,lQB)
@@ -2423,9 +2420,9 @@ style.childNodes[0].nodeValue = css;
 }
 return rewritor;
 }
-setCssToHead([])();setCssToHead([[2,0]],"Some selectors are not allowed in component wxss, including tag name selectors, ID selectors, and attribute selectors.(./app.wxss:4415:14)",{path:"./app.wxss"})();
+setCssToHead([])();setCssToHead([[2,0]],"Some selectors are not allowed in component wxss, including tag name selectors, ID selectors, and attribute selectors.(./app.wxss:4479:14)",{path:"./app.wxss"})();
 
-__wxAppCode__['app.wxss']=setCssToHead([[2,0]],"Some selectors are not allowed in component wxss, including tag name selectors, ID selectors, and attribute selectors.(./app.wxss:4415:14)",{path:"./app.wxss"});    
+__wxAppCode__['app.wxss']=setCssToHead([[2,0]],"Some selectors are not allowed in component wxss, including tag name selectors, ID selectors, and attribute selectors.(./app.wxss:4479:14)",{path:"./app.wxss"});    
 __wxAppCode__['app.wxml']=$gwx('./app.wxml');
 
 __wxAppCode__['components/free-ui/free-divider.wxss']=undefined;    

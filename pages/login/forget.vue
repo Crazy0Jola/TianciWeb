@@ -82,14 +82,14 @@
 				    title: '模拟倒计时触发'
 				});
 				
-				setTimeout(function(){
+
 					_this.$refs.runCode.$emit('runCode',0); //假装模拟下需要 终止倒计时
 					uni.showToast({
 					    icon: 'none',
 						position: 'bottom',
 					    title: '模拟倒计时终止'
 					});
-				},3000)
+
 			},
 			startRePass() {
 				//重置密码
@@ -123,9 +123,8 @@
 				}
 				console.log("重置密码成功")
 				_this.isRotate=true
-				setTimeout(function(){
+
 					_this.isRotate=false
-				},3000)
 				
 				
 			}

@@ -39,7 +39,7 @@
 				let w = e.detail.width
 				let h = e.detail.height
 				// // 最大宽度 px
-				let maxW = uni.upx2px(this.maxWidth)
+				let maxW = uni.upx2px(this.maxWidth)-20;
 				// 最大高度
 				let maxH = uni.upx2px(this.maxHeight)
 				if (h <= maxH) {

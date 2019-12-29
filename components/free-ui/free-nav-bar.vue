@@ -33,7 +33,6 @@
 			<view class="flex flex-column" 
 			style="width: 320rpx;height: 205rpx;">
 				<view class="flex-1 flex align-center" 
-				hover-class="bg-hover-dark"
 				v-for="(item,index) in menus"
 				:key="index"
 				@click="clickEvent(item.event)">

@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white flex align-stretch" hover-class="bg-light"
+	<view class="bg-white flex align-stretch"
 	@click="$emit('click')">
 		<view class="flex align-center justify-center py-2 pl-3"
 		v-if="showLeftIcon">

@@ -9,7 +9,7 @@
 				<view class="flex align-center">
 					<!-- 返回按钮 -->
 					<view class="flex align-center justify-center"
-					hover-class="bg-hover-light" @click="back"
+					 @click="back"
 					style="height: 90rpx;width: 90rpx;">
 						<text class="iconfont font-md"
 						:style="buttonStyle">{{'\ue60d'}}</text>
@@ -20,7 +20,6 @@
 				<!-- 右边 -->
 				<view class="flex align-center">
 					<view class="flex align-center justify-center"
-					hover-class="bg-hover-light"
 					style="height: 90rpx;width: 90rpx;">
 						<text class="iconfont font-md"
 						:style="buttonStyle">{{'\ue682'}}</text>

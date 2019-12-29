@@ -1,9 +1,9 @@
 <template>
-	<view :class="item.extras.istop ? 'bg-light' : 'bg-white'" hover-class="bg-light">
+	<view :class="item.extras.istop ? 'bg-light' : 'bg-white'" >
 	<div class="flex align-stretch" @tap="onClick" :username="item.username" :nickname="item.nickName" @longpress="long">
 		<view class="flex align-center justify-center position-relative"
 		style="width: 145rpx;">
-			<free-avater :src="item.avatar?item.avatar:'/static/images/demo/demo6.jpg'" size="92"></free-avater>
+			<free-avater :src="item.avatar?item.avatar:'/static/images/userpic.png'" size="92"></free-avater>
 			<free-badge badgeClass="position-absolute"
 			badgeStyle="top:15rpx;right:15rpx"
 			v-if="item.unread_msg_count" :value="item.unread_msg_count"></free-badge>
@@ -36,7 +36,6 @@
 		},
 		methods:{
 			onClick(e){
-				console.log(e)
 				var username = e.currentTarget.attr.username;
 				var nickname = e.currentTarget.attr.nickname;
 				uni.navigateTo({

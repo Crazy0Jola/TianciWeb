@@ -38,16 +38,18 @@
 
 <script>
 	var _this;
-	import wInput from '../../components/watch-login/watch-input.vue' //input
-	import wButton from '../../components/watch-login/watch-button.vue' //button
-	import getCodeMsg from '../../js_sdk/ErrorCode.js';
+	import wInput from '@/components/watch-login/watch-input.vue' //input
+	import wButton from '@/components/watch-login/watch-button.vue' //button
+	import getCodeMsg from '@/js_sdk/ErrorCode.js';
+	import JMessage from '@/js_sdk/jmessage-wxapplet-sdk-1.4.2.min.js'
+	import md5 from '@/js_sdk/md5.min.js'
 	
 	import {
 		getLogin,
 		wexinLogin,
-	} from '../../service/api/login.js' //登录api
+	} from '@/service/api/login.js' //登录api
 	
-	var JIM = getApp().globalData.JIM.getJIM();
+	var JIM = getApp().globalData.JIM;
 	
 	export default {
 		data() {
@@ -71,11 +73,32 @@
 				JIM.login({
 				    'username' :username,
 					'password':password
-				}).onSuccess(function(data) {							
+				}).onSuccess(function(data) {						
 				    console.log('success:' + JSON.stringify(data));		   
 				    JIM.onMsgReceive(function(data) {
-				        data = JSON.stringify(data);
-				        console.log('msg_receive:' + data);
+				        console.log('msg_receive:' + JSON.stringify(data));
+						for(var i=0;i<data.messages.length;i++){
+							var content = data.messages[i].content;
+							var latest_msg;
+							var username = data.messages[i].from_username;
+							// 分类型进行判断
+							if(content.msg_type=="text"){
+								latest_msg = content.msg_body.text;
+							}
+							JIM.updateConversation({
+							   'username' : username,
+							   'extras' : {'istop':false,'del':false,'latest_msg':latest_msg}
+							});
+							var list = uni.getStorageSync(username);
+							if(list){
+								list.push(content);
+								uni.setStorageSync(username,list);
+							}
+						}
+						data = JSON.stringify(data);						
+						console.log('msg_receive:' + data);		
+										
+						uni.$emit('get_msg',{})
 				    });
 					
 				    JIM.onEventNotification(function(data) {
@@ -83,7 +106,28 @@
 				    });
 					
 					JIM.onSyncConversation(function(data) { //离线消息同步监听
-				        console.log( data);
+				        console.log( "zzzzzzzzz"+JSON.stringify(data));
+						for(var i=0;i<data.length;i++){
+							var latest_msg;
+							var last_content= data[i].msgs[data[i].msgs.length-1].content;
+							var username = data[i].from_username
+							// 分类型进行判断
+							if(last_content.msg_type=="text"){
+								latest_msg = last_content.msg_body.text;
+							}
+							JIM.updateConversation({
+							   'username' : username,
+							   'extras' : {'istop':false,'del':false,'latest_msg':latest_msg}
+							});
+							var list = uni.getStorageSync(username);
+							for(var j=0;j<data[i].msgs.length;j++){
+								list.push(data[i].msgs[j].content);
+							}
+							uni.setStorageSync(username,list);
+							
+							
+						}
+						
 				    });
 					
 				    JIM.onUserInfUpdate(function(data) {
@@ -131,7 +175,7 @@
 						position: 'bottom',
 						title: '登录成功!'
 					});
-					uni.reLaunch({
+					uni.switchTab({
 						url: '../tabbar/index/index',
 					});
 					
@@ -179,10 +223,43 @@
 				
 				_this.isRotate=true
 				
-				uni.showLoading({
-					title: '登录中'
-				});
-				_this.login(_this.phoneData,_this.passData)
+				if(JIM.isInit()){
+					_this.login(_this.phoneData,_this.passData)
+				}else{
+					var appkey='09970876f33e884a3624335c';
+					var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
+					var timestamp=(new Date()).getTime();
+					var signature;
+					uni.request({
+						url: 'http://117.83.152.39:8081/interconnect/appUser/getJMKey',
+						header: {
+							"token": 'e463192ddfad487682638189f64020b9',
+							"Content-Type":"application/json"
+						},
+						data:{
+							timestamp:timestamp
+						},
+						success(res) {
+							signature = res.data.result;
+							JIM.init({
+									  "appkey"    : appkey,
+									  "random_str": random_str,
+									  "signature" : signature,
+									  "timestamp" : timestamp,
+									  "flag":1
+							}).onSuccess(function(data) {
+								console.log('Init-success:' + JSON.stringify(data));	
+								_this.login(_this.phoneData,_this.passData)
+							}).onFail(function(data) {
+							    console.log('Init-error:' + JSON.stringify(data))		    
+							});
+						}
+					})
+					
+					// _this.login(_this.phoneData,_this.passData)
+					
+				}
+				
 						
 				
 				// getLogin()

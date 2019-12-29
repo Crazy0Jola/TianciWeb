@@ -44,8 +44,7 @@
 		</free-list-item>
 		<free-list-item title="更多信息" showRight :showLeftIcon="false"></free-list-item>
 		<free-divider></free-divider>
-		<view class="py-3 flex align-center justify-center bg-white"
-		hover-class="bg-light">
+		<view class="py-3 flex align-center justify-center bg-white">
 			<text class="iconfont text-primary mr-1" 
 			v-if="!isBlack">&#xe64e;</text>
 			<text class="font-md text-primary">{{isBlack ? '移出黑名单' : '发信息'}}</text>

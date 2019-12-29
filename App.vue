@@ -1,19 +1,50 @@
  <script>
 	import Vue from 'vue'
-	import Chat from './js_sdk/chat.js'
+	import JMessage from 'js_sdk/jmessage-wxapplet-sdk-1.4.2.min.js'
+	import md5 from 'js_sdk/md5.min.js'
 	
-	var JIM = new Chat();
+	var JIM = new JMessage({
+		debug:true
+	})
 	export default {
 		globalData:{
 			JIM:JIM
 		},
 		onLaunch: function() {
-			JIM.init();
+			var appkey='09970876f33e884a3624335c';
+			var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
+			var timestamp=(new Date()).getTime();
+			var signature;
+			uni.request({
+				url: 'http://117.83.152.39:8081/interconnect/appUser/getJMKey',
+				header: {
+					"token": 'e463192ddfad487682638189f64020b9',
+					"Content-Type":"application/json"
+				},
+				data:{
+					timestamp:timestamp
+				},
+				success(res) {
+					signature = res.data.result;
+					JIM.init({
+							  "appkey"    : appkey,
+							  "random_str": random_str,
+							  "signature" : signature,
+							  "timestamp" : timestamp,
+							  "flag":1
+					}).onSuccess(function(data) {
+						console.log('Init-success:' + JSON.stringify(data));	
+						uni.$emit("JIMinit",{})
+					}).onFail(function(data) {
+					    console.log('Init-error:' + JSON.stringify(data))		    
+					});
+				}
+			})
 			// 加载公共图标库
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
 			    'fontFamily': "iconfont",
-			    'src': "url('https://at.alicdn.com/t/font_1587665_27dlqnljm0t.ttf')"
+			    'src': "url('https://at.alicdn.com/t/font_1587665_jt2cfj0o0hp.ttf')"
 			});
 			// 初始化录音管理器
 			this.$store.commit('initRECORD')
@@ -48,6 +79,39 @@
 			
 		},
 		onShow: function() {
+			JIM.onDisconnect(function(){
+				var appkey='09970876f33e884a3624335c';
+				var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
+				var timestamp=(new Date()).getTime();
+				var signature;
+				uni.request({
+					url: 'http://117.83.152.39:8081/interconnect/appUser/getJMKey',
+					header: {
+						"token": 'e463192ddfad487682638189f64020b9',
+						"Content-Type":"application/json"
+					},
+					data:{
+						timestamp:timestamp
+					},
+					success(res) {
+						console.log(res)
+						signature = res.data.result;
+						console.log(signature)
+						JIM.init({
+								  "appkey"    : appkey,
+								  "random_str": random_str,
+								  "signature" : signature,
+								  "timestamp" : timestamp,
+								  "flag":1
+						}).onSuccess(function(data) {
+							console.log('Init-success:' + JSON.stringify(data));	
+							uni.$emit("JIMinit",{})
+						}).onFail(function(data) {
+						    console.log('Init-error:' + JSON.stringify(data))		    
+						});
+					}
+				})
+			});			
 			console.log('App Show')
 		},
 		onHide: function() {

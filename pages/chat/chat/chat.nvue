@@ -14,7 +14,7 @@
 			
 			<!-- 聊天信息列表组件 -->
 			<block v-for="(item,index) in list" :key="index">
-				<free-chat-item :item="item" :index="index" ref="chatItem"
+				<free-chat-item :item="item" :avator="avator" :username="username" :myAvator="myAvator" :index="index" ref="chatItem"
 				:pretime=" index > 0 ? list[index-1].create_time : 0"
 				@long="long" @preview="previewImage"></free-chat-item>
 			</block>
@@ -36,7 +36,7 @@
 					<text class="font">{{isRecording ? '松开 结束':'按住 说话'}}</text>
 				</view>
 				
-				<textarea v-else fixed class="bg-white rounded p-2 font-md" style="height: 75rpx;" :adjust-position="false" v-model="text" @focus="mode = 'text'"/>
+				<textarea v-else fixed class="bg-white rounded p-2 font-md" style="height: 80rpx;" :adjust-position="false" v-model="text" @focus="mode = 'text'"/>
 			</view>
 			<!-- 表情 -->
 			<free-icon-button :icon="'\ue60d'"
@@ -80,7 +80,6 @@
 		style="width: 240rpx;"
 		:style="getMenusStyle">
 			<view class="flex-1 flex align-center" 
-			hover-class="bg-light"
 			v-for="(item,index) in menusList"
 			:key="index"
 			@click="clickEvent(item.event)">
@@ -114,8 +113,9 @@
 	
 	
 	import { mapState,mapMutations } from 'vuex'
-	
+
 	var _this;
+	var JIM = getApp().globalData.JIM;
 	
 	export default {
 		components: {
@@ -128,9 +128,12 @@
 		data() {
 			return {
 				// 模式 text输入文字，emoticon表情，action操作，audio音频
-				mode:"audio",
+				mode:"text",
 				username:"",
 				nickname:"",
+				avator:"/static/images/userpic.png",
+				myUsername:"",
+				myAvator:"/static/images/userpic.png",
 				// 扩展菜单列表
 				actionList:[
 					[{
@@ -182,83 +185,84 @@
 					event:'removeChatItem'
 				}],
 				navBarHeight:0,
-				list:[{
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:1,
-					nickname:"昵称",
-					type:"text",// image,audio,video
-					data:"你好你好你好你好你好你好你好你好你好你好你好你好你好你好",
-					create_time:1569331227,
-					isremove:false
-				},{
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:2,
-					nickname:"昵称",
-					type:"text",// image,audio,video
-					data:"123456你好你好你好你好",
-					create_time:1569331267,
-					isremove:false
-				},{
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:1,
-					nickname:"昵称",
-					type:"text",// image,audio,video
-					data:"你好你好你好你好你好你好你好你好你好你好你好你好你好你好",
-					create_time:1569331287,
-					isremove:false
-				},{
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:2,
-					nickname:"昵称",
-					type:"text",// image,audio,video
-					data:"123456你好你好你好你好",
-					create_time:1569331327,
-					isremove:false
-				},{
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:1,
-					nickname:"昵称",
-					type:"audio",// image,audio,video
-					data:"/static/audio/1.mp3",
-					options:{
-						time:60
-					},
-					create_time:1569331327,
-					isremove:false
-				},{
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:1,
-					nickname:"昵称",
-					type:"audio",// image,audio,video
-					data:"/static/audio/2.mp3",
-					options:{
-						time:20
-					},
-					create_time:1569331327,
-					isremove:false
-				},{
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:2,
-					nickname:"昵称",
-					type:"audio",// image,audio,video
-					data:"/static/audio/3.mp3",
-					options:{
-						time:10
-					},
-					create_time:1569331327,
-					isremove:false
-				},{
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:1,
-					nickname:"昵称",
-					type:"video",// image,audio,video
-					data:"/static/video/demo.mp4",
-					options:{
-						poster:"/static/video/demo.jpg"
-					},
-					create_time:1569331327,
-					isremove:false
-				}],
+				list:[],
+					// {
+				// 	avatar:"/static/images/demo/demo6.jpg",
+				// 	user_id:1,
+				// 	nickname:"昵称",
+				// 	type:"text",// image,audio,video
+				// 	data:"你好你好你好你好你好你好你好你好你好你好你好你好你好你好",
+				// 	create_time:1569331227,
+				// 	isremove:false
+				// },{
+				// 	avatar:"/static/images/demo/demo6.jpg",
+				// 	user_id:2,
+				// 	nickname:"昵称",
+				// 	type:"text",// image,audio,video
+				// 	data:"123456你好你好你好你好",
+				// 	create_time:1569331267,
+				// 	isremove:false
+				// },{
+				// 	avatar:"/static/images/demo/demo6.jpg",
+				// 	user_id:1,
+				// 	nickname:"昵称",
+				// 	type:"text",// image,audio,video
+				// 	data:"你好你好你好你好你好你好你好你好你好你好你好你好你好你好",
+				// 	create_time:1569331287,
+				// 	isremove:false
+				// },{
+				// 	avatar:"/static/images/demo/demo6.jpg",
+				// 	user_id:2,
+				// 	nickname:"昵称",
+				// 	type:"text",// image,audio,video
+				// 	data:"123456你好你好你好你好",
+				// 	create_time:1569331327,
+				// 	isremove:false
+				// },{
+				// 	avatar:"/static/images/demo/demo6.jpg",
+				// 	user_id:1,
+				// 	nickname:"昵称",
+				// 	type:"audio",// image,audio,video
+				// 	data:"/static/audio/1.mp3",
+				// 	options:{
+				// 		time:60
+				// 	},
+				// 	create_time:1569331327,
+				// 	isremove:false
+				// },{
+				// 	avatar:"/static/images/demo/demo6.jpg",
+				// 	user_id:1,
+				// 	nickname:"昵称",
+				// 	type:"audio",// image,audio,video
+				// 	data:"/static/audio/2.mp3",
+				// 	options:{
+				// 		time:20
+				// 	},
+				// 	create_time:1569331327,
+				// 	isremove:false
+				// },{
+				// 	avatar:"/static/images/demo/demo6.jpg",
+				// 	user_id:2,
+				// 	nickname:"昵称",
+				// 	type:"audio",// image,audio,video
+				// 	data:"/static/audio/3.mp3",
+				// 	options:{
+				// 		time:10
+				// 	},
+				// 	create_time:1569331327,
+				// 	isremove:false
+				// },{
+				// 	avatar:"/static/images/demo/demo6.jpg",
+				// 	user_id:1,
+				// 	nickname:"昵称",
+				// 	type:"video",// image,audio,video
+				// 	data:"/static/video/demo.mp4",
+				// 	options:{
+				// 		poster:"/static/video/demo.jpg"
+				// 	},
+				// 	create_time:1569331327,
+				// 	isremove:false
+				// }
 				// 当前操作的气泡索引
 				propIndex:-1,
 				// 输入文字
@@ -275,6 +279,67 @@
 			_this=this;
 			_this.username = e.username;
 			_this.nickname = e.nickname;
+			_this.myUsername = uni.getStorageSync('setUserData').username;
+		},
+		onShow(){
+			uni.$on("get_msg",function(){
+				var msg = uni.getStorageSync(_this.username);
+				_this.list=msg;
+				var pageToBottomTimer = setTimeout(()=>{
+					_this.pageToBottom()
+					clearTimeout(pageToBottomTimer)
+				},200)
+			})
+			var msg = uni.getStorageSync(_this.username);
+			JIM.resetUnreadCount({
+				'username' : _this.username
+			});
+			if(msg){
+				_this.list=msg;
+				var pageToBottomTimer = setTimeout(()=>{
+					_this.pageToBottom()
+					clearTimeout(pageToBottomTimer)
+				},500)
+			}else{
+				uni.showLoading({
+					"title":"正在获取聊天记录..."
+				})
+				uni.request({
+					url: 'https://report.im.jpush.cn/v2/users/' + _this.username +
+						'/messages?count=1000&begin_time=2019-12-25%2023:59:59&end_time=2019-12-29%2023:59:59',
+					header: {
+						"Authorization": 'Basic MDk5NzA4NzZmMzNlODg0YTM2MjQzMzVjOmU4ZTg3M2U2MDI0NTMxNWE3MGVkZTRiMg=='
+					},
+					success(res) {
+						console.log(res.data)
+						var msg = res.data.messages
+						_this.list=msg;
+						var pageToBottomTimer = setTimeout(()=>{
+							_this.pageToBottom()
+							clearTimeout(pageToBottomTimer)
+						},200)
+						uni.hideLoading()
+						uni.setStorageSync(_this.username,msg);
+					}
+				})
+			}
+			// var phone=[];
+			// phone.push("18952158867");
+			// phone.push("18012018031");
+			// uni.request({
+			// 	url: 'http://117.83.152.39:8081/interconnect/appUser/getUserPhotoByPhone',
+			// 	header: {
+			// 		"token": '06874c8b7be14969abac9a18935b18b8',
+			// 		"Content-Type":"application/json"
+			// 	},
+			// 	method:"POST",
+			// 	data:{
+			// 		// phones:JSON.stringify(phone)
+			// 	},
+			// 	success(res) {
+			// 		console.log(res)
+			// 	}
+			// })
 		},
 		mounted() {
 			// #ifdef APP-PLUS-NVUE
@@ -381,7 +446,6 @@
 					arr[i] = []
 					for (var j = 0; j < 8; j++) {
 						var no = start + j
-						console.log(no)
 						if ((no+1) > total) {
 							continue;
 						}
@@ -404,31 +468,53 @@
 			},
 			// 发送
 			send(type, data = '',options = {}){
-				var obj = {
-					avatar:"/static/images/demo/demo6.jpg",
-					user_id:1,
-					nickname:"昵称",
-					type:type,// image,audio,video,emoticon
-					data:data,
-					options:options,
-					create_time:(new Date()).getTime(),
-					isremove:false
-				}
+				var _that = this;
+				var text = this.text
 				switch (type){
 					case 'text':
-					obj.data = this.text
+					JIM.sendSingleMsg({
+						'target_username' : _this.username,
+						'content' : text,
+						'extras' : {
+							"isremove":false			
+						}
+					}).onSuccess(function(data) {
+						var obj = {
+							"from_id": _this.myUsername,
+							"create_time": (new Date()).getTime(),				
+							"msg_type": type,
+							"target_id": _this.username,
+							"msg_id":data.msg_id,
+							"msg_body":{
+								"extras": {isremove:false},
+								"text": text
+							}
+						}
+						_this.list.push(obj)
+						
+						// 发送文字成功，清空输入框
+						if (type === 'text') {
+							_that.text = ''
+						}
+						// 置于底部
+						var pageToBottomTimer = setTimeout(()=>{
+							_this.pageToBottom()
+							clearTimeout(pageToBottomTimer)
+						},200)
+						
+						uni.setStorageSync(_this.username,_this.list);
+						//data.code 返回码
+						//data.message 描述
+						//data.msg_id 发送成功后的消息 id
+						//data.ctime_ms 消息生成时间,毫秒
+					
+					}).onFail(function(data) {
+						//data.code 返回码
+						//data.message 描述
+					});
 						break;
 				}
-				this.list.push(obj)
-				// 发送文字成功，清空输入框
-				if (type === 'text') {
-					this.text = ''
-				}
-				// 置于底部
-				var pageToBottomTimer = setTimeout(()=>{
-					this.pageToBottom()
-					clearTimeout(pageToBottomTimer)
-				},200)
+	   		   
 			},
 			// 回到底部
 			pageToBottom(){
@@ -453,7 +539,7 @@
 					case 'removeChatItem': // 撤回消息
 					// 拿到当前被操作的信息
 					if (this.propIndex > -1) {
-						this.list[this.propIndex].isremove = true
+						this.list[this.propIndex].msg_body.extras.isremove = true
 					}
 						break;
 					default:
@@ -501,7 +587,7 @@
 			previewImage(url){
 				uni.previewImage({
 					current:url,
-					urls:this.imageList,
+					urls:[url],
 					indicator:"default"
 				})
 			},

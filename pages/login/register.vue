@@ -64,7 +64,7 @@
 	var _this;
 	import wInput from '../../components/watch-login/watch-input.vue' //input
 	import wButton from '../../components/watch-login/watch-button.vue' //button
-	var JIM = getApp().globalData.JIM.getJIM();
+	var JIM = getApp().globalData.JIM;
 	export default {
 		data() {
 			return {
@@ -108,14 +108,14 @@
 				    title: '模拟倒计时触发'
 				});
 				
-				setTimeout(function(){
+				
 					_this.$refs.runCode.$emit('runCode',0); //假装模拟下需要 终止倒计时
 					uni.showToast({
 					    icon: 'none',
 						position: 'bottom',
 					    title: '模拟倒计时终止'
 					});
-				},3000)
+
 			},
 		    startReg() {
 				//注册

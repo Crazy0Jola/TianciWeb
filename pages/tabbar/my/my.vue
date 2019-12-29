@@ -44,7 +44,7 @@
 	import freeListItem from "@/components/free-ui/free-list-item.vue"
 	import freeDivider from "@/components/free-ui/free-divider.vue"
 	
-	var JIM=getApp().globalData.JIM.getJIM();	
+	var JIM=getApp().globalData.JIM;	
 	export default {
 		components: {
 			freeNavBar,
@@ -65,7 +65,7 @@
 				JIM.loginOut();
 				this.$store.dispatch("setUserData","") //清空登录状态
 				try {
-					uni.removeStorageSync('setUserData'); //清空登录缓存
+					uni.clearStorage();
 				} catch (e) {
 					// error
 				}

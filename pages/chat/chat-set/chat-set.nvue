@@ -11,7 +11,7 @@
 			
 			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;">
 				<view class="flex align-center justify-center border" 
-				style="width: 120rpx;height: 120rpx;" hover-class="bg-light">
+				style="width: 120rpx;height: 120rpx;" >
 					<text class="text-light-muted" 
 					style="font-size: 100rpx;">+</text>
 				</view>
@@ -55,8 +55,7 @@
 		<free-divider></free-divider>
 		<free-list-item title="投诉" showRight :showLeftIcon="false"></free-list-item>
 		<free-divider></free-divider>
-		<view class="py-3 flex align-center justify-center bg-white"
-		hover-class="bg-light">
+		<view class="py-3 flex align-center justify-center bg-white">
 			<text class="font-md text-danger">删除并退出</text>
 		</view>
 		
