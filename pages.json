@@ -59,7 +59,7 @@
         ,{
 			"path" : "pages/find/moments/moments",
 			"style" : {
-				"navigationBarTitleText" : "发现",
+				"navigationBarTitleText" : "朋友圈",
 				"enablePullDownRefresh" : true,
 				"app-plus" : {
 					"bounce" : "none",
@@ -81,7 +81,13 @@
 		,{
 			"path" : "pages/find/publish/publish",
 			"style" : {
-				"navigationBarTitleText" : "发表"
+				"navigationBarTitleText" : "发表动态",
+				"app-plus" : {
+					"bounce" : "none",
+					"titleNView" : {
+						"type" : "default"
+					}
+				}
 			}
 		}
 		, {
@@ -94,7 +100,19 @@
         }, {
             "path": "pages/login/register",
             "style": {}
-        } 
+        }
+        ,{
+            "path" : "pages/webview/webview",
+            "style" : {
+            	"navigationBarTitleText" : "",
+            	"app-plus" : {
+            		"bounce" : "none",
+            		"titleNView" : {
+            			"type" : "default"
+            		}
+            	}
+            }
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

@@ -141,7 +141,7 @@ var JIM = new _jmessageWxappletSdk142Min.default({
     var domModule = weex.requireModule('dom');
     domModule.addRule('fontFace', {
       'fontFamily': "iconfont",
-      'src': "url('https://at.alicdn.com/t/font_1587665_jt2cfj0o0hp.ttf')" });
+      'src': "url('https://at.alicdn.com/t/font_1587665_7eqr0fco5qs.ttf')" });
 
     // 初始化录音管理器
     this.$store.commit('initRECORD');

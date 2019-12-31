@@ -30,7 +30,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _index_nvue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.nvue?vue&type=script&lang=js& */ 28);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _index_nvue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _index_nvue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 /* harmony import */ var _index_nvue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./index.nvue?vue&type=style&index=0&lang=css& */ 31);
-/* harmony import */ var _HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../HBuilderX/plugins/uniapp-cli/node_modules/vue-loader/lib/runtime/componentNormalizer.js */ 19);
+/* harmony import */ var _index_nvue_vue_type_style_index_1_lang_css___WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./index.nvue?vue&type=style&index=1&lang=css& */ 303);
+/* harmony import */ var _HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../HBuilderX/plugins/uniapp-cli/node_modules/vue-loader/lib/runtime/componentNormalizer.js */ 19);
+
 
 
 
@@ -39,7 +41,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* normalize component */
 
-var component = Object(_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+var component = Object(_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_4__["default"])(
   _index_nvue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
   _index_nvue_vue_type_template_id_db26057c___WEBPACK_IMPORTED_MODULE_0__["render"],
   _index_nvue_vue_type_template_id_db26057c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
@@ -90,6 +92,31 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
+  var l0 = _vm.__map(_vm.list, function(item, index) {
+    var m0 = _vm.isTop(item.username)
+    return {
+      $orig: _vm.__get_orig(item),
+      m0: m0
+    }
+  })
+
+  var l1 = _vm.__map(_vm.list, function(item, index) {
+    var m1 = _vm.isTop(item.username)
+    return {
+      $orig: _vm.__get_orig(item),
+      m1: m1
+    }
+  })
+
+  _vm.$mp.data = Object.assign(
+    {},
+    {
+      $root: {
+        l0: l0,
+        l1: l1
+      }
+    }
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -196,11 +223,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var _ErrorCode = _interopRequireDefault(__webpack_require__(/*! @/js_sdk/ErrorCode.js */ 30));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var freeNavBar = function freeNavBar() {return __webpack_require__.e(/*! import() | components/free-ui/free-nav-bar */ "components/free-ui/free-nav-bar").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-nav-bar.vue */ 183));};var freeMediaList = function freeMediaList() {return Promise.all(/*! import() | components/free-ui/free-media-list */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/free-ui/free-media-list")]).then(__webpack_require__.bind(null, /*! @/components/free-ui/free-media-list.vue */ 188));};var freePopup = function freePopup() {return __webpack_require__.e(/*! import() | components/free-ui/free-popup */ "components/free-ui/free-popup").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-popup.vue */ 195));};
 
+
+
+
+
+
+
+
+var _ErrorCode = _interopRequireDefault(__webpack_require__(/*! @/js_sdk/ErrorCode.js */ 30));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var freeNavBar = function freeNavBar() {return __webpack_require__.e(/*! import() | components/free-ui/free-nav-bar */ "components/free-ui/free-nav-bar").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-nav-bar.vue */ 189));};var freeMediaList = function freeMediaList() {return Promise.all(/*! import() | components/free-ui/free-media-list */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/free-ui/free-media-list")]).then(__webpack_require__.bind(null, /*! @/components/free-ui/free-media-list.vue */ 194));};var freePopup = function freePopup() {return __webpack_require__.e(/*! import() | components/free-ui/free-popup */ "components/free-ui/free-popup").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-popup.vue */ 201));};
 var _this;
 var JIM = getApp().globalData.JIM;var _default =
-
 {
   components: {
     freeNavBar: freeNavBar,
@@ -235,7 +268,7 @@ var JIM = getApp().globalData.JIM;var _default =
       //获取会话列表
       JIM.getConversation().onSuccess(function (data) {
         console.log('success:Conversation222222===========' + JSON.stringify(data));
-        _this.list = data.conversations;
+        _this.list = data.conversations.reverse();
         uni.hideLoading();
       }).onFail(function (data) {
         console.log('error:' + JSON.stringify(data));
@@ -260,16 +293,23 @@ var JIM = getApp().globalData.JIM;var _default =
     // 获取菜单的样式
     getMenusStyle: function getMenusStyle() {
       return "height: ".concat(this.getMenusHeight, "rpx;");
+    },
+    isTop: function isTop() {
+      return function (username) {
+        if (uni.getStorageSync(username + "isTop")) {
+          return uni.getStorageSync(username + "isTop");
+        } else {
+          return false;
+        }
+      };
     } },
 
   mounted: function mounted() {
     _this = this;
     uni.$on("JIMinit", function () {
-      console.log("hhhhhhhhhhhhhhhJIMinit");
       _this.isLogin();
     });
     uni.$on("reInit", function () {
-      console.log("zzzzzzzzzzzzzreInit");
       _this.isLogin();
     });
   },
@@ -283,30 +323,64 @@ var JIM = getApp().globalData.JIM;var _default =
         'password': password }).
       onSuccess(function (data) {
 
-
-
         JIM.onMsgReceive(function (data) {
+          console.log(JSON.stringify(data) + "===================================");
           for (var i = 0; i < data.messages.length; i++) {
+            var content = data.messages[i].content;
+            var latest_msg;
+            var username = data.messages[i].from_username;
+            var list = uni.getStorageSync(username);
+            if (content.msg_type != "text") {
+              JIM.getResource({
+                'media_id': content.msg_body.media_id }).
+              onSuccess(function (data) {
+                content.msg_body.media_id = data.url;
+                if (list) {
+                  list.push(content);
+                  uni.setStorageSync(username, list);
+                }
+              }).onFail(function (data) {
+                //data.code 返回码
+                //data.message 描述
+              });
+            }
             // 分类型进行判断
+            if (content.msg_type == "text") {
+              latest_msg = content.msg_body.text;
+            }
+            if (content.msg_type == "image") {
+              latest_msg = "[图片]";
+            }
+            if (content.msg_type == "file") {
+              var str = content.msg_body.media_id;
+              if (str.substring(str.length - 3) == "mp3") {
+                latest_msg = "[语音]";
+              }
+              if (str.substring(str.length - 3) == "mp4") {
+                latest_msg = "[短视频]";
+              }
+            }
+
             JIM.updateConversation({
-              'username': data.messages[i].content.from_id,
-              'extras': { 'istop': false, 'del': false, 'latest_msg': data.messages[i].content.msg_body.text } });
+              'username': username,
+              'extras': { 'latest_msg': latest_msg } });
 
           }
           data = JSON.stringify(data);
           console.log('msg_receive:' + data);
 
-          uni.$emit('get_msg', data.messages);
+          //获取会话列表
+          JIM.getConversation().onSuccess(function (data) {
+            console.log('success:Conversation33333333===========' + JSON.stringify(data));
+            _this.list = data.conversations.reverse();
+            uni.hideLoading();
+          }).onFail(function (data) {
+            console.log('error:' + JSON.stringify(data));
+          });
 
-          // //获取会话列表
-          // JIM.getConversation().onSuccess(function(data) {
-          // 	console.log('success:Conversation===========' + JSON.stringify(data));
-          // 	_this.list=data.conversations;
-          // 	console.log(_this.list)
-          // 	uni.hideLoading()
-          // }).onFail(function(data) {
-          // 	console.log('error:' + JSON.stringify(data));
-          // });
+          uni.$emit('get_msg', {});
+
+
         });
 
         JIM.onEventNotification(function (data) {
@@ -314,7 +388,70 @@ var JIM = getApp().globalData.JIM;var _default =
         });
 
         JIM.onSyncConversation(function (data) {//离线消息同步监听
-          console.log(data + "zzzzzzzzzzzzzzzzzzzz");
+          for (var i = 0; i < data.length; i++) {
+            var latest_msg;
+            var last_content = data[i].msgs[data[i].msgs.length - 1].content;
+            var username = data[i].from_username;
+            var list = uni.getStorageSync(username);
+
+            for (var j = 0; j < data[i].msgs.length; j++) {
+              var content = data[i].msgs[j].content;
+              if (content.msg_type != "text") {
+                JIM.getResource({
+                  'media_id': content.msg_body.media_id }).
+                onSuccess(function (data) {
+                  content.msg_body.media_id = data.url;
+                  if (list) {
+                    list.push(content);
+                    uni.setStorageSync(username, list);
+                  }
+                }).onFail(function (data) {
+                  //data.code 返回码
+                  //data.message 描述
+                });
+              }
+            }
+
+
+            // 分类型进行判断
+            if (last_content.msg_type == "text") {
+              latest_msg = last_content.msg_body.text;
+            }
+            if (last_content.msg_type == "image") {
+              latest_msg = "[图片]";
+            }
+            if (last_content.msg_type == "file") {
+              var str = content.msg_body.media_id;
+              if (str.substring(str.length - 3) == "mp3") {
+                latest_msg = "[语音]";
+              }
+              if (str.substring(str.length - 3) == "mp4") {
+                latest_msg = "[短视频]";
+              }
+            }
+
+            var updateconversationTimer = setTimeout(function () {
+              JIM.updateConversation({
+                'username': username,
+                'extras': { 'latest_msg': latest_msg } });
+
+              clearTimeout(updateconversationTimer);
+            }, 500);
+
+          }
+
+          var conversationTimer = setTimeout(function () {
+            //获取会话列表
+            JIM.getConversation().onSuccess(function (data) {
+              console.log('success:Conversation3333===========' + JSON.stringify(data));
+              _this.list = data.conversations.reverse();
+              uni.hideLoading();
+            }).onFail(function (data) {
+              console.log('error:' + JSON.stringify(data));
+            });
+            clearTimeout(conversationTimer);
+          }, 500);
+
         });
 
         JIM.onUserInfUpdate(function (data) {
@@ -349,7 +486,7 @@ var JIM = getApp().globalData.JIM;var _default =
         //获取会话列表
         JIM.getConversation().onSuccess(function (data) {
           console.log('success:Conversation===========' + JSON.stringify(data));
-          _this.list = data.conversations;
+          _this.list = data.conversations.reverse();
           uni.hideLoading();
         }).onFail(function (data) {
           console.log('error:' + JSON.stringify(data));
@@ -393,8 +530,9 @@ var JIM = getApp().globalData.JIM;var _default =
       this.propIndex = index;
       // 拿到当前对象
       var item = this.list[index];
+      var isTop = uni.getStorageSync(item.username + "isTop") || false;
       // 判断之前是否处于置顶状态
-      this.menus[0].name = item.extras.istop ? '取消置顶' : '设为置顶';
+      this.menus[0].name = isTop ? '取消置顶' : '设为置顶';
 
       this.$refs.extend.show(x, y);
     },
@@ -422,13 +560,45 @@ var JIM = getApp().globalData.JIM;var _default =
     // 置顶/取消置顶会话
     setTop: function setTop() {
       var item = this.list[this.propIndex];
-      item.extras.istop = !item.extras.istop;
-      JIM.updateConversation({
-        'username': item.username,
-        'extras': { 'istop': item.extras.istop } });
-
+      var isTop = uni.getStorageSync(item.username + "isTop") || false;
+      uni.setStorageSync(item.username + "isTop", !isTop);
+      //获取会话列表
+      JIM.getConversation().onSuccess(function (data) {
+        console.log('success:Conversation222222===========' + JSON.stringify(data));
+        _this.list = data.conversations.reverse();
+        uni.hideLoading();
+      }).onFail(function (data) {
+        console.log('error:' + JSON.stringify(data));
+      });
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+
+/***/ 303:
+/*!**************************************************************************************!*\
+  !*** E:/天赐/TianciWeb/pages/tabbar/index/index.nvue?vue&type=style&index=1&lang=css& ***!
+  \**************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _HBuilderX_plugins_uniapp_cli_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_6_oneOf_1_1_HBuilderX_plugins_uniapp_cli_node_modules_css_loader_index_js_ref_6_oneOf_1_2_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_stylePostLoader_js_HBuilderX_plugins_uniapp_cli_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_nvue_vue_type_style_index_1_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../HBuilderX/plugins/uniapp-cli/node_modules/mini-css-extract-plugin/dist/loader.js??ref--6-oneOf-1-0!../../../../../HBuilderX/plugins/uniapp-cli/node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--6-oneOf-1-1!../../../../../HBuilderX/plugins/uniapp-cli/node_modules/css-loader??ref--6-oneOf-1-2!../../../../../HBuilderX/plugins/uniapp-cli/node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../HBuilderX/plugins/uniapp-cli/node_modules/postcss-loader/src??ref--6-oneOf-1-3!../../../../../HBuilderX/plugins/uniapp-cli/node_modules/vue-loader/lib??vue-loader-options!../../../../../HBuilderX/plugins/uniapp-cli/node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-custom-block-loader??ref--0-1!../../../../../HBuilderX/plugins/uniapp-cli/node_modules/@dcloudio/webpack-uni-mp-loader/lib/style.js!./index.nvue?vue&type=style&index=1&lang=css& */ 304);
+/* harmony import */ var _HBuilderX_plugins_uniapp_cli_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_6_oneOf_1_1_HBuilderX_plugins_uniapp_cli_node_modules_css_loader_index_js_ref_6_oneOf_1_2_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_stylePostLoader_js_HBuilderX_plugins_uniapp_cli_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_nvue_vue_type_style_index_1_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_HBuilderX_plugins_uniapp_cli_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_6_oneOf_1_1_HBuilderX_plugins_uniapp_cli_node_modules_css_loader_index_js_ref_6_oneOf_1_2_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_stylePostLoader_js_HBuilderX_plugins_uniapp_cli_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_nvue_vue_type_style_index_1_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _HBuilderX_plugins_uniapp_cli_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_6_oneOf_1_1_HBuilderX_plugins_uniapp_cli_node_modules_css_loader_index_js_ref_6_oneOf_1_2_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_stylePostLoader_js_HBuilderX_plugins_uniapp_cli_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_nvue_vue_type_style_index_1_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _HBuilderX_plugins_uniapp_cli_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_6_oneOf_1_1_HBuilderX_plugins_uniapp_cli_node_modules_css_loader_index_js_ref_6_oneOf_1_2_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_stylePostLoader_js_HBuilderX_plugins_uniapp_cli_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_nvue_vue_type_style_index_1_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_HBuilderX_plugins_uniapp_cli_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_6_oneOf_1_1_HBuilderX_plugins_uniapp_cli_node_modules_css_loader_index_js_ref_6_oneOf_1_2_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_stylePostLoader_js_HBuilderX_plugins_uniapp_cli_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_nvue_vue_type_style_index_1_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ 304:
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/mini-css-extract-plugin/dist/loader.js??ref--6-oneOf-1-0!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--6-oneOf-1-1!./node_modules/css-loader??ref--6-oneOf-1-2!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-oneOf-1-3!./node_modules/vue-loader/lib??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-custom-block-loader??ref--0-1!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/style.js!E:/天赐/TianciWeb/pages/tabbar/index/index.nvue?vue&type=style&index=1&lang=css& ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
 
 /***/ }),
 

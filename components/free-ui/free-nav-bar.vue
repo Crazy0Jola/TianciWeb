@@ -69,7 +69,7 @@
 			},
 			bgColor:{
 				type:String,
-				default:"bg-light"
+				default:"bg-nav"
 			},
 			showRight:{
 				type:Boolean,

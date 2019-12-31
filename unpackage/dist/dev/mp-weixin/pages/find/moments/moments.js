@@ -183,7 +183,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var _indexPostData = _interopRequireDefault(__webpack_require__(/*! @/common/moments/index.post.data.js */ 141));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var chatInput = function chatInput() {return __webpack_require__.e(/*! import() | components/im-chat/chatinput */ "components/im-chat/chatinput").then(__webpack_require__.bind(null, /*! @/components/im-chat/chatinput.vue */ 239));}; //朋友圈数据
+var _indexPostData = _interopRequireDefault(__webpack_require__(/*! @/common/moments/index.post.data.js */ 141));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var chatInput = function chatInput() {return __webpack_require__.e(/*! import() | components/im-chat/chatinput */ "components/im-chat/chatinput").then(__webpack_require__.bind(null, /*! @/components/im-chat/chatinput.vue */ 245));}; //朋友圈数据
 var _default =
 {
   components: {
@@ -256,21 +256,23 @@ var _default =
   onReachBottom: function onReachBottom() {var _this3 = this; //监听上拉触底事件
     console.log('onReachBottom');
     this.showLoadMore = true;
-    setTimeout(function () {
+    var bottomTimer = setTimeout(function () {
       //获取数据
       if (_this3.posts.length < 20) {//测试数据
         _this3.posts = _this3.posts.concat(_this3.posts);
       } else {
         _this3.loadMoreText = "暂无更多";
       }
+      clearTimeout(bottomTimer);
     }, 1000);
   },
   onPullDownRefresh: function onPullDownRefresh() {//监听下拉刷新动作
     console.log('onPullDownRefresh');
     // 这里获取数据
-    setTimeout(function () {
+    var pullTimer = setTimeout(function () {
       //初始化数据
       uni.stopPullDownRefresh(); //停止下拉刷新
+      clearTimeout(pullTimer);
     }, 1000);
   },
   onNavigationBarButtonTap: function onNavigationBarButtonTap(e) {//监听标题栏点击事件

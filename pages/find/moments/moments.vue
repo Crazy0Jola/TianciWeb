@@ -132,21 +132,23 @@
 		onReachBottom() { //监听上拉触底事件
 			console.log('onReachBottom');
 			this.showLoadMore = true;
-			setTimeout(() => {
+			var bottomTimer=setTimeout(() => {
 				//获取数据
 				if (this.posts.length < 20){//测试数据
 					this.posts = this.posts.concat(this.posts);
 				}else{
 					this.loadMoreText = "暂无更多";
 				}
+				clearTimeout(bottomTimer)
 			}, 1000);
 		},
 		onPullDownRefresh() { //监听下拉刷新动作
 			console.log('onPullDownRefresh');
 			// 这里获取数据
-			setTimeout(function() {
+			var pullTimer = setTimeout(function() {
 				//初始化数据
 				uni.stopPullDownRefresh(); //停止下拉刷新
+				clearTimeout(pullTimer)
 			}, 1000);
 		},
 		onNavigationBarButtonTap(e) {//监听标题栏点击事件

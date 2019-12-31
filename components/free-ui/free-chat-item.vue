@@ -21,31 +21,37 @@
 				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-left-icon">&#xe601;</text>
 			</template>
 			
-			<div class="p-2 rounded" :class="labelClass" style="max-width:500rpx;" :style="labelStyle">
+			<div class=" rounded" :class="labelClass" style="max-width:500rpx;" :style="labelStyle">
+				<!-- 表情包  -->
+				<free-image  v-if="item.msg_body.extras.isEmotion" :src="item.msg_body.extras.emotion" @click="preview(item.msg_body.extras.emotion)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
+
 				<!-- 文字 -->
-				<text v-if="item.msg_type === 'text'" class="font-md">{{item.msg_body.text}}</text>
-				<!-- 表情包 | 图片-->
-				<free-image  v-else-if="item.msg_type === 'emoticon' || item.msg_type === 'image'" :src="getImg" @click="preview(url)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
 				
+				<text v-else-if="item.msg_type === 'text'" class="font-md">{{item.msg_body.text}}</text>
+				<!--  图片-->			
+				<free-image  v-else-if="item.msg_type === 'image'&&item.my" :src="item.data" @click="preview(item.data)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
+				
+				<free-image  v-else-if="item.msg_type === 'image'" :src="item.msg_body.media_id" @click="preview(item.msg_body.media_id)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
+
 				<!-- 音频 -->
-				<view v-else-if="item.msg_type === 'audio'" 
+				<view v-else-if="item.msg_body.extras.isAudio" 
 				class="flex align-center"
 				@click="openAudio">
 					<image v-if="!isother" :src=" !audioPlaying ? '/static/audio/audio3.png' : '/static/audio/play.gif'" 
 					style="width: 50rpx;height: 50rpx;" 
 					class="mx-1"></image>
-					<text class="font">{{item.options.time + '"'}}</text>
+					<text class="font">{{item.msg_body.extras.time + '"'}}</text>
 					<image v-if="isother" :src=" !audioPlaying ? '/static/audio/audio3.png' : '/static/audio/play.gif'"
 					style="width: 50rpx;height: 50rpx;" 
 					class="mx-1"></image>
 				</view>
 				
 				<!-- 视频 -->
-				<view v-else-if="item.msg_type === 'video'"
+				<view v-else-if="this.item.msg_body.extras.isVideo"
 				class="position-relative rounded"
 				@click="openVideo">
-					<free-image :src="item.options.poster" imageClass="rounded" :maxWidth="300" :maxHeight="350" @load="loadPoster"></free-image>
-					<text class="iconfont text-white position-absolute" style="font-size: 80rpx;width: 80rpx;height: 80rpx;" :style="posterIconStyle">&#xe737;</text>
+					<free-image src="" imageClass="rounded" :maxWidth="300" :maxHeight="350" @load="loadPoster"></free-image>
+					<text class="iconfont text-white position-absolute" style="font-size: 80rpx;width: 80rpx;height: 80rpx;" :style="posterIconStyle">&#xe61d;</text>
 				</view>
 				
 			</div>
@@ -92,7 +98,7 @@
 					w:100,
 					h:100
 				},
-				url:"/static/images/noImg.jpg"
+				
 			}
 		},
 		computed: {
@@ -107,16 +113,23 @@
 			},
 			// 是否需要气泡样式
 			hasLabelClass(){
-				return this.item.msg_type === 'text' || this.item.msg_type === 'audio'
-			},
+				if(this.item.msg_body.extras.isEmotion||this.item.msg_type=="image"||this.item.msg_body.extras.isVideo){
+					return false;
+				}else{
+					return true;
+				}
+			}, 
 			// 气泡的样式
 			labelClass(){
-				let label = this.hasLabelClass ? 'bg-chat-item mr-3' : 'mr-3'
-				return this.isother ? 'bg-white ml-3' : label
+				if(this.hasLabelClass){
+					return this.isother ? 'p-2 bg-white ml-3' : 'p-2 bg-chat-item mr-3';
+				}else{
+					return this.isother ? 'ml-3' : 'mr-3';
+				}
 			},
 			labelStyle(){
-				if (this.item.msg_type === 'audio') {
-					let time = this.item.options.time || 0
+				if (this.item.msg_body.extras.isAudio) {
+					let time = this.item.msg_body.extras.time || 0
 					let width = parseInt(time) / (60/500)
 					width = width < 150 ? 150 : width
 					return `width:${width}rpx;`
@@ -128,26 +141,17 @@
 				let h = this.poster.h/2- uni.upx2px(80)/2
 				return `left:${w}px;top:${h}px;`
 			},
-			//获取图片
-			getImg(){
-				_this = this;
-				JIM.getResource({'media_id' :this.item.msg_body.media_id}).onSuccess(function(data){
-					  _this.url=data.url;
-					  console.log('success:' + JSON.stringify(data));
-				 }).onFail(function(data){
-					   console.log('error:' + JSON.stringify(data));
-				 });
-				 return _this.url;
-			},
+			
 		},
 		mounted() {
 			// 注册全局事件
-			if (this.item.msg_type === 'audio') {
+
+			if (this.item.msg_body.extras.isAudio) {
 				this.audioOn(this.onPlayAudio)
 			}
 			// 监听是否撤回消息
 			// #ifdef APP-PLUS-NVUE
-			this.$watch('item.isremove',(newVal,oldVal)=>{
+			this.$watch('item.msg_body.extras.isremove',(newVal,oldVal)=>{
 				if (newVal) {
 					const animation = weex.requireModule('animation')
 					this.$nextTick(()=>{
@@ -167,7 +171,8 @@
 		},
 		// 组件销毁
 		destroyed() {
-			if (this.item.msg_type === 'audio') {
+
+			if (this.item.msg_body.extras.isAudio) {
 				this.audioOff(this.onPlayAudio)
 			}
 			// 销毁音频
@@ -197,7 +202,11 @@
 				this.audioEmit(this.index)
 				if (!this.innerAudioContext) {
 					this.innerAudioContext = uni.createInnerAudioContext();
-					this.innerAudioContext.src = this.item.data
+					if(this.item.my){
+						this.innerAudioContext.src = this.item.data;
+					}else{
+						this.innerAudioContext.src = this.item.msg_body.media_id;
+					}
 					this.innerAudioContext.play()
 					// 监听播放
 					this.innerAudioContext.onPlay(()=>{
@@ -246,9 +255,17 @@
 			},
 			// 打开视频
 			openVideo(){
-				uni.navigateTo({
-					url: '/pages/chat/video/video?url='+this.item.data,
-				});
+				if(this.item.my){
+					uni.navigateTo({
+						url: '/pages/chat/video/video?url='+this.item.data,
+					});
+				}else{
+					console.log(this.item.msg_body.media_id)
+					uni.navigateTo({
+						url: '/pages/chat/video/video?url='+this.item.msg_body.media_id,
+					});
+				}
+				
 			}
 		}
 	}

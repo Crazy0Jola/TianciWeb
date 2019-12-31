@@ -44,7 +44,7 @@
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
 			    'fontFamily': "iconfont",
-			    'src': "url('https://at.alicdn.com/t/font_1587665_jt2cfj0o0hp.ttf')"
+			    'src': "url('https://at.alicdn.com/t/font_1587665_7eqr0fco5qs.ttf')"
 			});
 			// 初始化录音管理器
 			this.$store.commit('initRECORD')
@@ -79,7 +79,7 @@
 			
 		},
 		onShow: function() {
-			JIM.onDisconnect(function(){
+			if(!JIM.isInit()){
 				var appkey='09970876f33e884a3624335c';
 				var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
 				var timestamp=(new Date()).getTime();
@@ -94,9 +94,7 @@
 						timestamp:timestamp
 					},
 					success(res) {
-						console.log(res)
 						signature = res.data.result;
-						console.log(signature)
 						JIM.init({
 								  "appkey"    : appkey,
 								  "random_str": random_str,
@@ -105,13 +103,15 @@
 								  "flag":1
 						}).onSuccess(function(data) {
 							console.log('Init-success:' + JSON.stringify(data));	
-							uni.$emit("JIMinit",{})
+							uni.$emit("reInit",{})
+							uni.hideLoading()
 						}).onFail(function(data) {
 						    console.log('Init-error:' + JSON.stringify(data))		    
 						});
 					}
 				})
-			});			
+			}	
+				
 			console.log('App Show')
 		},
 		onHide: function() {

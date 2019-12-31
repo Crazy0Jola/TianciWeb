@@ -69,7 +69,7 @@
 				} catch (e) {
 					// error
 				}
-				uni.reLaunch({
+				uni.navigateTo({
 					url:"../../login/login"
 				})
 			},

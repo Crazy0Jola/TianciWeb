@@ -18,7 +18,8 @@
     "pages/find/publish/publish",
     "pages/login/login",
     "pages/login/forget",
-    "pages/login/register"
+    "pages/login/register",
+    "pages/webview/webview"
   ],
   "subPackages": [],
   "window": {
@@ -60,5 +61,5 @@
     ]
   },
   "usingComponents": {},
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap15.json"
 }

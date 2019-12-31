@@ -185,7 +185,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
-var _this;var wInput = function wInput() {return __webpack_require__.e(/*! import() | components/watch-login/watch-input */ "components/watch-login/watch-input").then(__webpack_require__.bind(null, /*! ../../components/watch-login/watch-input.vue */ 246));};var wButton = function wButton() {return __webpack_require__.e(/*! import() | components/watch-login/watch-button */ "components/watch-login/watch-button").then(__webpack_require__.bind(null, /*! ../../components/watch-login/watch-button.vue */ 253));};
+var _this;var wInput = function wInput() {return __webpack_require__.e(/*! import() | components/watch-login/watch-input */ "components/watch-login/watch-input").then(__webpack_require__.bind(null, /*! ../../components/watch-login/watch-input.vue */ 252));};var wButton = function wButton() {return __webpack_require__.e(/*! import() | components/watch-login/watch-button */ "components/watch-login/watch-button").then(__webpack_require__.bind(null, /*! ../../components/watch-login/watch-button.vue */ 259));};
 
 //button
 var JIM = getApp().globalData.JIM;var _default =

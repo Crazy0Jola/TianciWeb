@@ -3,9 +3,17 @@
 		
 		
 		<!-- 导航栏 -->
-		<free-nav-bar title="仿微信" :noreadnum="1">
+		<free-nav-bar title="国政通" :noreadnum="1">
 		</free-nav-bar>
 		
+		<view class="noConversation" v-if="list.length==0">
+			<view>
+				<text class="iconfont text-gray text-center" style="font-size: 200rpx;">&#xe662;</text>
+			</view>
+			<view>
+				<text class=" font-md text-gray text-center">暂无会话</text>
+			</view>
+		</view>
 		
 		<!-- 置顶列表 -->
 		<block v-for="(item,index) in list" :key="index">
@@ -44,10 +52,8 @@
 	
 	import freePopup from "@/components/free-ui/free-popup.vue"
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
-	
 	var _this;
 	var JIM=getApp().globalData.JIM;
-	
 	export default {
 		components:{
 			freeNavBar,
@@ -71,7 +77,20 @@
 			}
 		},
 		onLoad() {
-		
+			uni.$on("get_index_msg",function(){
+				//获取会话列表
+				JIM.getConversation().onSuccess(function(data) {
+					console.log('success:Conversation222222===========' + JSON.stringify(data));
+					_this.list=data.conversations.reverse();
+				}).onFail(function(data) {
+					console.log('error:' + JSON.stringify(data));
+				});
+			})
+		},
+		onUnload(){
+			uni.$off("get_index_msg")
+			uni.$off("JIMinit")
+			uni.$off("reInit")
 		},
 		onShow() {
 			_this= this;
@@ -79,13 +98,11 @@
 				// uni.showLoading({
 				// 	title:"读取消息列表中..."
 				// })
+				
 				//获取会话列表
 				JIM.getConversation().onSuccess(function(data) {
 					console.log('success:Conversation222222===========' + JSON.stringify(data));
-					_this.list=[];
-					for(var i=data.conversations.length-1;i>=0;i--){
-						_this.list.push(data.conversations[i])
-					}
+					_this.list=data.conversations.reverse();
 					uni.hideLoading()
 				}).onFail(function(data) {
 					console.log('error:' + JSON.stringify(data));
@@ -97,7 +114,41 @@
 				if (value) {
 					//有登录信息
 					console.log("已登录用户：",value);	
-					_this.login(value.username,value.password)					
+					if(JIM.isInit()){
+						_this.login(value.username,value.password)			
+					}else{
+						var appkey='09970876f33e884a3624335c';
+						var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
+						var timestamp=(new Date()).getTime();
+						var signature;
+						uni.request({
+							url: 'http://117.83.152.39:8081/interconnect/appUser/getJMKey',
+							header: {
+								"token": 'e463192ddfad487682638189f64020b9',
+								"Content-Type":"application/json"
+							},
+							data:{
+								timestamp:timestamp
+							},
+							success(res) {
+								console.log(res)
+								signature = res.data.result;
+								console.log(signature)
+								JIM.init({
+										  "appkey"    : appkey,
+										  "random_str": random_str,
+										  "signature" : signature,
+										  "timestamp" : timestamp,
+										  "flag":1
+								}).onSuccess(function(data) {
+									console.log('Init-success:' + JSON.stringify(data));	
+									_this.login(value.username,value.password)	
+								}).onFail(function(data) {
+								    console.log('Init-error:' + JSON.stringify(data))		    
+								});
+							}
+						})
+					}		
 				}
 			}
 		},
@@ -146,38 +197,66 @@
 							var content = data.messages[i].content;
 							var latest_msg;
 							var username = data.messages[i].from_username;
+							var list = uni.getStorageSync(username);	
+							
 							// 分类型进行判断
 							if(content.msg_type=="text"){
 								latest_msg = content.msg_body.text;
 							}
+							if(content.msg_type=="image"){
+								latest_msg = "[图片]"
+							}
+							if(content.msg_type=="file"){
+								if(content.msg_body.extras.isAudio){
+									latest_msg = "[语音]"
+								}
+								if(content.msg_body.extras.isVideo){
+									latest_msg = "[短视频]"
+								}
+							}
+							
+							if(content.msg_type=="text"){
+								if(list){
+									list.push(content);
+									uni.setStorageSync(username,list);	
+								}
+								
+							}else{
+								JIM.getResource({
+									'media_id' : content.msg_body.media_id,
+								}).onSuccess(function(data) {
+									content.msg_body.media_id=data.url;
+									if(list){
+										list.push(content);
+										uni.setStorageSync(username,list);	
+									}
+								}).onFail(function(data) {
+									//data.code 返回码
+									//data.message 描述
+								});	
+							}
+							
 							JIM.updateConversation({
 							   'username' : username,
 							   'extras' : {'latest_msg':latest_msg}
 							});
-							var list = uni.getStorageSync(username);
-							if(list){
-								list.push(content);
-								uni.setStorageSync(username,list);	
-							}
+						
 						}
-				        data = JSON.stringify(data);						
-				        console.log('msg_receive:' + data);		
+								
+				        console.log('msg_receive:' + JSON.stringify(data));		
 			
 						//获取会话列表
 						JIM.getConversation().onSuccess(function(data) {
 							console.log('success:Conversation33333333===========' + JSON.stringify(data));
-							_this.list=[];
-							for(var i=data.conversations.length-1;i>=0;i--){
-								_this.list.push(data.conversations[i])
-							}
+							_this.list=data.conversations.reverse()
 							uni.hideLoading()
 						}).onFail(function(data) {
 							console.log('error:' + JSON.stringify(data));
 						});	
 			
-						uni.$emit('get_msg',{})
+						uni.$emit('get_index_msg',{})
 						
-						
+						uni.$emit('get_chat_msg',{})
 				    });
 					
 				    JIM.onEventNotification(function(data) {
@@ -189,31 +268,61 @@
 				        	var latest_msg;
 				        	var last_content= data[i].msgs[data[i].msgs.length-1].content;
 				        	var username = data[i].from_username
-				        	// 分类型进行判断
-				        	if(last_content.msg_type=="text"){
-				        		latest_msg = last_content.msg_body.text;
-				        	}
-				        	JIM.updateConversation({
-				        	   'username' : username,
-				        	   'extras' : {'latest_msg':latest_msg}
-				        	});
-				        	var list = uni.getStorageSync(username);
-							if(list){
-								for(var j=0;j<data[i].msgs.length;j++){
-									list.push(data[i].msgs[j].content);
+							var list = uni.getStorageSync(username);
+							
+							for(var j=0;j<data[i].msgs.length;j++){
+								var content = data[i].msgs[j].content;
+								
+								if(content.msg_type=="text"){
+									if(list){
+										list.push(content);
+										uni.setStorageSync(username,list);	
+									}
+								}else{
+									JIM.getResource({
+										'media_id' : content.msg_body.media_id,
+									}).onSuccess(function(data) {
+										content.msg_body.media_id=data.url;
+										if(list){
+											list.push(content);
+											uni.setStorageSync(username,list);	
+										}
+									}).onFail(function(data) {
+										//data.code 返回码
+										//data.message 描述
+									});
 								}
-								uni.setStorageSync(username,list);	
+							}	
+							
+							
+							// 分类型进行判断
+							if(last_content.msg_type=="text"){
+								latest_msg = last_content.msg_body.text;
 							}
+							if(last_content.msg_type=="image"){
+								latest_msg = "[图片]"
+							}
+							if(last_content.msg_type=="file"){
+								if(content.msg_body.extras.isAudio){
+									latest_msg = "[语音]"
+								}
+								if(content.msg_body.extras.isVideo){
+									latest_msg = "[短视频]"
+								}
+							}
+
+							JIM.updateConversation({
+							 'username' : username,
+							 'extras' : {'latest_msg':latest_msg}
+							});	 
+							 	
 				        }
 						
 						var conversationTimer = setTimeout(()=>{
 							//获取会话列表
 							JIM.getConversation().onSuccess(function(data) {
 								console.log('success:Conversation3333===========' + JSON.stringify(data));
-								_this.list=[];
-								for(var i=data.conversations.length-1;i>=0;i--){
-									_this.list.push(data.conversations[i])
-								}
+								_this.list=data.conversations.reverse();
 								uni.hideLoading()
 							}).onFail(function(data) {
 								console.log('error:' + JSON.stringify(data));
@@ -255,10 +364,7 @@
 					//获取会话列表
 					JIM.getConversation().onSuccess(function(data) {
 						console.log('success:Conversation===========' + JSON.stringify(data));
-						_this.list=[];
-						for(var i=data.conversations.length-1;i>=0;i--){
-							_this.list.push(data.conversations[i])
-						}
+						_this.list=data.conversations.reverse();
 						uni.hideLoading()
 					}).onFail(function(data) {
 						console.log('error:' + JSON.stringify(data));
@@ -337,10 +443,7 @@
 				//获取会话列表
 				JIM.getConversation().onSuccess(function(data) {
 					console.log('success:Conversation222222===========' + JSON.stringify(data));
-					_this.list=[];
-					for(var i=data.conversations.length-1;i>=0;i--){
-						_this.list.push(data.conversations[i])
-					}
+					_this.list=data.conversations.reverse();
 					uni.hideLoading()
 				}).onFail(function(data) {
 					console.log('error:' + JSON.stringify(data));
@@ -351,5 +454,9 @@
 </script>
 
 <style>
-	
+	.noConversation{
+		width: 750rpx;
+		height: 500rpx;
+		margin-top: 100rpx;
+	}
 </style>

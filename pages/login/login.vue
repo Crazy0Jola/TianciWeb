@@ -76,29 +76,65 @@
 				}).onSuccess(function(data) {						
 				    console.log('success:' + JSON.stringify(data));		   
 				    JIM.onMsgReceive(function(data) {
-				        console.log('msg_receive:' + JSON.stringify(data));
-						for(var i=0;i<data.messages.length;i++){
-							var content = data.messages[i].content;
-							var latest_msg;
-							var username = data.messages[i].from_username;
-							// 分类型进行判断
-							if(content.msg_type=="text"){
-								latest_msg = content.msg_body.text;
-							}
-							JIM.updateConversation({
-							   'username' : username,
-							   'extras' : {'del':false,'latest_msg':latest_msg}
-							});
-							var list = uni.getStorageSync(username);
-							if(list){
-								list.push(content);
-								uni.setStorageSync(username,list);
-							}
-						}
-						data = JSON.stringify(data);						
-						console.log('msg_receive:' + data);		
+				    	console.log(JSON.stringify(data)+"===================================")
+				    	for(var i=0;i<data.messages.length;i++){
+				    		var content = data.messages[i].content;
+				    		var latest_msg;
+				    		var username = data.messages[i].from_username;
+				    		var list = uni.getStorageSync(username);	
+				    		
+				    		// 分类型进行判断
+				    		if(content.msg_type=="text"){
+				    			latest_msg = content.msg_body.text;
+				    		}
+				    		if(content.msg_type=="image"){
+				    			latest_msg = "[图片]"
+				    		}
+				    		if(content.msg_type=="file"){
+				    			if(content.msg_body.extras.isAudio){
+				    				latest_msg = "[语音]"
+				    			}
+				    			if(content.msg_body.extras.isVideo){
+				    				latest_msg = "[短视频]"
+				    			}
+				    		}
+				    		
+				    		if(content.msg_type=="text"){
+				    			if(list){
+				    				list.push(content);
+				    				uni.setStorageSync(username,list);	
+				    			}
+				    			
+				    			JIM.updateConversation({
+				    			   'username' : username,
+				    			   'extras' : {'latest_msg':latest_msg}
+				    			});
+				    		}else{
+				    			JIM.getResource({
+				    				'media_id' : content.msg_body.media_id,
+				    			}).onSuccess(function(data) {
+				    				content.msg_body.media_id=data.url;
+				    				if(list){
+				    					list.push(content);
+				    					uni.setStorageSync(username,list);	
+				    				}
+				    			}).onFail(function(data) {
+				    				//data.code 返回码
+				    				//data.message 描述
+				    			});
+				    			
+				    			
+				    			
+				    			JIM.updateConversation({
+				    			   'username' : username,
+				    			   'extras' : {'latest_msg':latest_msg}
+				    			});
+				    		}
+				    	
+				    	}				
 										
-						uni.$emit('get_msg',{})
+						uni.$emit('get_index_msg',{})
+						uni.$emit('get_chat_msg',{})
 				    });
 					
 				    JIM.onEventNotification(function(data) {
@@ -111,21 +147,53 @@
 							var latest_msg;
 							var last_content= data[i].msgs[data[i].msgs.length-1].content;
 							var username = data[i].from_username
+							
 							// 分类型进行判断
 							if(last_content.msg_type=="text"){
 								latest_msg = last_content.msg_body.text;
 							}
-							JIM.updateConversation({
-							   'username' : username,
-							   'extras' : {'del':false,'latest_msg':latest_msg}
-							});
-							var list = uni.getStorageSync(username);
-							for(var j=0;j<data[i].msgs.length;j++){
-								list.push(data[i].msgs[j].content);
+							if(last_content.msg_type=="image"){
+								latest_msg = "[图片]"
 							}
-							uni.setStorageSync(username,list);
+							if(last_content.msg_type=="file"){
+								if(last_content.msg_body.extras.isAudio){
+									latest_msg = "[语音]"
+								}
+								if(last_content.msg_body.extras.isVideo){
+									latest_msg = "[短视频]"
+								}
+							}
 							
+							var list = uni.getStorageSync(username);
 							
+							for(var j=0;j<data[i].msgs.length;j++){
+								var content = data[i].msgs[j].content;
+								if(content.msg_type=="text"){
+									if(list){
+										list.push(content);
+										uni.setStorageSync(username,list);	
+									}
+								}else{
+									JIM.getResource({
+										'media_id' : content.msg_body.media_id,
+									}).onSuccess(function(data) {
+										content.msg_body.media_id=data.url;
+										if(list){
+											list.push(content);
+											uni.setStorageSync(username,list);	
+										}
+									}).onFail(function(data) {
+										//data.code 返回码
+										//data.message 描述
+									});
+								}
+							}	
+				
+							JIM.updateConversation({
+							 'username' : username,
+							 'extras' : {'latest_msg':latest_msg}
+							});	 
+	
 						}
 						
 				    });
@@ -172,7 +240,6 @@
 					_this.isRotate=false;
 					uni.showToast({
 						icon: 'success',
-						position: 'bottom',
 						title: '登录成功!'
 					});
 					uni.switchTab({

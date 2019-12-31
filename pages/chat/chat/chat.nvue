@@ -113,10 +113,8 @@
 	
 	
 	import { mapState,mapMutations } from 'vuex'
-
 	var _this;
 	var JIM = getApp().globalData.JIM;
-	
 	export default {
 		components: {
 			freeNavBar,
@@ -129,11 +127,12 @@
 			return {
 				// 模式 text输入文字，emoticon表情，action操作，audio音频
 				mode:"text",
+				tempurl:"",
 				username:"",
 				nickname:"",
-				avator:"/static/images/userpic.png",
+				avator:"/static/images/userpic.jpg",
 				myUsername:"",
-				myAvator:"/static/images/userpic.png",
+				myAvator:"/static/images/userpic.jpg",
 				// 扩展菜单列表
 				actionList:[
 					[{
@@ -169,16 +168,7 @@
 					name:"复制",
 					event:'',
 				},{ 
-					name:"发送给朋友",
-					event:''
-				},{ 
-					name:"收藏",
-					event:''
-				},{ 
 					name:"删除",
-					event:''
-				},{ 
-					name:"多选",
 					event:''
 				},{ 
 					name:"撤回",
@@ -186,83 +176,6 @@
 				}],
 				navBarHeight:0,
 				list:[],
-					// {
-				// 	avatar:"/static/images/demo/demo6.jpg",
-				// 	user_id:1,
-				// 	nickname:"昵称",
-				// 	type:"text",// image,audio,video
-				// 	data:"你好你好你好你好你好你好你好你好你好你好你好你好你好你好",
-				// 	create_time:1569331227,
-				// 	isremove:false
-				// },{
-				// 	avatar:"/static/images/demo/demo6.jpg",
-				// 	user_id:2,
-				// 	nickname:"昵称",
-				// 	type:"text",// image,audio,video
-				// 	data:"123456你好你好你好你好",
-				// 	create_time:1569331267,
-				// 	isremove:false
-				// },{
-				// 	avatar:"/static/images/demo/demo6.jpg",
-				// 	user_id:1,
-				// 	nickname:"昵称",
-				// 	type:"text",// image,audio,video
-				// 	data:"你好你好你好你好你好你好你好你好你好你好你好你好你好你好",
-				// 	create_time:1569331287,
-				// 	isremove:false
-				// },{
-				// 	avatar:"/static/images/demo/demo6.jpg",
-				// 	user_id:2,
-				// 	nickname:"昵称",
-				// 	type:"text",// image,audio,video
-				// 	data:"123456你好你好你好你好",
-				// 	create_time:1569331327,
-				// 	isremove:false
-				// },{
-				// 	avatar:"/static/images/demo/demo6.jpg",
-				// 	user_id:1,
-				// 	nickname:"昵称",
-				// 	type:"audio",// image,audio,video
-				// 	data:"/static/audio/1.mp3",
-				// 	options:{
-				// 		time:60
-				// 	},
-				// 	create_time:1569331327,
-				// 	isremove:false
-				// },{
-				// 	avatar:"/static/images/demo/demo6.jpg",
-				// 	user_id:1,
-				// 	nickname:"昵称",
-				// 	type:"audio",// image,audio,video
-				// 	data:"/static/audio/2.mp3",
-				// 	options:{
-				// 		time:20
-				// 	},
-				// 	create_time:1569331327,
-				// 	isremove:false
-				// },{
-				// 	avatar:"/static/images/demo/demo6.jpg",
-				// 	user_id:2,
-				// 	nickname:"昵称",
-				// 	type:"audio",// image,audio,video
-				// 	data:"/static/audio/3.mp3",
-				// 	options:{
-				// 		time:10
-				// 	},
-				// 	create_time:1569331327,
-				// 	isremove:false
-				// },{
-				// 	avatar:"/static/images/demo/demo6.jpg",
-				// 	user_id:1,
-				// 	nickname:"昵称",
-				// 	type:"video",// image,audio,video
-				// 	data:"/static/video/demo.mp4",
-				// 	options:{
-				// 		poster:"/static/video/demo.jpg"
-				// 	},
-				// 	create_time:1569331327,
-				// 	isremove:false
-				// }
 				// 当前操作的气泡索引
 				propIndex:-1,
 				// 输入文字
@@ -276,13 +189,7 @@
 			}
 		},
 		onLoad:function(e){
-			_this=this;
-			_this.username = e.username;
-			_this.nickname = e.nickname;
-			_this.myUsername = uni.getStorageSync('setUserData').username;
-		},
-		onShow(){
-			uni.$on("get_msg",function(){
+			uni.$on("get_chat_msg",function(){
 				var msg = uni.getStorageSync(_this.username);
 				_this.list=msg;
 				var pageToBottomTimer = setTimeout(()=>{
@@ -290,36 +197,124 @@
 					clearTimeout(pageToBottomTimer)
 				},200)
 			})
+			var pageToBottomTimer = setTimeout(()=>{
+				_this.pageToBottom()
+				clearTimeout(pageToBottomTimer)
+			},500)
+			_this=this;
+			_this.username = e.username;
+			_this.nickname = e.nickname;
+			_this.myUsername = uni.getStorageSync('setUserData').username;
+		},
+		onUnload(){
+			uni.$off("get_chat_msg")
+		},
+		onShow(){						
+			// var imagepath=_this.image_cache("https://img.jiguang.cn/im-portal/0.0.1/assets/img/jverify-flow-banner-new.png","a");
+			// var p = plus.io.convertLocalFileSystemURL(imagepath);  
+			// console.log(p)
 			var msg = uni.getStorageSync(_this.username);
 			JIM.resetUnreadCount({
 				'username' : _this.username
 			});
 			if(msg){
 				_this.list=msg;
-				var pageToBottomTimer = setTimeout(()=>{
-					_this.pageToBottom()
-					clearTimeout(pageToBottomTimer)
-				},500)
+				console.log(JSON.stringify(msg))
+				// var pageToBottomTimer = setTimeout(()=>{
+				// 	_this.pageToBottom()
+				// 	clearTimeout(pageToBottomTimer)
+				// },500)
 			}else{
+				var now = new Date()
+				var past = new Date(new Date()-86400000*7)
+				
+				var now_year = now.getFullYear();
+				var now_month = now.getMonth()+1;
+				var now_day = now.getDate();
+				var now_hour = now.getHours();
+				var now_minutes = now.getMinutes();
+				var now_seconds = now.getSeconds();
+				
+				if(now_month<10){
+					now_month="0"+now_month;
+				}
+				if(now_day<10){
+					now_day="0"+now_day;
+				}
+				if(now_hour<10){
+					now_hour="0"+now_hour;
+				}
+				if(now_minutes<10){
+					now_minutes="0"+now_minutes;
+				}
+				if(now_seconds<10){
+					now_seconds="0"+now_seconds;
+				}
+				var now_date = now_year+"-"+now_month+"-"+now_day+"%20"+now_hour+":"+now_minutes+":"+now_seconds
+				
+				var past_yaer = past.getFullYear();
+				var past_month = past.getMonth()+1;
+				var past_day = past.getDate();
+				var past_hour = past.getHours();
+				var past_minutes = past.getMinutes();
+				var past_seconds = past.getSeconds();
+				if(past_month<10){
+					past_month="0"+past_month;
+				}
+				if(past_day<10){
+					past_day="0"+past_day;
+				}
+				if(past_hour<10){
+					past_hour="0"+past_hour;
+				}
+				if(past_minutes<10){
+					past_minutes="0"+past_minutes;
+				}
+				if(past_seconds<10){
+					past_seconds="0"+past_seconds;
+				}
+				var past_date = past_yaer+"-"+past_month+"-"+past_day+"%20"+past_hour+":"+past_minutes+":"+past_seconds
+				
 				uni.showLoading({
 					"title":"正在获取聊天记录..."
 				})
 				uni.request({
 					url: 'https://report.im.jpush.cn/v2/users/' + _this.username +
-						'/messages?count=1000&begin_time=2019-12-25%2023:59:59&end_time=2019-12-29%2023:59:59',
+						'/messages?count=1000&begin_time='+past_date+'&end_time='+now_date,
 					header: {
 						"Authorization": 'Basic MDk5NzA4NzZmMzNlODg0YTM2MjQzMzVjOmU4ZTg3M2U2MDI0NTMxNWE3MGVkZTRiMg=='
 					},
 					success(res) {
-						console.log(res.data)
 						var msg = res.data.messages
-						_this.list=msg;
+						// msg.forEach(function(item){
+						// 	if(item.msg_type=="image"){
+						// 		JIM.getResource({'media_id' :item.msg_body.media_id}).onSuccess(function(data){
+						// 			item.msg_body.media_id = data.url;
+						// 			console.log('success:' + JSON.stringify(data));
+						// 		}).onFail(function(data){
+						// 			console.log('error:' + JSON.stringify(data));
+						// 		});
+						// 	}	
+						// })
+						
+						
+						
+						_this.$data.list=msg;
+						
+						
+						_this.$data.list.map(function(elem,index){
+						    if(elem.msg_type!="text"){
+						    	_this.setPic(elem.msg_body.media_id,index);
+						    }
+						})
+		
 						var pageToBottomTimer = setTimeout(()=>{
 							_this.pageToBottom()
 							clearTimeout(pageToBottomTimer)
 						},200)
-						uni.hideLoading()
-						uni.setStorageSync(_this.username,msg);
+						
+						uni.hideLoading()					
+												
 					}
 				})
 			}
@@ -402,7 +397,6 @@
 			},
 			// 聊天区域bottom
 			chatBodyBottom(){
-				console.log(this.KeyboardHeight)
 				return `bottom:${uni.upx2px(105) + this.KeyboardHeight}px;top:${this.navBarHeight}px;`
 			},
 			// 获取操作或者表情列表
@@ -457,6 +451,44 @@
 				}
 				this.emoticonList = arr
 			},
+			//图片缓存
+			image_cache(image_url,media_id) {	
+				var url;
+				uni.getStorage({
+					key: media_id,
+					success:function(res){
+						url = res.data.tempFilePath;	
+					},
+					fail:function(res){
+						// 本地没有缓存 需要下载 
+						uni.downloadFile({
+							url: image_url,
+							success: (res) => {
+								if (res.statusCode === 200) {	
+									url = res.tempFilePath;
+									uni.setStorage({
+										key:media_id,
+										data:res,
+										success:function(res){
+											
+										}
+									})
+								}
+							}
+						}); 
+					}
+				})
+				return url;
+			},
+			setPic(media_id,index){
+				JIM.getResource({'media_id' :media_id}).onSuccess(function(data){
+					_this.$data.list[index].msg_body.media_id=data.url;
+					uni.setStorageSync(_this.username,_this.$data.list);
+				}).onFail(function(data){
+					console.log('error:' + JSON.stringify(data));
+					reject(data);
+				});		
+			},
 			// 打开扩展菜单或者表情包
 			openActionOrEmoticon(mode = 'action'){
 				this.mode = mode
@@ -464,20 +496,22 @@
 				
 				uni.hideKeyboard()
 				this.KeyboardHeight = uni.upx2px(580)
-				console.log(this.KeyboardHeight)
 			},
 			// 发送
 			send(type, data = '',options = {}){
 				var _that = this;
 				var text = this.text
+				var latest_msg;
+				console.log(type+"====="+data)
 				switch (type){
 					case 'text':
+					latest_msg = text;
 					JIM.sendSingleMsg({
 						'target_username' : _this.username,
 						'content' : text,
-						'extras' : {
-							"isremove":false			
-						}
+						"extras": {
+							'isremove':false
+						},
 					}).onSuccess(function(data) {
 						var obj = {
 							"from_id": _this.myUsername,
@@ -486,7 +520,7 @@
 							"target_id": _this.username,
 							"msg_id":data.msg_id,
 							"msg_body":{
-								"extras": {isremove:false},
+								"extras": {'isremove':false},
 								"text": text
 							}
 						}
@@ -502,28 +536,240 @@
 							clearTimeout(pageToBottomTimer)
 						},200)
 						
+						JIM.updateConversation({
+						   'username' : _this.username,
+						   'extras' : {'latest_msg':latest_msg}
+						});
+						
 						uni.setStorageSync(_this.username,_this.list);
-						//data.code 返回码
-						//data.message 描述
-						//data.msg_id 发送成功后的消息 id
-						//data.ctime_ms 消息生成时间,毫秒
 					
 					}).onFail(function(data) {
 						//data.code 返回码
 						//data.message 描述
 					});
 						break;
+						
+					case 'image':
+					uni.showLoading({
+						"title":"图片资源较大，发送中请稍候..."
+					})
+					latest_msg = "[图片]";
+					JIM.sendSinglePic({
+						'target_username' : _this.username,
+						'image' : data, //设置图片参数
+						"extras": {
+							'isremove':false,
+						},
+					}).onSuccess(function(res,msg) {
+						console.log(JSON.stringify(msg)+"===================")
+						var obj = {
+							"from_id": _this.myUsername,
+							"create_time": (new Date()).getTime(),				
+							"msg_type": type,
+							"target_id": _this.username,
+							"msg_id":res.msg_id,
+							"msg_body":{
+								"media_id": msg.content.msg_body.media_id,
+								"extras": {
+									'isremove':false,
+								},
+							},
+							"my":true,
+							"data":data,
+						}
+						_this.list.push(obj)
+						uni.hideLoading()
+						// 置于底部
+						var pageToBottomTimer = setTimeout(()=>{
+							_this.pageToBottom()
+							clearTimeout(pageToBottomTimer)
+						},200)
+						
+						JIM.updateConversation({
+						   'username' : _this.username,
+						   'extras' : {'latest_msg':latest_msg}
+						});
+						
+						uni.setStorageSync(_this.username,_this.list);
+					}).onFail(function(data) {
+						//TODO
+					});
+						break;		
+								
+					case 'audio':
+					if(options.time<=2){
+						uni.showToast({
+							title:"说话时间太短啦",
+							icon:"none"
+						})
+						break;
+					}
+					latest_msg = "[语音]";
+					JIM.sendSingleFile({
+						'target_username' : _this.username,
+						'file' : data ,//设置图片参数
+						'extras':{
+							'isremove':false,
+							'time':options.time,
+							'isAudio':true
+						}
+					}).onSuccess(function(res,msg) {
+						console.log(JSON.stringify(msg)+"===================")
+						var obj = {
+							"from_id": _this.myUsername,
+							"create_time": (new Date()).getTime(),				
+							"msg_type": "file",
+							"target_id": _this.username,
+							"msg_id":res.msg_id,
+							"msg_body":{		
+								"media_id":msg.content.msg_body.media_id,
+								"extras": {
+									'isremove':false,
+									'time':options.time,
+									'isAudio':true
+								}
+							},
+							"my":true,
+							"data":data,
+						}
+						_this.list.push(obj)
+						
+						// 置于底部
+						var pageToBottomTimer = setTimeout(()=>{
+							_this.pageToBottom()
+							clearTimeout(pageToBottomTimer)
+						},200)
+						
+						JIM.updateConversation({
+						   'username' : _this.username,
+						   'extras' : {'latest_msg':latest_msg}
+						});
+						
+						uni.setStorageSync(_this.username,_this.list);
+					}).onFail(function(data) {
+						//TODO
+					});
+						break;	
+						
+					case 'emoticon':
+					latest_msg = "[表情]";
+					JIM.sendSingleMsg({
+						'target_username' : _this.username,
+						'content' : '[表情]',
+						'extras' :{
+							"emotion":data,
+							"isEmotion":true,
+							"isremove":false
+						}
+					}).onSuccess(function(res) {
+						var obj = {
+							"from_id": _this.myUsername,
+							"create_time": (new Date()).getTime(),				
+							"msg_type": "text",
+							"target_id": _this.username,
+							"msg_body":{
+								"text":"[表情]",
+								'extras' :{
+									"emotion":data,
+									"isEmotion":true,
+									"isremove":false
+								},
+							},
+							"my":true,
+							"data":data,
+						}		
+						
+						_this.list.push(obj)				
+						
+						// 置于底部
+						var pageToBottomTimer = setTimeout(()=>{
+							_this.pageToBottom()
+							clearTimeout(pageToBottomTimer)
+						},200)
+						
+						JIM.updateConversation({
+						   'username' : _this.username,
+						   'extras' : {'latest_msg':latest_msg}
+						});
+						
+						uni.setStorageSync(_this.username,_this.list);
+					
+					}).onFail(function(data) {
+						//data.code 返回码
+						//data.message 描述
+					});
+									
+						break;
+						
+						
+					case 'video':
+					uni.showLoading({
+						"title":"视频资源较大，发送中请稍候..."
+					})
+					latest_msg = "[短视频]";
+					
+					JIM.sendSingleVedio({
+						'target_username' : _this.username,
+						'file' : data ,//设置图片参数
+						"extras": {
+							"video": "mp4",
+							'isremove':false,
+							"isVideo":true
+						},
+					}).onSuccess(function(res,msg) {
+						console.log(JSON.stringify(msg)+"===================")
+						var obj = {
+							"from_id": _this.myUsername,
+							"create_time": msg.content.create_time,		
+							"msg_type": "file",
+							"target_id": _this.username,
+							"msg_id":res.msg_id,
+							"msg_body":{
+								"media_id":msg.content.msg_body.media_id,
+								"extras": {
+									"video": "mp4",
+									'isremove':false,
+									"isVideo":true
+								}
+							},
+							"my":true,
+							"data":data,
+						}
+						_this.list.push(obj)
+						
+						uni.hideLoading()
+						
+						// 置于底部
+						var pageToBottomTimer = setTimeout(()=>{
+							_this.pageToBottom()
+							clearTimeout(pageToBottomTimer)
+						},200)
+						
+						JIM.updateConversation({
+						   'username' : _this.username,
+						   'extras' : {'latest_msg':latest_msg}
+						});
+						
+						uni.setStorageSync(_this.username,_this.list);
+					}).onFail(function(data) {
+						//TODO
+					});
+						break;	
 				}
 	   		   
 			},
 			// 回到底部
 			pageToBottom(){
+				_this=this;
 				// #ifdef APP-PLUS-NVUE
-				let chatItem = this.$refs.chatItem
-				let lastIndex = chatItem.length > 0 ? chatItem.length - 1 : 0
-				if (chatItem[lastIndex]) {
-					dom.scrollToElement(chatItem[lastIndex],{})
-				}
+				console.log("pageToBottom")
+				this.$nextTick(()=>{
+					let chatItem = _this.$refs.chatItem
+					let lastIndex = chatItem.length > 0 ? chatItem.length - 1 : 0
+					if (chatItem[lastIndex]) {
+						dom.scrollToElement(chatItem[lastIndex],{})
+					}
+				})
 				// #endif
 			},
 			// 长按消息气泡
@@ -554,11 +800,12 @@
 					case 'uploadImage': // 选择相册
 					uni.chooseImage({
 						count:9,
+						sizeType:['compressed'],
 						success: (res) => {
 							// 发送到服务器
 							// 渲染到页面
 							res.tempFilePaths.forEach((item)=>{
-								this.send('image',item)
+								this.send('image',item)							
 							})
 						}
 					})
@@ -567,7 +814,15 @@
 					uni.chooseVideo({
 						maxDuration:10,
 						success:(res)=>{
+							if(res.duration>11){
+								uni.showToast({
+									"title":"请选择10s以内的短视频！"
+								})
+								return;
+							}
+							console.log(res)
 							this.send('video',res.tempFilePath)
+							
 							// 渲染页面
 							// 发送到服务端（获取视频封面，返回url）
 							// 修改本地的发送状态

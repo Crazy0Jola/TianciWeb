@@ -1,7 +1,11 @@
 {
   "pages": [
+    "pages/tabbar/my/my",
     "pages/find/moments/moments",
-    "pages/find/publish/publish"
+    "pages/find/publish/publish",
+    "pages/login/login",
+    "pages/login/forget",
+    "pages/login/register"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -58,12 +62,6 @@
         "nvue": true
       },
       "pages/tabbar/find/find.html": {
-        "window": {
-          "usingComponents": {}
-        },
-        "nvue": true
-      },
-      "pages/tabbar/my/my.html": {
         "window": {
           "usingComponents": {}
         },

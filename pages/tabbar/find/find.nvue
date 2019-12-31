@@ -13,7 +13,7 @@
 			</view>
 		</free-list-item>
 		<free-divider></free-divider>
-		<free-list-item title="扫一扫" showRight>
+		<free-list-item title="扫一扫" showRight @click="openTest"> 
 			<text slot="icon" class="iconfont font-lg py-1">&#xe86d;</text>
 		</free-list-item>
 		<free-list-item title="摇一摇" showRight>
@@ -56,6 +56,13 @@
 			openMoments(){
 				uni.navigateTo({
 					url: '../../find/moments/moments',
+				});
+			},
+			openTest(){
+				console.log("hhhh")
+				var url="https://www.baidu.com";
+				uni.navigateTo({
+					url: '../../webview/webview?url=https://www.baidu.com',
 				});
 			}
 		}

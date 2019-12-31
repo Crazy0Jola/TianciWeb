@@ -39,3 +39,10 @@ swiper-item {
   position: absolute;
 }
 
+
+.noConversation{
+	width: 750rpx;
+	height: 500rpx;
+	margin-top: 100rpx;
+}
+

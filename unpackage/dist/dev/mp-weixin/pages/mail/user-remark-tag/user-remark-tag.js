@@ -122,7 +122,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var freeNavBar = function freeNavBar() {return __webpack_require__.e(/*! import() | components/free-ui/free-nav-bar */ "components/free-ui/free-nav-bar").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-nav-bar.vue */ 183));};var freeMainButton = function freeMainButton() {return __webpack_require__.e(/*! import() | components/free-ui/free-main-button */ "components/free-ui/free-main-button").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-main-button.vue */ 229));};var _default =
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var freeNavBar = function freeNavBar() {return __webpack_require__.e(/*! import() | components/free-ui/free-nav-bar */ "components/free-ui/free-nav-bar").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-nav-bar.vue */ 189));};var freeMainButton = function freeMainButton() {return __webpack_require__.e(/*! import() | components/free-ui/free-main-button */ "components/free-ui/free-main-button").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-main-button.vue */ 235));};var _default =
 
 
 

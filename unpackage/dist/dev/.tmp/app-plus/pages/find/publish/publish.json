@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "发表动态",
+  "bounce": "none",
+  "titleNView": {
+    "type": "default"
+  },
+  "usingComponents": {
+    "free-nav-bar": "/components/free-ui/free-nav-bar"
+  }
+}

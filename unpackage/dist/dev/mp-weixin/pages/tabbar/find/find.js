@@ -122,7 +122,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var freeNavBar = function freeNavBar() {return __webpack_require__.e(/*! import() | components/free-ui/free-nav-bar */ "components/free-ui/free-nav-bar").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-nav-bar.vue */ 183));};var freeListItem = function freeListItem() {return __webpack_require__.e(/*! import() | components/free-ui/free-list-item */ "components/free-ui/free-list-item").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-list-item.vue */ 202));};var freeAvater = function freeAvater() {return __webpack_require__.e(/*! import() | components/free-ui/free-avater */ "components/free-ui/free-avater").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-avater.vue */ 207));};var freeDivider = function freeDivider() {return __webpack_require__.e(/*! import() | components/free-ui/free-divider */ "components/free-ui/free-divider").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-divider.vue */ 212));};var _default =
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var freeNavBar = function freeNavBar() {return __webpack_require__.e(/*! import() | components/free-ui/free-nav-bar */ "components/free-ui/free-nav-bar").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-nav-bar.vue */ 189));};var freeListItem = function freeListItem() {return __webpack_require__.e(/*! import() | components/free-ui/free-list-item */ "components/free-ui/free-list-item").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-list-item.vue */ 208));};var freeAvater = function freeAvater() {return __webpack_require__.e(/*! import() | components/free-ui/free-avater */ "components/free-ui/free-avater").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-avater.vue */ 213));};var freeDivider = function freeDivider() {return __webpack_require__.e(/*! import() | components/free-ui/free-divider */ "components/free-ui/free-divider").then(__webpack_require__.bind(null, /*! @/components/free-ui/free-divider.vue */ 218));};var _default =
 
 
 
@@ -209,6 +209,13 @@ __webpack_require__.r(__webpack_exports__);
     openMoments: function openMoments() {
       uni.navigateTo({
         url: '../../find/moments/moments' });
+
+    },
+    openTest: function openTest() {
+      console.log("hhhh");
+      var url = "https://www.baidu.com";
+      uni.navigateTo({
+        url: '../../webview/webview?url=https://www.baidu.com' });
 
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))

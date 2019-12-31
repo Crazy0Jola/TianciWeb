@@ -3,9 +3,8 @@
 	<div class="flex align-stretch" @tap="onClick" :username="item.username" :nickname="item.nickName" @longpress="long">
 		<view class="flex align-center justify-center position-relative"
 		style="width: 145rpx;">
-			<free-avater :src="item.avatar?item.avatar:'/static/images/userpic.png'" size="92"></free-avater>
-			<free-badge badgeClass="position-absolute"
-			badgeStyle="top:15rpx;right:15rpx"
+			<free-avater :src="item.avatar?item.avatar:'/static/images/userpic.jpg'" size="92"></free-avater>
+			<free-badge badgeStyle="top:15rpx;right:15rpx"
 			v-if="item.unread_msg_count" :value="item.unread_msg_count"></free-badge>
 		</view>
 		<view class="flex flex-column border-bottom flex-1 py-3 pr-3 border-light-secondary">

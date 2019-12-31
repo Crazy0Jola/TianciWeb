@@ -1,6 +1,5 @@
 <template>
 	<view class="page" @touchstart="touchStart" @touchend="touchEnd">
-		<free-nav-bar title="发表动态" :showBack="true" :showRight="false"></free-nav-bar>
 		<form>
 			<view class="uni-textarea">
 				<textarea placeholder="这一刻的想法..." v-model="input_content" />
