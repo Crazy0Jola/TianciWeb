@@ -25,6 +25,7 @@
 				});
 			}
 			this.url = e.url
+			console.log(e.url)
 			// 动态获取高度
 			let res = uni.getSystemInfoSync()
 			this.windowHeight = res.windowHeight

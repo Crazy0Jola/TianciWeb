@@ -248,6 +248,7 @@
 	/* #endif */
 	/* #ifdef APP-PLUS-NVUE */
 	lines: 1;
+	text-overflow:ellipsis;
 	/* #endif */
 }
 /* 文字粗细和斜体 */
@@ -258,6 +259,7 @@
 .font-weight-bolder { font-weight: bold;} /*更粗*/
 .font-italic { font-style: italic;} /*斜体*/
 /* 文字颜色 */
+.text-gray {color: #aaaaaa;}
 .text-white {color: #ffffff;}
 .text-primary {color: #007bff;}
 .text-hover-primary { color: #0056b3;}

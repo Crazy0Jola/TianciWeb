@@ -19,7 +19,10 @@
     "pages/login/login",
     "pages/login/forget",
     "pages/login/register",
-    "pages/webview/webview"
+    "pages/webview/webview",
+    "pages/friend/addFriend/addFriend",
+    "pages/group/addGroup/addGroup",
+    "pages/group/groupChat/groupChat"
   ],
   "subPackages": [],
   "window": {
@@ -60,6 +63,5 @@
       }
     ]
   },
-  "usingComponents": {},
-  "sitemapLocation": "sitemap15.json"
+  "usingComponents": {}
 }

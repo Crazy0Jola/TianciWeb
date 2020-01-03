@@ -28,9 +28,7 @@
 				<!-- 文字 -->
 				
 				<text v-else-if="item.msg_type === 'text'" class="font-md">{{item.msg_body.text}}</text>
-				<!--  图片-->			
-				<free-image  v-else-if="item.msg_type === 'image'&&item.my" :src="item.data" @click="preview(item.data)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
-				
+				<!--  图片-->							
 				<free-image  v-else-if="item.msg_type === 'image'" :src="item.msg_body.media_id" @click="preview(item.msg_body.media_id)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
 
 				<!-- 音频 -->
@@ -87,7 +85,7 @@
 			pretime:[Number,String],
 			avator:String,
 			myAvator:String,
-			username:String
+			myUsername:String
 		},
 		data() {
 			return {
@@ -105,7 +103,7 @@
 			// 是否是他人
 			isother() {
 				// 获取他人id
-				return this.item.from_id === this.username
+				return this.item.from_id !== this.myUsername
 			},
 			// 显示的时间
 			showTime(){
@@ -202,11 +200,7 @@
 				this.audioEmit(this.index)
 				if (!this.innerAudioContext) {
 					this.innerAudioContext = uni.createInnerAudioContext();
-					if(this.item.my){
-						this.innerAudioContext.src = this.item.data;
-					}else{
-						this.innerAudioContext.src = this.item.msg_body.media_id;
-					}
+					this.innerAudioContext.src =  plus.io.convertAbsoluteFileSystem(this.item.msg_body.media_id);
 					this.innerAudioContext.play()
 					// 监听播放
 					this.innerAudioContext.onPlay(()=>{
@@ -231,7 +225,11 @@
 			},
 			// 预览图片
 			preview(url){
-				this.$emit('preview',url)
+				if(this.item.msg_body.extras.isEmotion){
+					this.$emit('preview',this.item.msg_body.extras.emotion)
+				}else{
+					this.$emit('preview',url)
+				}
 			},
 			// 长按事件
 			long(e){
@@ -255,17 +253,9 @@
 			},
 			// 打开视频
 			openVideo(){
-				if(this.item.my){
-					uni.navigateTo({
-						url: '/pages/chat/video/video?url='+this.item.data,
-					});
-				}else{
-					console.log(this.item.msg_body.media_id)
-					uni.navigateTo({
-						url: '/pages/chat/video/video?url='+this.item.msg_body.media_id,
-					});
-				}
-				
+				uni.navigateTo({
+					url: '/pages/chat/video/video?url='+this.item.msg_body.media_id,
+				});
 			}
 		}
 	}

@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "朋友圈",
-  "enablePullDownRefresh": true,
-  "usingComponents": {
-    "chat-input": "/components/im-chat/chatinput"
-  }
-}

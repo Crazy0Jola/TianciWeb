@@ -14,7 +14,7 @@
 			
 			<!-- 聊天信息列表组件 -->
 			<block v-for="(item,index) in list" :key="index">
-				<free-chat-item :item="item" :avator="avator" :username="username" :myAvator="myAvator" :index="index" ref="chatItem"
+				<free-chat-item :item="item" :avator="avator" :myUsername="myUsername" :myAvator="myAvator" :index="index" ref="chatItem"
 				:pretime=" index > 0 ? list[index-1].create_time : 0"
 				@long="long" @preview="previewImage"></free-chat-item>
 			</block>
@@ -190,6 +190,7 @@
 		},
 		onLoad:function(e){
 			uni.$on("get_chat_msg",function(){
+				console.log("===================有新消息来啦=====================")
 				var msg = uni.getStorageSync(_this.username);
 				_this.list=msg;
 				var pageToBottomTimer = setTimeout(()=>{
@@ -207,9 +208,11 @@
 			_this.myUsername = uni.getStorageSync('setUserData').username;
 		},
 		onUnload(){
+			console.log("=================onUnload==================")
 			uni.$off("get_chat_msg")
 		},
-		onShow(){						
+		onShow(){			
+			console.log("chat__________________onSHow")
 			// var imagepath=_this.image_cache("https://img.jiguang.cn/im-portal/0.0.1/assets/img/jverify-flow-banner-new.png","a");
 			// var p = plus.io.convertLocalFileSystemURL(imagepath);  
 			// console.log(p)
@@ -218,13 +221,13 @@
 				'username' : _this.username
 			});
 			if(msg){
-				_this.list=msg;
-				console.log(JSON.stringify(msg))
+				_this.list=msg;		
 				// var pageToBottomTimer = setTimeout(()=>{
 				// 	_this.pageToBottom()
 				// 	clearTimeout(pageToBottomTimer)
 				// },500)
 			}else{
+				console.log("hhhhhhhhhhhh")
 				var now = new Date()
 				var past = new Date(new Date()-86400000*7)
 				
@@ -296,23 +299,16 @@
 						// 		});
 						// 	}	
 						// })
-						
-						
-						
+											
 						_this.$data.list=msg;
-						
-						
+					
 						_this.$data.list.map(function(elem,index){
 						    if(elem.msg_type!="text"){
 						    	_this.setPic(elem.msg_body.media_id,index);
 						    }
 						})
-		
-						var pageToBottomTimer = setTimeout(()=>{
-							_this.pageToBottom()
-							clearTimeout(pageToBottomTimer)
-						},200)
-						
+						uni.setStorageSync(_this.username,_this.$data.list);
+						_this.pageToBottom();
 						uni.hideLoading()					
 												
 					}
@@ -428,6 +424,17 @@
 			// 初始化
 			this.__init()
 		},
+		onBackPress(options){
+			console.log(options)
+			console.log(JSON.stringify(options))
+			if(options.from==='backbutton'||options.from==='navigateBack'){
+				console.log("hhhh")
+				uni.switchTab({
+					url:"../../tabbar/index/index"
+				})
+				return true;
+			}
+		},
 		methods: {
 			...mapMutations(['regSendVoiceEvent']),
 			__init(){
@@ -451,42 +458,28 @@
 				}
 				this.emoticonList = arr
 			},
-			//图片缓存
-			image_cache(image_url,media_id) {	
-				var url;
-				uni.getStorage({
-					key: media_id,
-					success:function(res){
-						url = res.data.tempFilePath;	
-					},
-					fail:function(res){
-						// 本地没有缓存 需要下载 
-						uni.downloadFile({
-							url: image_url,
-							success: (res) => {
-								if (res.statusCode === 200) {	
-									url = res.tempFilePath;
-									uni.setStorage({
-										key:media_id,
-										data:res,
-										success:function(res){
-											
-										}
-									})
-								}
-							}
-						}); 
-					}
-				})
-				return url;
-			},
 			setPic(media_id,index){
 				JIM.getResource({'media_id' :media_id}).onSuccess(function(data){
-					_this.$data.list[index].msg_body.media_id=data.url;
-					uni.setStorageSync(_this.username,_this.$data.list);
+					uni.downloadFile({
+						url: data.url,
+						success: (res) => {
+							if (res.statusCode === 200) {	
+								uni.saveFile({
+									tempFilePath: res.tempFilePath,
+									success: function (res) {
+										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+										_this.$data.list[index].msg_body.media_id=savedFilePath;
+										uni.setStorageSync(_this.username,_this.$data.list);									
+									}
+								});
+							}
+						}
+					}); 
 				}).onFail(function(data){
-					console.log('error:' + JSON.stringify(data));
-					reject(data);
+					uni.showToast({
+						"title":getCodeMsg(data.code),
+						"position":bottom
+					})
 				});		
 			},
 			// 打开扩展菜单或者表情包
@@ -502,6 +495,15 @@
 				var _that = this;
 				var text = this.text
 				var latest_msg;
+				if(type=="image"||type=="audio"||type=="video"){
+					uni.saveFile({
+						tempFilePath: data,
+						success: function (res) {
+							data = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+							console.log(data)
+						}
+					});
+				}
 				console.log(type+"====="+data)
 				switch (type){
 					case 'text':
@@ -544,6 +546,10 @@
 						uni.setStorageSync(_this.username,_this.list);
 					
 					}).onFail(function(data) {
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":bottom
+						})
 						//data.code 返回码
 						//data.message 描述
 					});
@@ -569,7 +575,7 @@
 							"target_id": _this.username,
 							"msg_id":res.msg_id,
 							"msg_body":{
-								"media_id": msg.content.msg_body.media_id,
+								"media_id": data,
 								"extras": {
 									'isremove':false,
 								},
@@ -592,7 +598,10 @@
 						
 						uni.setStorageSync(_this.username,_this.list);
 					}).onFail(function(data) {
-						//TODO
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":bottom
+						})
 					});
 						break;		
 								
@@ -622,7 +631,7 @@
 							"target_id": _this.username,
 							"msg_id":res.msg_id,
 							"msg_body":{		
-								"media_id":msg.content.msg_body.media_id,
+								"media_id":data,
 								"extras": {
 									'isremove':false,
 									'time':options.time,
@@ -647,7 +656,10 @@
 						
 						uni.setStorageSync(_this.username,_this.list);
 					}).onFail(function(data) {
-						//TODO
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":bottom
+						})
 					});
 						break;	
 						
@@ -695,8 +707,10 @@
 						uni.setStorageSync(_this.username,_this.list);
 					
 					}).onFail(function(data) {
-						//data.code 返回码
-						//data.message 描述
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":bottom
+						})
 					});
 									
 						break;
@@ -725,7 +739,7 @@
 							"target_id": _this.username,
 							"msg_id":res.msg_id,
 							"msg_body":{
-								"media_id":msg.content.msg_body.media_id,
+								"media_id":data,
 								"extras": {
 									"video": "mp4",
 									'isremove':false,
@@ -752,7 +766,10 @@
 						
 						uni.setStorageSync(_this.username,_this.list);
 					}).onFail(function(data) {
-						//TODO
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})
 					});
 						break;	
 				}
@@ -840,9 +857,10 @@
 			},
 			// 预览图片
 			previewImage(url){
+				var reUrl = plus.io.convertAbsoluteFileSystem(url);
 				uni.previewImage({
-					current:url,
-					urls:[url],
+					current:reUrl,
+					urls:[reUrl],
 					indicator:"default"
 				})
 			},

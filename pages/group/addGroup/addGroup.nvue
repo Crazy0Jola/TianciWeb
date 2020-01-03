@@ -1,0 +1,386 @@
+<template>
+	<view>
+		
+		<!-- 导航栏 -->
+		<free-nav-bar title="发起群聊" showBack :showRight="true">
+			<free-main-button @click="addGroup" :name="'确定 ('+selectCount+')'" slot="right"></free-main-button>
+		</free-nav-bar>
+		
+		
+		<view class="flex" style="height: 100rpx;">
+			<view  class="flex-1 pl-2 text-center justify-center">
+				<text class="font-md ">群聊名称</text>
+			</view>
+			<view class="flex-3 p-1 justify-center">
+				<input v-model="gname" class="font-md" focus placeholder="请输入群聊名称" />
+			</view>
+		</view>
+		<!-- 通讯录列表 -->
+		<scroll-view scroll-y="true" :style="'height:'+scrollHeight+'px;'"
+		:scroll-into-view="scrollInto">
+			<view v-for="(item,index) in list" :key="index"
+			:id="'item-'+item.letter">
+				<view v-if="item.data.length" 
+				class="py-2 px-3 border-bottom bg-light">
+					<text class="font-md text-dark">{{item.letter}}</text>
+				</view>
+				<free-list-item v-for="(item2,index2) in item.data" 
+				:key="index2" :title="item2.username" 
+				:cover="item2.avatar"
+				:showRightIcon="false" showRight
+				@click="selectItem(item2)">
+					<view slot="right"
+					style="width: 40rpx;height: 40rpx;"
+					class="border rounded-circle flex align-center justify-center mr-4">
+						<view v-if="item2.checked" 
+						style="width: 30rpx;height: 30rpx;"
+						class="main-bg-color rounded-circle"></view>
+					</view>
+				</free-list-item>
+			</view>
+		</scroll-view>
+		
+		<!-- 侧边导航条 -->
+		<view class="position-fixed right-0 bottom-0 bg-light flex flex-column" :style="'top:'+top+'px;'" style="width: 50rpx;" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
+			<view class="flex-1 flex align-center justify-center"
+			v-for="(item,index) in list" :key="index">
+				<text class="font-sm text-muted">{{item.letter}}</text>
+			</view>
+		</view>
+
+		<view class="position-fixed rounded-circle bg-light border flex align-center justify-center" v-if="current"
+		style="width: 150rpx;height: 150rpx;left: 300rpx;"
+		:style="'top:'+modalTop+'px;'">
+			<text class="font-lg">{{current}}</text>
+		</view>
+
+	</view>
+</template>
+
+<script>
+	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
+	import freeListItem from "@/components/free-ui/free-list-item.vue"
+	import freeMainButton from '@/components/free-ui/free-main-button.vue';
+	
+	var JIM = getApp().globalData.JIM;
+	var _this;
+	
+	export default {
+		components: {
+			freeNavBar,
+			freeListItem,
+			freeMainButton
+		},
+		data() {
+			return {
+				gid:'',
+				gname:'',
+				list: [{
+				    "letter": "A",
+				    "data": [
+				        "test1",
+				        "test2",
+				        "阿勒",
+				        "阿里",
+				        "安庆",
+				        "澳机"
+				    ]
+				}, {
+				    "letter": "B",
+				    "data": [
+				        "保罗",
+				        "包头",
+				        "北海福成",
+				        "北南苑",
+				        "北都国际"
+				    ]
+				}, {
+				    "letter": "C",
+				    "data": [
+				        "长山场",
+				        "长国",
+				        "常德",
+				        "长花~",
+				        "长王",
+				        "常机",
+				        "成双",
+				        "赤峰"
+				    ]
+				}, {
+				    "letter": "D",
+				    "data": [
+				        "大理爱你",
+				        "大周哈哈",
+				        "达河",
+				        "丹浪",
+				        "德芒",
+				        "迪香里拉",
+				    ]
+				}, {
+				    "letter": "E",
+				    "data": [
+				        "鄂多斯",
+				    ]
+				}, {
+				    "letter": "F",
+				    "data": [
+				        "福乐",
+				    ]
+				}, {
+				    "letter": "G",
+				    "data": [
+				        "固原六盘",
+				        "广盘龙",
+				        "广白机",
+				        "桂江",
+				    ]
+				}, {
+				    "letter": "H",
+				    "data": [
+				        "哈尔滨太平",
+				        "哈密",
+				        "海美兰",
+				        "海拉尔",
+				        "邯郸",
+				    ]
+				}, {
+				    "letter": "I",
+				    "data": []
+				}, {
+				    "letter": "J",
+				    "data": [
+				        "鸡西兴",
+				        "佳木斯",
+				        "嘉峪",
+				    ]
+				}, {
+				    "letter": "K",
+				    "data": [
+				        "克拉玛依",
+				        "库车龟兹",
+				        "库尔勒",
+				    ]
+				}, {
+				    "letter": "L",
+				    "data": [
+				        "拉萨贡嘎",
+				        "黎平",
+				        "林芝米",
+				        "柳州白莲",
+				    ]
+				}, {
+				    "letter": "M",
+				    "data": [
+				        
+				    ]
+				}, {
+				    "letter": "N",
+				    "data": [
+				        
+				    ]
+				}, {
+				    "letter": "O",
+				    "data": []
+				}, {
+				    "letter": "P",
+				    "data": [
+				        "普洱思茅"
+				    ]
+				}, {
+				    "letter": "Q",
+				    "data": [
+				        "齐齐哈尔",
+				        "秦皇岛山",
+				        "青岛流亭",
+				        "衢州机场",
+				        "泉州晋江机场"
+				    ]
+				}, {
+				    "letter": "R",
+				    "data": [
+				        "日喀则和"
+				    ]
+				}, {
+				    "letter": "S",
+				    "data": [
+				        "三亚凤凰",
+				        "汕头",
+				        "上海虹桥",
+				        "上海浦东",
+				        "深圳宝安",
+				        "沈阳桃仙",
+				        "石家庄正定",
+				        "苏南硕放"
+				    ]
+				}, {
+				    "letter": "T",
+				    "data": [
+				        "塔城",
+				    ]
+				}, {
+				    "letter": "U",
+				    "data": []
+				}, {
+				    "letter": "V",
+				    "data": []
+				}, {
+				    "letter": "W",
+				    "data": [
+				        "文山",
+				        "温永强",
+				        "乌海",
+				        "武汉天",
+				    ]
+				}, {
+				    "letter": "X",
+				    "data": [
+				    ]
+				}, {
+				    "letter": "Y",
+				    "data": [
+				    ]
+				}, {
+				    "letter": "Z",
+				    "data": [
+				        "昭通",
+				        "芷江",
+				        "中卫",
+				        "舟山",
+				    ]
+				}],
+				
+				top:0,
+				scrollHeight:0,
+				scrollInto:'',
+				current:'',
+				selectList:[]
+			}
+		},
+		mounted(){
+			// 监听键盘高度变化
+			uni.onKeyboardHeightChange(res => {
+		
+			})
+		},
+		onLoad() {
+			_this=this;
+			let res = uni.getSystemInfoSync()
+			this.top = res.statusBarHeight + uni.upx2px(90)
+			this.scrollHeight = res.windowHeight - this.top -uni.upx2px(100)
+			
+			this.list.forEach(item=>{
+				item.data = item.data.map(username=>{
+					return {
+						username:username,
+						avatar:"/static/images/mail/friend.png",
+						checked:false
+					}
+				})
+			})
+		},
+		computed: {
+			modalTop(){
+				return (this.scrollHeight - uni.upx2px(150)) / 2
+			},
+			// 每个索引的高度
+			itemHeight() {
+				let count = this.list.length
+				if(count < 1){
+					return 0
+				}
+				return this.scrollHeight /  count
+			},
+			// 选中数量
+			selectCount(){
+				return this.selectList.length
+			}
+		},
+		methods: {
+			addGroup(){
+				if(this.gname==""){
+					uni.showToast({
+						"title":"请输入群聊名称",
+						"icon":"none"
+					})
+					return;
+				}
+				if(this.selectList.length<2){
+					uni.showToast({
+						"title":"请至少选择两个好友",
+						"icon":"none"
+					})
+					return;
+				}
+				this.selectList = this.selectList.map(res=>{
+					return {
+						username:res.username,
+					}
+				})
+				JIM.createGroup({
+					'group_name' : _this.gname,
+				}).onSuccess(function(data) {
+					console.log("============="+data.gid+"============")
+					_this.gid=data.gid;
+					JIM.addGroupMembers({
+						'gid' : data.gid,
+						'member_usernames' : _this.selectList
+					}).onSuccess(function(data) {
+						uni.navigateTo({
+							url:"../groupChat/groupChat?gid="+_this.gid+"&gname="+_this.gname
+						})
+
+					}).onFail(function(data) {
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})
+					});
+				}).onFail(function(data) {
+					uni.showToast({
+						"title":getCodeMsg(data.code),
+						"position":"bottom"
+					})
+				});
+				console.log(JSON.stringify(this.selectList))
+			},
+			touchstart(e){
+				this.changeScrollInto(e)
+			},
+			touchmove(e){
+				this.changeScrollInto(e)
+			},
+			touchend(e){
+				this.current = ''
+			},
+			// 联动
+			changeScrollInto(e){
+				let Y = e.touches[0].pageY
+				// #ifdef MP
+				Y = Y - this.top
+				// #endif
+				let index = Math.floor(Y / this.itemHeight)
+				let item = this.list[index]
+				if(item){
+					this.scrollInto = 'item-'+item.letter
+					this.current = item.letter
+				}
+			},
+			// 选中/取消选中
+			selectItem(item){
+				item.checked = !item.checked
+				if(item.checked){ // 选中
+					this.selectList.push(item)
+				} else { // 取消选中
+					let index = this.selectList.findIndex(v=> v === item)
+					if(index > -1){
+						this.selectList.splice(index,1)
+					}
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

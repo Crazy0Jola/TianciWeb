@@ -36,7 +36,10 @@
 						console.log('Init-success:' + JSON.stringify(data));	
 						uni.$emit("JIMinit",{})
 					}).onFail(function(data) {
-					    console.log('Init-error:' + JSON.stringify(data))		    
+					    uni.showToast({
+					    	"title":getCodeMsg(data.code),
+					    	"position":"bottom"
+					    })	    
 					});
 				}
 			})
@@ -76,9 +79,20 @@
 				}
 			})
 			
+			JIM.onDisconnect(function(){
+			  uni.showToast({
+				"title":"网络中断，请检查网络",
+				"position":"bottom"
+			  })
+			});
 			
 		},
 		onShow: function() {
+			uni.getStorageInfo({
+				success: function (res) {
+					console.log(res.keys);
+				}
+			});
 			if(!JIM.isInit()){
 				var appkey='09970876f33e884a3624335c';
 				var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
@@ -106,7 +120,10 @@
 							uni.$emit("reInit",{})
 							uni.hideLoading()
 						}).onFail(function(data) {
-						    console.log('Init-error:' + JSON.stringify(data))		    
+						    uni.showToast({
+						    	"title":getCodeMsg(data.code),
+						    	"position":"bottom"
+						    })	    
 						});
 					}
 				})
@@ -123,8 +140,6 @@
 
 <style>
 	/*每个页面公共css */
-	@import "./colorui/icon.css";
-	@import "./colorui/main.css";
 	@import "./common/free.css";
 	@import "./common/common.css";
 	/* #ifndef APP-PLUS-NVUE */

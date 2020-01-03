@@ -1,11 +1,11 @@
 {
   "pages": [
-    "pages/tabbar/my/my",
     "pages/find/moments/moments",
     "pages/find/publish/publish",
     "pages/login/login",
     "pages/login/forget",
-    "pages/login/register"
+    "pages/login/register",
+    "pages/webview/webview"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -67,6 +67,12 @@
         },
         "nvue": true
       },
+      "pages/tabbar/my/my.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
+      },
       "pages/chat/chat/chat.html": {
         "window": {
           "usingComponents": {}
@@ -122,6 +128,30 @@
         "nvue": true
       },
       "pages/mail/user-report/user-report.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
+      },
+      "pages/friend/addFriend/addFriend.html": {
+        "window": {
+          "usingComponents": {},
+          "navigationBarTitleText": "添加关注",
+          "navigationBarBackgroundColor": "#EDEDED",
+          "bounce": "none",
+          "titleNView": {
+            "type": "default"
+          }
+        },
+        "nvue": true
+      },
+      "pages/group/addGroup/addGroup.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
+      },
+      "pages/group/groupChat/groupChat.html": {
         "window": {
           "usingComponents": {}
         },

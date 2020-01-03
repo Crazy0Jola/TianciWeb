@@ -1,6 +1,0 @@
-{
-  "navigationBarTitleText": "发表动态",
-  "usingComponents": {
-    "free-nav-bar": "/components/free-ui/free-nav-bar"
-  }
-}

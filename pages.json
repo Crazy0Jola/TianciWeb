@@ -113,6 +113,27 @@
             	}
             }
         }
+        ,{
+            "path" : "pages/friend/addFriend/addFriend",
+            "style" : {
+				"navigationBarTitleText" : "添加关注",
+				"navigationBarBackgroundColor":"#EDEDED",
+				"app-plus" : {
+					"bounce" : "none",
+					"titleNView" : {
+						"type" : "default"
+					}
+				}
+			}
+        }
+        ,{
+            "path" : "pages/group/addGroup/addGroup",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/group/groupChat/groupChat",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

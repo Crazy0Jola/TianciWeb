@@ -5,7 +5,7 @@
 		<free-nav-bar title="通讯录"></free-nav-bar>
 		
 		<!-- 通讯录列表 -->
-		<scroll-view scroll-y="true"
+		<scroll-view scroll-y="true" :style="'height:'+scrollHeight+'px;'"
 		:scroll-into-view="scrollInto">
 			<free-list-item v-for="(item,index) in topList" :key="index"
 			:title="item.title" :cover="item.cover"></free-list-item>
@@ -249,8 +249,7 @@
 		onLoad() {
 			let res = uni.getSystemInfoSync()
 			this.top = res.statusBarHeight + uni.upx2px(90)
-			this.scrollHeight = res.windowHeight - this.top
-	
+			this.scrollHeight = res.windowHeight - this.top - 50
 		},
 		computed: {
 			modalTop(){
@@ -283,7 +282,9 @@
 				// #endif
 				let index = Math.floor(Y / this.itemHeight)
 				let item = this.list[index]
+				console.log(item)
 				if(item){
+					
 					this.scrollInto = 'item-'+item.letter
 					this.current = item.letter
 				}

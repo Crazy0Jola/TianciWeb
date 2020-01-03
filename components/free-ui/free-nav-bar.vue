@@ -4,7 +4,7 @@
 			<!-- 状态栏 -->
 			<view :style="'height:'+statusBarHeight+'px'"></view>
 			<!-- 导航 -->
-			<view class="w-100 flex align-center justify-between" style="height: 90rpx;">
+			<view class="w-100 flex align-center justify-between" v-if="showNav" style="height: 90rpx;">
 				<!-- 左边 -->
 				<view class="flex align-center">
 					<!-- 返回按钮 -->
@@ -16,8 +16,8 @@
 				<!-- 右边 -->
 				<view class="flex align-center" v-if="showRight">
 					<slot name="right">
-						<free-icon-button @click="search" 
-						:icon="'\ue607'"></free-icon-button>
+						<!-- <free-icon-button @click="search" 
+						:icon="'\ue607'"></free-icon-button> -->
 						<free-icon-button @click="openExtend"
 						:icon="'\ue636'"></free-icon-button>
 					</slot>
@@ -49,11 +49,16 @@
 <script>
 	import freeIconButton from "./free-icon-button.vue"
 	import freePopup from "./free-popup.vue"
+	var _this;
 	export default {
 		props: {
 			showBack:{
 				type:Boolean,
 				default:false
+			},
+			showNav:{
+				type:Boolean,
+				default:true
 			},
 			title: {
 				type: [String,Boolean],
@@ -87,18 +92,19 @@
 				menus:[
 					{
 						name:"发起群聊",
-						event:"",
+						event:"createGroup",
 						icon:"\ue600"
 					},
 					{
-						name:"添加好友",
-						event:"",
+						name:"添加关注",
+						event:"follow",
 						icon:"\ue6a5"
 					}
 				],
 			}
 		},
 		mounted() {
+			_this = this;
 			// #ifdef APP-PLUS-NVUE
 			this.statusBarHeight = plus.navigator.getStatusbarHeight()
 			// #endif
@@ -120,6 +126,22 @@
 		methods: {
 			openExtend() {
 				this.$refs.extend.show(uni.upx2px(415),uni.upx2px(150))
+			},
+			clickEvent(e){
+				switch (e){
+					case 'createGroup':
+						_this.$refs.extend.hide()
+						uni.navigateTo({
+							url:'/pages/group/addGroup/addGroup'
+						})
+						break;
+					case 'follow':
+						_this.$refs.extend.hide()
+						uni.navigateTo({
+							url:'/pages/friend/addFriend/addFriend'
+						})
+						break;
+				}
 			},
 			// 返回
 			back(){

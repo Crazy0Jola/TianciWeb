@@ -1,0 +1,206 @@
+<template>
+	<view class="page">
+		<free-nav-bar bgColor="bg-white" :showRight="false" :showNav="false" :fixed="false">
+		</free-nav-bar>
+		<free-list-item @click="changeAvator" :cover="url" coverSize="120" title="楚绵" showRight>
+			<view class="flex flex-column">
+				<text class="text-dark font-lg font-weight-bold">楚绵</text>
+				<text class="text-light-muted font mt-2">仿微信号：summer</text>
+			</view>
+			<view slot="right">
+				<text class="iconfont font-md text-light-muted">&#xe614;</text>
+			</view>
+		</free-list-item>
+		<free-divider></free-divider>
+		<free-list-item title="支付" showRight>
+			<text slot="icon" class="iconfont font-lg py-1">&#xe66c;</text>
+		</free-list-item>
+		<free-divider></free-divider>
+		<free-list-item title="收藏" showRight @click="test4">
+			<text slot="icon" class="iconfont font-lg py-1">&#xea2d;</text>
+		</free-list-item>
+		<free-list-item title="相册" showRight @click="test3">
+			<text slot="icon" class="iconfont font-lg py-1">&#xe608;</text>
+		</free-list-item>
+		<free-list-item title="表情" showRight @click="test2">
+			<text slot="icon" class="iconfont font-lg py-1">&#xe605;</text>
+		</free-list-item>
+		<free-divider></free-divider>
+		<free-list-item title="设置" showRight @click="test">
+			<text slot="icon" class="iconfont font-lg py-1">&#xe612;</text>
+		</free-list-item>
+		<free-list-item title="退出登录" showRight @click="exit">
+			<text slot="icon" class="iconfont font-lg py-1">&#xe612;</text>
+		</free-list-item>
+		
+	</view>
+</template>
+
+<script>
+	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
+	import freeIconButton from "@/components/free-ui/free-icon-button.vue"
+	import freeListItem from "@/components/free-ui/free-list-item.vue"
+	import freeDivider from "@/components/free-ui/free-divider.vue"
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	
+	var JIM=getApp().globalData.JIM;	
+	export default {
+		components: {
+			freeNavBar,
+			freeIconButton,
+			freeListItem,
+			freeDivider
+		},
+		data() {
+			return {
+				url:"",
+			}
+		},
+		onShow(){
+			var imagepath=this.image_cache("https://img.jiguang.cn/im-portal/0.0.1/assets/img/jverify-flow-banner-new.png","b");
+			var p = plus.io.convertLocalFileSystemURL(imagepath);  
+			console.log(p)
+			this.url=p;
+			const value = uni.getStorageSync('setUserData');
+			if (value) {
+				//有登录信息
+				console.log("已登录用户：",value);	
+				if(!JIM.isLogin()){
+					_this.login(value.username,value.password)			
+				}
+			}else{
+				uni.reLaunch({
+					url: '../../login/login',
+				});
+			}
+		},
+		methods: {
+			//图片缓存
+			image_cache(image_url,media_id) {	
+				var url;
+				uni.getStorage({
+					key: media_id,
+					success:function(res){
+						url = res.data.tempFilePath;	
+					},
+					fail:function(res){
+						// 本地没有缓存 需要下载 
+						uni.downloadFile({
+							url: image_url,
+							success: (res) => {
+								if (res.statusCode === 200) {	
+									url = res.tempFilePath;
+									uni.setStorage({
+										key:media_id,
+										data:res,
+										success:function(res){
+											
+										}
+									})
+								}
+							}
+						}); 
+					}
+				})
+				return url;
+			},
+			test4(){
+				var url = "https://dlop.im.jiguang.cn/qiniu/file/j/5C31DCED0025DB78CA38C55C7B84B5FF.mp4\?e=1577949080&token=pNf8Uh3lsdBw4BGIUE1tgWT8dPKDDyzuOGEgtEJi:vEqmBKPVnRTqgkpsP-DZkBTID1o=";
+				uni.navigateTo({
+					url: `/pages/chat/video/video?url=${url}`,
+				});
+			},
+			test(){
+				JIM.addGroupMembers({
+					'gid' : 42084214,
+					'member_usernames' : [{'username':'test3'}]
+				}).onSuccess(function(data) {
+					console.log("==========="+JSON.stringify(data)+"=========")
+				//data.code 返回码
+				//data.message 描述
+				}).onFail(function(data) {
+					uni.showToast({
+						"title":getCodeMsg(data.code),
+						"position":"bottom"
+					})
+				//同上
+				});
+			},
+			test2(){
+				var arr = ['18952158867'];
+				uni.request({
+					url:"http://117.83.152.39:8081/interconnect/appUser/getUserPhotoByPhone",
+					method:"POST",
+					header:{
+						"token":"e0b57b9a4e7e49bdab5f5e87fc5c0a0d"
+					},
+					data:JSON.stringify(arr),
+					success(data){
+						console.log(JSON.stringify(data))
+					}
+				})
+			},
+			test3(){
+				 JIM.updateSelfInfo({
+				            'username' : "13771504601",
+				        }).onSuccess(function(data) {
+							console.log(JSON.stringify(data))
+				            //data.code 返回码
+				            //data.message 描述
+				            //data.user_info.username
+				            //data.user_info.appkey
+				            //data.user_info.nickname
+				            //data.user_info.avatar 头像
+				            //data.user_info.birthday 生日，默认空
+				            //data.user_info.gender 性别 0 - 未知， 1 - 男 ，2 - 女
+				            //data.user_info.signature 用户签名
+				            //data.user_info.region 用户所属地区
+				            //data.user_info.address 用户地址
+				            //data.user_info.mtime 用户信息最后修改时间
+				            //data.extras 自定义json字段
+				          }).onFail(function(data) {
+				           uni.showToast({
+				           	"title":getCodeMsg(data.code),
+				           	"position":"bottom"
+				           })
+				        });
+			},
+			exit(){
+				JIM.loginOut();
+				this.$store.dispatch("setUserData","") //清空登录状态
+				try {
+					uni.removeStorageSync("setUserData")
+				} catch (e) {
+					// error
+				}
+				uni.navigateTo({
+					url:"../../login/login"
+				})
+			},
+			changeAvator(){
+				
+				uni.chooseImage({
+					count:1,
+					success: (res) => {
+						// 发送到服务器					
+						// 渲染到页面						
+						JIM.updateSelfAvatar({'avatar' : res.tempFilePaths[0]}).onSuccess(function(data) {
+						    console.log('success:' + JSON.stringify(data));				
+						  
+						}).onFail(function(data) {
+						    uni.showToast({
+						    	"title":getCodeMsg(data.code),
+						    	"position":"bottom"
+						    })			
+						});
+					}
+				})
+				
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>
