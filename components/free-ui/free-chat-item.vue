@@ -15,7 +15,7 @@
 		:class="isother ? 'justify-start' : 'justify-end'">
 			<!-- 好友 -->
 			<template v-if="isother">
-				<free-avater size="70" :src="avator"
+				<free-avater size="70" :src="avatar||'/static/images/userpic.jpg'"
 				clickType="navigate"></free-avater>
 				
 				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-left-icon">&#xe601;</text>
@@ -56,7 +56,7 @@
 			<!-- 本人 -->
 			<template v-if="!isother">
 				<text v-if="hasLabelClass" class="iconfont text-chat-item font-md position-absolute chat-right-icon">&#xe619;</text>
-				<free-avater size="70" :src="myAvator"
+				<free-avater size="70" :src="myAvatar||'/static/images/userpic.jpg'"
 				clickType="navigate"></free-avater>
 			</template>
 		</view>
@@ -83,8 +83,8 @@
 			index:Number,
 			// 上一条消息的时间戳
 			pretime:[Number,String],
-			avator:String,
-			myAvator:String,
+			avatar:String,
+			myAvatar:String,
 			myUsername:String
 		},
 		data() {

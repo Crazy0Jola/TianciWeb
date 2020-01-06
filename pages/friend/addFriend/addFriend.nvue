@@ -9,19 +9,19 @@
 			<text class="font text-light-muted">暂无搜索结果</text>
 		</view>
 		<recycle-list for="(item, i) in allList">
-			<cell-slot :key="item.id">
+			<cell-slot :key="item.id" @click="test(item)">
 				<view class="bg-white flex align-stretch">
 					<view class="flex align-center justify-center py-2 pl-3">
 						<image :src="item.portrait?item.portrait:'/static/images/userpic.jpg'" 
-						mode="widthFix" style="width: 75rpx;height: 75rpx;"></image>
+						mode="aspectFill" style="width: 75rpx;height: 75rpx;"></image>
 					</view>
 					<view class="flex-1 flex flex-column justify-between pr-3 py-3 pl-3 border-bottom">
 						<text class="font-md text-dark text-ellipsis">{{item.name}}{{item.post?'('+item.post+')':''}}</text>
 						<text class="font-sm text-gray text-ellipsis">{{item.company}}</text>
 					</view>
-					<view class="flex align-center justify-center py-2 pl-3 mr-2">
+					<view class="flex align-center justify-center py-2 pl-3 mr-2" @click="follow(item.token,item.isFollow,i)">
 						<image :src="item.isFollow?'/static/images/success.png':'/static/images/add.png'" 
-						mode="widthFix" style="width: 75rpx;height: 75rpx;"></image>
+						mode="aspectFill" style="width: 75rpx;height: 75rpx;"></image>
 					</view>
 				</view>
 			</cell-slot>
@@ -31,16 +31,18 @@
 
 <script>	
 	var _this;
+	var SERVER_API=getApp().globalData.SERVER_API;
 	export default {
 		data() {
 			return {
 				keyword:"",
-				list:[],
+				list:[]
 			};
 		},
 		computed:{
 			// 最终列表
 			allList(){
+				console.log("hh")
 				return this.keyword==='' ? this.list : this.searchList
 			},
 			// 搜索结果列表
@@ -55,40 +57,40 @@
 		},
 		onLoad() {
 			_this=this;
-					
-			var storagelist=uni.getStorageSync("allUser");
-			
-			if(storagelist){
+							
+			// var storagelist=uni.getStorageSync("allUser");
+			// console.log(JSON.stringify(_this.list))
+			// if(storagelist){
+			// 	uni.showLoading({
+			// 		"title":"加载中，请稍候..."
+			// 	})
+			// 	_this.list = storagelist;
+			// 	var loadTimer = setTimeout(function() {
+			// 		uni.hideLoading();
+			// 		clearTimeout(loadTimer);
+			// 	}, 1000);
+				
+			// }else{
 				uni.showLoading({
 					"title":"加载中，请稍候..."
 				})
-				console.log(storagelist.length)
-				this.list = storagelist;
-				var loadTimer = setTimeout(function() {
-					uni.hideLoading();
-					clearTimeout(loadTimer);
-				}, 1000);
-				
-			}else{
-				uni.showLoading({
-					"title":"首次加载，数据量较大请稍候..."
-				})
 				uni.request({
-					url: 'http://117.83.152.39:8081/interconnect/appUser/search',
+					url: SERVER_API+ 'appUser/search',
 					header: {
-						"token": 'e463192ddfad487682638189f64020b9',
+						"token": uni.getStorageSync("setUserData").token,
 						"Content-Type":"application/json;charset=utf-8"
 					},
 					method:"POST",
 					success(res) {
+						console.log(res)
 						uni.hideLoading()
 						var data = res.data.result;
 						_this.list = data;
-						uni.setStorageSync("allUser",_this.list);
+						// uni.setStorageSync("allUser",_this.list);
 						
 					}
 				})
-			}		
+			// }
 		},
 		mounted(){
 			// 监听键盘高度变化
@@ -97,8 +99,64 @@
 			})
 		},
 		methods: {
-			follow(phone,i){
-				console.log(phone+"==="+i)
+			test(item){
+				console.log(JSON.stringify(item))
+			},
+			follow(followId,isFollow,i){
+				console.log(followId+"=="+isFollow+"=="+i)
+				if(!isFollow){
+					uni.request({
+						url:SERVER_API+'appUser/follow',
+						data:{
+							followId:followId
+						},
+						method:"POST",
+						success(res){
+							if(res.data.code==1){
+								uni.showToast({
+									"title":"关注成功",
+									"position":"bottom"
+								})
+								if(_this.keyword==""){
+									_this.list[i].isFollow=!isFollow
+								}else{
+									_this.searchList.isFollow=!isFollow
+								}
+							}else{
+								uni.showToast({
+									"title":res.data.message,
+									"position":"bottom"
+								})
+							}
+						}
+					})
+				}else{
+					uni.request({
+						url:SERVER_API+'appUser/unfollow',
+						data:{
+							followId:followId
+						},
+						method:"POST",
+						success(res){
+							if(res.data.code==1){
+								uni.showToast({
+									"title":"取消关注",
+									"position":"bottom"
+								})
+								if(_this.keyword==""){
+									_this.list[i].isFollow=!isFollow
+								}else{
+									_this.searchList.isFollow=!isFollow
+								}
+							}else{
+								uni.showToast({
+									"title":res.data.message,
+									"position":"bottom"
+								})
+							}
+						}
+					})
+				}
 			}
 		}
 	}

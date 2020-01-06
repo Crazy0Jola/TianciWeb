@@ -39,6 +39,8 @@
 	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
 	import image from '@/common/image.js';
 	
+	var SERVER_API = getApp().globalData.SERVER_API;
+	
 	var sourceType = [
 		['camera'],
 		['album'],
@@ -87,31 +89,34 @@
 		methods: {
 			async publish(){
 				if (!this.input_content) {
-					uni.showModal({ content: '内容不能为空', showCancel: false, });
+					uni.showToast({
+						"title":"内容不能为空",
+						"position":"bottom"
+					})
 					return;
 				}
 				
 				uni.showLoading({title:'发布中'});
 				
-				var location = await this.getLocation();//位置信息,可删除,主要想记录一下异步转同步处理
+				// var location = await this.getLocation();//位置信息,可删除,主要想记录一下异步转同步处理
+				
 				var images = [];
-				for(var i = 0,len = this.imageList.length; i < len; i++){
-					var image_obj = {name:'image-'+i,uri:this.imageList[i]};
+				for(var i = 1,len = this.imageList.length; i <=len; i++){
+					var image_obj = {name:'image'+i,uri:this.imageList[i]};
 					images.push(image_obj);
 				}
 				
-				uni.uploadFile({//该上传仅为示例,可根据自己业务修改或封装,注意:统一上传可能会导致服务器压力过大
-					url: 'moment/moments', //仅为示例，非真实的接口地址
-					files:images,//有files时,会忽略filePath和name
-					filePath: '',
-					name: '',
-					formData: {//后台以post方式接收
-						'user_id':'1',//自己系统中的用户id
-						'text': this.input_content,//moment文字部分
-						'longitude':location.longitude,//经度
-						'latitude':location.latitude//纬度
+				uni.uploadFile({
+					url: SERVER_API+'appFriends/publish', 
+					files:images,
+					formData: {
+						'content': this.input_content,//moment文字部分
+					},
+					header:{
+						token:uni.getStorageSync("setUserData").token
 					},
 					success: (uploadFileRes) => {
+						console.log(uploadFileRes)
 						uni.hideLoading();
 						uni.showToast({
 							icon:'success',

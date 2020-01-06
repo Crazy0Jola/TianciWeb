@@ -1,0 +1,91 @@
+<template>
+	<view>
+		<!-- 导航栏 -->
+		<free-nav-bar :title="title" showBack :showRight="true">
+			<free-main-button @click="save" name="保存" slot="right" :disabled="getValue"></free-main-button>
+		</free-nav-bar>
+		<input class="m-2 border-bottom" maxlength="32" focus placeholder="请输入群聊名称"  v-model="value" v-if="editName" />
+		<textarea class="m-2" style="height:500rpx;" maxlength="108" focus placeholder="请输入群公告"  v-model="value" v-if="!editName" ></textarea>
+	</view>
+</template>
+
+<script>
+	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
+	import freeMainButton from '@/components/free-ui/free-main-button.vue';
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	
+	var JIM = getApp().globalData.JIM;
+	var _this;
+	export default {
+		data() {
+			return {
+				gid:"",
+				title:"群聊名称",
+				value:"test",
+				editName:true
+			}
+		},
+		computed:{
+			getValue(){
+				if(_this.value==""){
+					return true;
+				}else{
+					return false;
+				}
+			}
+		},
+		components: {
+			freeNavBar,
+			freeMainButton
+		},
+		onLoad:function(e){
+			_this=this;
+			_this.gid=e.gid;
+			if(e.title=="群聊名称"){
+				_this.editName=true;
+			}else{
+				_this.editName=false;
+			}
+			_this.title=e.title;
+			_this.value=e.value;
+		},
+		methods: {
+			save(){
+				uni.showLoading({					
+					"title":"正在保存",
+				})
+				if(_this.editName){
+					JIM.updateGroupInfo({
+					'gid' : _this.gid,
+					'group_name' : _this.value
+					}).onSuccess(function(data) {
+						uni.hideLoading()
+						uni.navigateBack()
+					}).onFail(function(data) {
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})
+					});
+				}else{
+					JIM.updateGroupInfo({
+					'gid' : _this.gid,
+					'group_description' : _this.value
+					}).onSuccess(function(data) {
+						uni.hideLoading()
+						uni.navigateBack()
+					}).onFail(function(data) {
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})
+					});
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

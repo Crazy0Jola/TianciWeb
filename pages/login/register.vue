@@ -17,7 +17,7 @@
 				<wInput
 					v-model="verCode"
 					type="number"
-					maxlength="4"
+					maxlength="6"
 					placeholder="验证码"
 					
 					isShowCode
@@ -27,17 +27,30 @@
 				<wInput
 					v-model="passData"
 					type="password"
-					maxlength="11"
 					placeholder="登录密码"
 					isShowPass
 				></wInput>
-				
+				<view class="flex">
+					<wInput
+							myClass="flex-sub"
+							v-model="name"
+							type="text"
+							placeholder="姓名"
+						></wInput>
+					<view class="flex-sub mt-3 ml-3">
+						性别：
+						<switch class="switch-sex" @change="SwitchSex" :class="skin?'checked':''" :checked="skin?true:false"></switch>
+					</view>
+				</view>
 				<wInput
-						v-model="name"
-						type="text"
-						maxlength="11"
-						placeholder="姓名"
-					></wInput>
+					v-model="inviter"
+					type="text"
+					placeholder="邀请人(选填)"
+					isShowPass
+				></wInput>
+				
+				
+				
 			</view>
 				
 			<wButton 
@@ -54,7 +67,7 @@
 					:class="showAgree?'cuIcon-radiobox':'cuIcon-round'"
 				>同意</text>
 				<!-- 协议地址 -->
-				<navigator url="" open-type="navigate">《协议》</navigator>
+				<navigator url="http://117.83.152.39:8081/agreement/index.html" open-type="navigate">《协议》</navigator>
 			</view>
 		</view>
 	</view>
@@ -62,9 +75,13 @@
 
 <script>
 	var _this;
-	import wInput from '../../components/watch-login/watch-input.vue' //input
-	import wButton from '../../components/watch-login/watch-button.vue' //button
+	import wInput from '@/components/watch-login/watch-input.vue' //input
+	import wButton from '@/components/watch-login/watch-button.vue' //button
+	import Bmob from '@/js_sdk/Bmob-1.7.1.min.js'
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	
 	var JIM = getApp().globalData.JIM;
+	var SERVER_API = getApp().globalData.SERVER_API;
 	export default {
 		data() {
 			return {
@@ -76,6 +93,8 @@
 				name:"",//姓名
 				showAgree:true, //协议是否选择
 				isRotate: false, //是否加载旋转
+				skin: false,//女
+				inviter:"",//邀请人
 			}
 		},
 		components:{
@@ -85,37 +104,42 @@
 		mounted() {
 			_this= this;
 		},
+		onLoad(){
+			Bmob.initialize("6c6118d83d45988daab23d65cd5652f3", "9fa3739eae864caea501a9fa1621d437");	
+		},
 		methods: {
+			SwitchSex(e) {
+				this.skin = e.detail.value
+			},
 			isShowAgree(){
 				//是否选择协议
 				_this.showAgree = !_this.showAgree;
 			},
 			getVerCode(){
+				var that = this;
 				//获取验证码
-				if (_this.phoneData.length != 11) {
-				     uni.showToast({
+				if(!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(_this.phoneData))) {
+				    uni.showToast({
 				        icon: 'none',
 						position: 'bottom',
 				        title: '手机号不正确'
 				    });
 				    return false;
 				}
-				console.log("获取验证码")
-				this.$refs.runCode.$emit('runCode'); //触发倒计时（一般用于请求成功验证码后调用）
-				uni.showToast({
-				    icon: 'none',
-					position: 'bottom',
-				    title: '模拟倒计时触发'
-				});
-				
-				
-					_this.$refs.runCode.$emit('runCode',0); //假装模拟下需要 终止倒计时
+				Bmob.requestSmsCode({"mobilePhoneNumber": _this.phoneData,"template":"tianci"} ).then(function(obj) {
 					uni.showToast({
 					    icon: 'none',
 						position: 'bottom',
-					    title: '模拟倒计时终止'
+					    title: '验证码已发送'
 					});
-
+					that.$refs.runCode.$emit('runCode'); //触发倒计时（一般用于请求成功验证码后调用）
+				}, function(err){
+					uni.showToast({
+					    icon: 'none',
+						position: 'bottom',
+					    title: err
+					});
+				});
 			},
 		    startReg() {
 				//注册
@@ -131,7 +155,7 @@
 				    });
 				    return false;
 				}
-				if (this.phoneData.length !=11) {
+				if(!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(_this.phoneData))) {
 				    uni.showToast({
 				        icon: 'none',
 						position: 'bottom',
@@ -147,11 +171,11 @@
 		            });
 		            return false;
 		        }
-				if (this.verCode.length != 4) {
+				if (this.verCode.length != 6) {
 				    uni.showToast({
 				        icon: 'none',
 						position: 'bottom',
-				        title: '验证码不正确'
+				        title: '请输入6位验证码'
 				    });
 				    return false;
 				}
@@ -166,40 +190,70 @@
 				
 				_this.isRotate=true
 				
-				JIM.register({
-				    'username' : _this.phoneData,
-					'password': _this.passData,
-					'nickname' : _this.name
-				}).onSuccess(function(data) {
-				    console.log('success:' + JSON.stringify(data));		
-					uni.showToast({
-						icon: 'success',
-						position: 'bottom',
-						title: '注册成功！'
-					});
-					_this.isRotate=false;
-				}).onFail(function(data) {
-				    console.log('error:' + JSON.stringify(data))
-					if(data.code==882002){
-						uni.showToast({
-							icon: 'none',
-							position: 'bottom',
-							title: '该手机号已注册！'
-						});
-					}else{
-						uni.showToast({
-							icon: 'none',
-							position: 'bottom',
-							title: getCodeMsg(data.code)
-						});
+				uni.request({
+					url:SERVER_API+"appUser/userReg",
+					data:{
+						"phone":_this.phoneData,
+						"name":_this.name,
+						"phoneCode":_this.verCode,
+						"password":_this.passData,
+						sex:_this.skin?'1':'2',
+						inviter:_this.inviter
+					},
+					header:{
+						"token":"token"
+					},
+					method:"POST",
+					success(res){
+						console.log(res)
+						if(res.data.code==1){
+							JIM.register({
+							    'username' : res.data.result,
+								'password': _this.passData,
+								'nickname' : _this.name,
+								"gender":_this.skin?'1':'2'
+							}).onSuccess(function(data) {
+							    console.log('success:' + JSON.stringify(data));		
+								uni.showToast({
+									icon: 'success',
+									position: 'bottom',
+									title: '注册成功！'
+								});
+								_this.isRotate=false;
+							}).onFail(function(data) {
+							    console.log('error:' + JSON.stringify(data))
+								if(data.code==882002){
+									uni.showToast({
+										icon: 'none',
+										position: 'bottom',
+										title: '该手机号已注册！'
+									});
+								}else{
+									uni.showToast({
+										icon: 'none',
+										position: 'bottom',
+										title: getCodeMsg(data.code)
+									});
+								}
+								_this.isRotate=false;
+							});
+						}else{
+							uni.showToast({
+								"title":res.data.message,
+								"position":"bottom"
+							})
+							_this.isRotate=false;
+						}	
 					}
-					_this.isRotate=false;
-				});
+				})
 		    }
 		}
 	}
 </script>
 
 <style>
+	@import url("../../colorui/icon.css");
+	@import url("../../colorui/main.css");
 	@import url("./css/main.css");
+		
 </style>

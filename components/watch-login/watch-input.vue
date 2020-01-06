@@ -1,5 +1,5 @@
 <template>
-	<view class="main-list oBorder">
+	<view class="main-list oBorder" :class="myClass" :style="myStyle">
 		<!-- 文本框 -->
 		<input 
 			class="main-input" 
@@ -38,6 +38,8 @@
 			}
 		},
 		props:{
+			myStyle:String,
+			myClass:String,
 			type: String, //类型
 			value: String, //值
 			placeholder: String, //框内提示
@@ -164,41 +166,41 @@
 	@import url("./css/icon.css");
 	
 	.main-list{
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		height: 36upx;   /* Input 高度 */
-		color: #333333;
-		padding: 32upx;
-		margin-top:24upx;
-		margin-bottom: 24upx;
+		display: flex!important;
+		flex-direction: row!important;
+		justify-content: space-between!important;
+		align-items: center!important;
+		height: 36upx!important;   /* Input 高度 */
+		color: #333333!important;
+		padding: 32upx!important;
+		margin-top:24upx!important;
+		margin-bottom: 24upx!important;
 	}
 	.img{
-		width: 32upx;
-		height: 32upx;
-		font-size: 32upx;
+		width: 32upx!important;
+		height: 32upx!important;
+		font-size: 32upx!important;
 	}
 	.main-input{
-		flex: 1;
-		text-align: left;
-		font-size: 28upx;
+		flex: 1!important;
+		text-align: left!important;
+		font-size: 28upx !important;
 		/* line-height: 100upx; */
-		padding-right: 10upx;
-		margin-left: 20upx;
+		padding-right: 10upx !important;
+		margin-left: 20upx !important;
 	}
 	.vercode {
-		color: rgba(0,0,0,0.7);
-		font-size: 24upx;
-		line-height: 100upx;
+		color: rgba(0,0,0,0.7)!important;
+		font-size: 24upx!important;
+		line-height: 100upx!important;
 	}
 	.vercode-run {
 		color: rgba(0,0,0,0.4) !important;
 	}
 	.oBorder{
-	    border: none;
-	    border-radius: 2.5rem ;
-	    -webkit-box-shadow: 0 0 60upx 0 rgba(43,86,112,.1) ;
-	    box-shadow: 0 0 60upx 0 rgba(43,86,112,.1) ;
+	    border: none!important;
+	    border-radius: 2.5rem !important;
+	    -webkit-box-shadow: 0 0 60upx 0 rgba(43,86,112,.1)!important ;
+	    box-shadow: 0 0 60upx 0 rgba(43,86,112,.1)!important ;
 	}
 </style>

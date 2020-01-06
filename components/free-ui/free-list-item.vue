@@ -5,16 +5,16 @@
 		v-if="showLeftIcon">
 			<slot name="icon"></slot>
 			<image :src="cover" v-if="cover"
-			mode="widthFix" :style="coverStyle"></image>
+			mode="aspectFill" :style="coverStyle"></image>
 		</view>
-		<view class="flex-1 flex align-center justify-between pr-3 py-3 pl-3" :class="border ? 'border-bottom' : ''">
+		<view class="flex-1 flex align-center  justify-between pr-3 py-3 pl-3" :class="border ? 'border-bottom' : ''">
 			<slot>
 				<text class="font-md text-dark">{{title}}</text>
 			</slot>
 			<view class="flex align-center" v-if="showRight">
 				<slot name="right"></slot>
 				<!-- 右箭头 -->
-				<text v-if="showRightIcon" class="iconfont text-light-muted font-md">&#xe60c;</text>
+				<text v-if="showRightIcon" class="iconfont text-light-muted font-md">&#xe605;</text>
 			</view>
 		</view>
 	</view>

@@ -4,9 +4,9 @@
 		<view class="home-pic">
 			<view class="home-pic-base">
 				<view class="top-pic">
-					<image class="header" src="../../../static/moments/test/header06.jpg" @tap="test"></image>
+					<image class="header" :src="myAvatar" @tap="goView"></image>
 				</view>
-				<view class="top-name">Liuxy</view>
+				<view class="top-name">{{name}}</view>
 			</view>
 		</view>
 
@@ -67,6 +67,9 @@
 		},
 		data() {
 			return {
+				name:"",
+				myAvatar:"",
+				
 				posts: postData,//模拟数据
 				user_id: 4,
 				username: 'Liuxy',
@@ -160,9 +163,6 @@
 			
 		},
 		methods: {
-			test(){
-				this.navigateTo('../test/test');
-			},
 			navigateTo(url) {
 				uni.navigateTo({
 					url: url

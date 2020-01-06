@@ -2,13 +2,17 @@
 	import Vue from 'vue'
 	import JMessage from 'js_sdk/jmessage-wxapplet-sdk-1.4.2.min.js'
 	import md5 from 'js_sdk/md5.min.js'
-	
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	import simpleCache from "@/js_sdk/Simple-Cache.js"
 	var JIM = new JMessage({
 		debug:true
 	})
+	var SERVER_API="http://117.83.152.39:8081/interconnect/";
 	export default {
 		globalData:{
-			JIM:JIM
+			JIM:JIM,
+			SERVER_API:SERVER_API,
+			simpleCache:simpleCache
 		},
 		onLaunch: function() {
 			var appkey='09970876f33e884a3624335c';
@@ -16,15 +20,16 @@
 			var timestamp=(new Date()).getTime();
 			var signature;
 			uni.request({
-				url: 'http://117.83.152.39:8081/interconnect/appUser/getJMKey',
+				url: SERVER_API+'appUser/getJMKey',
 				header: {
-					"token": 'e463192ddfad487682638189f64020b9',
+					"token": '1ab5f25e6e44485fb69646158126b6f6',
 					"Content-Type":"application/json"
 				},
 				data:{
 					timestamp:timestamp
 				},
 				success(res) {
+					console.log(res)
 					signature = res.data.result;
 					JIM.init({
 							  "appkey"    : appkey,
@@ -36,10 +41,10 @@
 						console.log('Init-success:' + JSON.stringify(data));	
 						uni.$emit("JIMinit",{})
 					}).onFail(function(data) {
-					    uni.showToast({
-					    	"title":getCodeMsg(data.code),
-					    	"position":"bottom"
-					    })	    
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})	    
 					});
 				}
 			})
@@ -47,7 +52,7 @@
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
 			    'fontFamily': "iconfont",
-			    'src': "url('https://at.alicdn.com/t/font_1587665_7eqr0fco5qs.ttf')"
+			    'src': "url('https://at.alicdn.com/t/font_1587665_c865desruai.ttf')"
 			});
 			// 初始化录音管理器
 			this.$store.commit('initRECORD')
@@ -88,6 +93,8 @@
 			
 		},
 		onShow: function() {
+			uni.setStorageSync("token","1772b438615944e09c42603130e04cbe")
+			
 			uni.getStorageInfo({
 				success: function (res) {
 					console.log(res.keys);
@@ -99,9 +106,9 @@
 				var timestamp=(new Date()).getTime();
 				var signature;
 				uni.request({
-					url: 'http://117.83.152.39:8081/interconnect/appUser/getJMKey',
+					url: SERVER_API+'appUser/getJMKey',
 					header: {
-						"token": 'e463192ddfad487682638189f64020b9',
+						"token": '1ab5f25e6e44485fb69646158126b6f6',
 						"Content-Type":"application/json"
 					},
 					data:{

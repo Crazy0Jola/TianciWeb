@@ -2,12 +2,12 @@
 	<view>
 		
 		<!-- 导航栏 -->
-		<free-nav-bar title="发起群聊" showBack :showRight="true">
+		<free-nav-bar :title="isAdd?'选择联系人':'发起群聊'" showBack :showRight="true">
 			<free-main-button @click="addGroup" :name="'确定 ('+selectCount+')'" slot="right"></free-main-button>
 		</free-nav-bar>
 		
 		
-		<view class="flex" style="height: 100rpx;">
+		<view class="flex" style="height: 100rpx;" v-if="!isAdd">
 			<view  class="flex-1 pl-2 text-center justify-center">
 				<text class="font-md ">群聊名称</text>
 			</view>
@@ -15,6 +15,16 @@
 				<input v-model="gname" class="font-md" focus placeholder="请输入群聊名称" />
 			</view>
 		</view>
+		
+		<view class="noConversation" v-if="list.length==0">
+			<view>
+				<text class="iconfont text-gray text-center" style="font-size: 200rpx;">&#xe662;</text>
+			</view>
+			<view>
+				<text class=" font-md text-gray text-center">暂无关注好友</text>
+			</view>
+		</view>
+		
 		<!-- 通讯录列表 -->
 		<scroll-view scroll-y="true" :style="'height:'+scrollHeight+'px;'"
 		:scroll-into-view="scrollInto">
@@ -25,8 +35,8 @@
 					<text class="font-md text-dark">{{item.letter}}</text>
 				</view>
 				<free-list-item v-for="(item2,index2) in item.data" 
-				:key="index2" :title="item2.username" 
-				:cover="item2.avatar"
+				:key="index2" :title="item2.name" 
+				:cover="item2.photo?item2.photo:'/static/images/userpic.jpg'"
 				:showRightIcon="false" showRight
 				@click="selectItem(item2)">
 					<view slot="right"
@@ -61,8 +71,10 @@
 	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
 	import freeListItem from "@/components/free-ui/free-list-item.vue"
 	import freeMainButton from '@/components/free-ui/free-main-button.vue';
-	
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	import {initial} from "@/js_sdk/chineseConversion.js" //引入汉字转拼音
 	var JIM = getApp().globalData.JIM;
+	var SERVER_API = getApp().globalData.SERVER_API;
 	var _this;
 	
 	export default {
@@ -75,185 +87,14 @@
 			return {
 				gid:'',
 				gname:'',
-				list: [{
-				    "letter": "A",
-				    "data": [
-				        "test1",
-				        "test2",
-				        "阿勒",
-				        "阿里",
-				        "安庆",
-				        "澳机"
-				    ]
-				}, {
-				    "letter": "B",
-				    "data": [
-				        "保罗",
-				        "包头",
-				        "北海福成",
-				        "北南苑",
-				        "北都国际"
-				    ]
-				}, {
-				    "letter": "C",
-				    "data": [
-				        "长山场",
-				        "长国",
-				        "常德",
-				        "长花~",
-				        "长王",
-				        "常机",
-				        "成双",
-				        "赤峰"
-				    ]
-				}, {
-				    "letter": "D",
-				    "data": [
-				        "大理爱你",
-				        "大周哈哈",
-				        "达河",
-				        "丹浪",
-				        "德芒",
-				        "迪香里拉",
-				    ]
-				}, {
-				    "letter": "E",
-				    "data": [
-				        "鄂多斯",
-				    ]
-				}, {
-				    "letter": "F",
-				    "data": [
-				        "福乐",
-				    ]
-				}, {
-				    "letter": "G",
-				    "data": [
-				        "固原六盘",
-				        "广盘龙",
-				        "广白机",
-				        "桂江",
-				    ]
-				}, {
-				    "letter": "H",
-				    "data": [
-				        "哈尔滨太平",
-				        "哈密",
-				        "海美兰",
-				        "海拉尔",
-				        "邯郸",
-				    ]
-				}, {
-				    "letter": "I",
-				    "data": []
-				}, {
-				    "letter": "J",
-				    "data": [
-				        "鸡西兴",
-				        "佳木斯",
-				        "嘉峪",
-				    ]
-				}, {
-				    "letter": "K",
-				    "data": [
-				        "克拉玛依",
-				        "库车龟兹",
-				        "库尔勒",
-				    ]
-				}, {
-				    "letter": "L",
-				    "data": [
-				        "拉萨贡嘎",
-				        "黎平",
-				        "林芝米",
-				        "柳州白莲",
-				    ]
-				}, {
-				    "letter": "M",
-				    "data": [
-				        
-				    ]
-				}, {
-				    "letter": "N",
-				    "data": [
-				        
-				    ]
-				}, {
-				    "letter": "O",
-				    "data": []
-				}, {
-				    "letter": "P",
-				    "data": [
-				        "普洱思茅"
-				    ]
-				}, {
-				    "letter": "Q",
-				    "data": [
-				        "齐齐哈尔",
-				        "秦皇岛山",
-				        "青岛流亭",
-				        "衢州机场",
-				        "泉州晋江机场"
-				    ]
-				}, {
-				    "letter": "R",
-				    "data": [
-				        "日喀则和"
-				    ]
-				}, {
-				    "letter": "S",
-				    "data": [
-				        "三亚凤凰",
-				        "汕头",
-				        "上海虹桥",
-				        "上海浦东",
-				        "深圳宝安",
-				        "沈阳桃仙",
-				        "石家庄正定",
-				        "苏南硕放"
-				    ]
-				}, {
-				    "letter": "T",
-				    "data": [
-				        "塔城",
-				    ]
-				}, {
-				    "letter": "U",
-				    "data": []
-				}, {
-				    "letter": "V",
-				    "data": []
-				}, {
-				    "letter": "W",
-				    "data": [
-				        "文山",
-				        "温永强",
-				        "乌海",
-				        "武汉天",
-				    ]
-				}, {
-				    "letter": "X",
-				    "data": [
-				    ]
-				}, {
-				    "letter": "Y",
-				    "data": [
-				    ]
-				}, {
-				    "letter": "Z",
-				    "data": [
-				        "昭通",
-				        "芷江",
-				        "中卫",
-				        "舟山",
-				    ]
-				}],
+				list: [],
 				
 				top:0,
 				scrollHeight:0,
 				scrollInto:'',
 				current:'',
-				selectList:[]
+				selectList:[],
+				isAdd:false,//增加成员
 			}
 		},
 		mounted(){
@@ -262,21 +103,44 @@
 		
 			})
 		},
-		onLoad() {
+		onShow(){
+			_this.list=[];
+			for(var i=0;i<26;i++){
+				var obj = {
+					letter:String.fromCharCode(65+i),
+					data:[]
+				}
+				_this.list.push(obj);
+			}
+			uni.request({
+				url:SERVER_API+"appUser/contact",
+				header:{
+					"token":uni.getStorageSync("setUserData").token
+				},
+				method:"POST",
+				success(res){
+					var result = res.data.result;
+					var len = result.length
+					for(var i=0;i<len;i++){
+						let letter = initial(result[i].name)
+						let index = letter.charCodeAt()-65;
+						_this.list[index].data.push(result[i])
+					}
+					
+				}
+			})
+		},
+		onLoad:function(e) {
 			_this=this;
+			if(e.gid){
+				_this.gid=e.gid;
+				_this.gname=e.gname;
+				_this.isAdd=true;
+			}
+			
 			let res = uni.getSystemInfoSync()
 			this.top = res.statusBarHeight + uni.upx2px(90)
 			this.scrollHeight = res.windowHeight - this.top -uni.upx2px(100)
-			
-			this.list.forEach(item=>{
-				item.data = item.data.map(username=>{
-					return {
-						username:username,
-						avatar:"/static/images/mail/friend.png",
-						checked:false
-					}
-				})
-			})
 		},
 		computed: {
 			modalTop(){
@@ -297,51 +161,85 @@
 		},
 		methods: {
 			addGroup(){
-				if(this.gname==""){
-					uni.showToast({
-						"title":"请输入群聊名称",
-						"icon":"none"
-					})
-					return;
+				if(!_this.isAdd){
+					if(this.gname==""){
+						uni.showToast({
+							"title":"请输入群聊名称",
+							"icon":"none"
+						})
+						return;
+					}
+					if(this.selectList.length<2){
+						uni.showToast({
+							"title":"请至少选择两位好友",
+							"icon":"none"
+						})
+						return;
+					}
+				}else{
+					if(this.selectList.length<1){
+						uni.showToast({
+							"title":"请至少选择一位好友",
+							"icon":"none"
+						})
+						return;
+					}
 				}
-				if(this.selectList.length<2){
-					uni.showToast({
-						"title":"请至少选择两个好友",
-						"icon":"none"
-					})
-					return;
-				}
+				
 				this.selectList = this.selectList.map(res=>{
 					return {
-						username:res.username,
+						username:res.token,
 					}
 				})
-				JIM.createGroup({
-					'group_name' : _this.gname,
-				}).onSuccess(function(data) {
-					console.log("============="+data.gid+"============")
-					_this.gid=data.gid;
+				if(_this.isAdd){
+					console.log(JSON.stringify(_this.selectList))
 					JIM.addGroupMembers({
-						'gid' : data.gid,
+						'gid' : _this.gid,
 						'member_usernames' : _this.selectList
 					}).onSuccess(function(data) {
+						uni.showToast({
+							"title":"邀请成功",
+							"position":"bottom"
+						})
 						uni.navigateTo({
 							url:"../groupChat/groupChat?gid="+_this.gid+"&gname="+_this.gname
 						})
-
+					
+					}).onFail(function(data) {
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})
+						uni.redirectTo({
+							url:`../addGroup/addGroup?gid=${_this.gid}&gname=${_this.gname}`
+						})
+					});
+				}else{
+					JIM.createGroup({
+						'group_name' : _this.gname,
+					}).onSuccess(function(data) {
+						_this.gid=data.gid;
+						JIM.addGroupMembers({
+							'gid' : data.gid,
+							'member_usernames' : _this.selectList
+						}).onSuccess(function(data) {
+							uni.navigateTo({
+								url:"../groupChat/groupChat?gid="+_this.gid+"&gname="+_this.gname
+							})
+					
+						}).onFail(function(data) {
+							uni.showToast({
+								"title":getCodeMsg(data.code),
+								"position":"bottom"
+							})
+						});
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
 							"position":"bottom"
 						})
 					});
-				}).onFail(function(data) {
-					uni.showToast({
-						"title":getCodeMsg(data.code),
-						"position":"bottom"
-					})
-				});
-				console.log(JSON.stringify(this.selectList))
+				}
 			},
 			touchstart(e){
 				this.changeScrollInto(e)

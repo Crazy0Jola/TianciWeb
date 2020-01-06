@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "free-nav-bar": "/components/free-ui/free-nav-bar",
+    "free-list-item": "/components/free-ui/free-list-item",
+    "free-avater": "/components/free-ui/free-avater",
+    "free-divider": "/components/free-ui/free-divider"
+  }
+}

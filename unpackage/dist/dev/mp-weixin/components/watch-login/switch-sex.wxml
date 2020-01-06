@@ -1,0 +1,1 @@
+<view class="flex-sub mt-3 ml-3 data-v-6e1e354d">性别：<switch class="{{['switch-sex data-v-6e1e354d',skin?'checked':'']}}" checked="{{skin?true:false}}" data-event-opts="{{[['change',[['SwitchSex',['$event']]]]]}}" bindchange="__e"></switch></view>

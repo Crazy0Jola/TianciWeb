@@ -54,6 +54,7 @@
 	
 	var _this;
 	var JIM=getApp().globalData.JIM;
+	var SERVER_API=getApp().globalData.SERVER_API;
 	export default {
 		components:{
 			freeNavBar,
@@ -88,6 +89,40 @@
 				JIM.getConversation().onSuccess(function(data) {
 					console.log('success:Conversation222222===========' + JSON.stringify(data));
 					_this.list=data.conversations.reverse();
+					var tokenList=[]
+					var len=_this.list.length;
+					for(var i =0;i<len;i++){
+						if(_this.list[i].type==4&&_this.list[i].avatar){//是群聊并且有头像就要获取头像地址
+							_this.getPic(_this.list[i].avatar,i)
+						}else{
+							tokenList.push(_this.list[i].username)
+						}
+					}
+					var userData = uni.getStorageSync("setUserData")
+					var token = userData.token
+					tokenList.push(token)
+					if(tokenList.length>0){
+						uni.request({
+							url:SERVER_API+'appUser/getUserPhotoByToken',
+							data:tokenList,
+							header:{
+								token:token
+							},
+							method:"POST",
+							success(res){
+								console.log(res)
+								for(var i=0;i<len-1;i++){
+									if(_this.list[i].type==3){//是单聊
+										var name= _this.list[i].username;
+										_this.list[i].avatar=res.data.result[name]
+									}	
+								}
+								userData.avatar = res.data.result[token];
+								uni.setStorageSync('setUserData',userData)
+							}
+						})
+					}
+					uni.hideLoading()
 				}).onFail(function(data) {
 					uni.showToast({
 						"title":getCodeMsg(data.code),
@@ -113,6 +148,39 @@
 				JIM.getConversation().onSuccess(function(data) {
 					console.log('success:Conversation222222===========' + JSON.stringify(data));
 					_this.list=data.conversations.reverse();
+					var tokenList=[]
+					var len=_this.list.length;
+					for(var i =0;i<len;i++){
+						if(_this.list[i].type==4&&_this.list[i].avatar){//是群聊并且有头像就要获取头像地址
+							_this.getPic(_this.list[i].avatar,i)
+						}else{
+							tokenList.push(_this.list[i].username)
+						}
+					}
+					var userData = uni.getStorageSync("setUserData")
+					var token = userData.token
+					tokenList.push(token)
+					if(tokenList.length>0){
+						uni.request({
+							url:SERVER_API+'appUser/getUserPhotoByToken',
+							data:tokenList,
+							header:{
+								token:token
+							},
+							method:"POST",
+							success(res){
+								console.log(res)
+								for(var i=0;i<len-1;i++){
+									if(_this.list[i].type==3){//是单聊
+										var name= _this.list[i].username;
+										_this.list[i].avatar=res.data.result[name]
+									}	
+								}
+								userData.avatar = res.data.result[token];
+								uni.setStorageSync('setUserData',userData)
+							}
+						})
+					}
 					uni.hideLoading()
 				}).onFail(function(data) {
 					uni.showToast({
@@ -134,9 +202,9 @@
 						var timestamp=(new Date()).getTime();
 						var signature;
 						uni.request({
-							url: 'http://117.83.152.39:8081/interconnect/appUser/getJMKey',
+							url: SERVER_API+'appUser/getJMKey',
 							header: {
-								"token": 'e463192ddfad487682638189f64020b9',
+								"token": '1ab5f25e6e44485fb69646158126b6f6',
 								"Content-Type":"application/json"
 							},
 							data:{
@@ -191,6 +259,19 @@
 
 		},
 		methods: {
+			getPic(media_id,index){
+				console.log(media_id+"=="+index)
+				JIM.getResource({
+					'media_id' : media_id,
+				}).onSuccess(function(res) {
+					_this.list[index].avatar=res.url;
+				}).onFail(function(res) {
+					uni.showToast({
+						"title":getCodeMsg(res.code),
+						"position":"bottom"
+					})
+				});
+			},
 			login(username,password){
 				uni.showLoading({
 					title:"读取消息列表中..."
@@ -346,9 +427,6 @@
 						}
 				    });
 					
-				    JIM.onEventNotification(function(data) {
-				        console.log('event_receive: ' + JSON.stringify(data));
-				    });
 					
 					JIM.onSyncConversation(function(data) { //离线消息同步监听
 						console.log("SSSSSSSSSSSSSSSSSS"+JSON.stringify(data))
@@ -473,50 +551,90 @@
 						var conversationTimer = setTimeout(()=>{
 							//获取会话列表
 							JIM.getConversation().onSuccess(function(data) {
-								console.log('success:Conversation3333===========' + JSON.stringify(data));
+								console.log('success:Conversation222222===========' + JSON.stringify(data));
 								_this.list=data.conversations.reverse();
+								var tokenList=[]
+								var len=_this.list.length;
+								for(var i =0;i<len;i++){
+									if(_this.list[i].type==4&&_this.list[i].avatar){//是群聊并且有头像就要获取头像地址
+										_this.getPic(_this.list[i].avatar,i)
+									}else{
+										tokenList.push(_this.list[i].username)
+									}
+								}
+								var userData = uni.getStorageSync("setUserData")
+								var token = userData.token
+								tokenList.push(token)
+								if(tokenList.length>0){
+									uni.request({
+										url:SERVER_API+'appUser/getUserPhotoByToken',
+										data:tokenList,
+										header:{
+											token:token
+										},
+										method:"POST",
+										success(res){
+											console.log(res)
+											for(var i=0;i<len-1;i++){
+												if(_this.list[i].type==3){//是单聊
+													var name= _this.list[i].username;
+													_this.list[i].avatar=res.data.result[name]
+												}	
+											}
+											userData.avatar = res.data.result[token];
+											uni.setStorageSync('setUserData',userData)
+										}
+									})
+								}
 								uni.hideLoading()
 							}).onFail(function(data) {
-								console.log('error:' + JSON.stringify(data));
+								uni.showToast({
+									"title":getCodeMsg(data.code),
+									"position":"bottom"
+								})
 							});
 							clearTimeout(conversationTimer)
 						},500)
 						
 				    });
 					
-				    JIM.onUserInfUpdate(function(data) {
-				        console.log('onUserInfUpdate : ' + JSON.stringify(data));
-				    });
-					 
-				    JIM.onSyncEvent(function(data) {
-				        console.log('onSyncEvent : ' + JSON.stringify(data));
-				    });
-					
-					JIM.onMsgReceiptChange(function(data){
-					    console.log('onMsgReceiptChange : ' + JSON.stringify(data));
-					});
-					
-					JIM.onSyncMsgReceipt(function(data){
-					    console.log('onSyncMsgReceipt : ' + JSON.stringify(data));				
-					});
-					
-					JIM.onMutiUnreadMsgUpdate(function(data){
-					    console.log('onConversationUpdate : ' + JSON.stringify(data));				
-					});
-					
-				    JIM.onTransMsgRec(function(data){
-					    console.log('onTransMsgRec : ' + JSON.stringify(data));
-					});
-					
-					JIM.onRoomMsg (function(data){
-					    console.log('onRoomMsg  : ' + JSON.stringify(data));
-					});			
-					
-					
 					//获取会话列表
 					JIM.getConversation().onSuccess(function(data) {
-						console.log('success:Conversation===========' + JSON.stringify(data));
+						console.log('success:Conversation222222===========' + JSON.stringify(data));
 						_this.list=data.conversations.reverse();
+						var tokenList=[]
+						var len=_this.list.length;
+						for(var i =0;i<len;i++){
+							if(_this.list[i].type==4&&_this.list[i].avatar){//是群聊并且有头像就要获取头像地址
+								_this.getPic(_this.list[i].avatar,i)
+							}else{
+								tokenList.push(_this.list[i].username)
+							}
+						}
+						var userData = uni.getStorageSync("setUserData")
+						var token = userData.token
+						tokenList.push(token)
+						if(tokenList.length>0){
+							uni.request({
+								url:SERVER_API+'appUser/getUserPhotoByToken',
+								data:tokenList,
+								header:{
+									token:token
+								},
+								method:"POST",
+								success(res){
+									console.log(res)
+									for(var i=0;i<len-1;i++){
+										if(_this.list[i].type==3){//是单聊
+											var name= _this.list[i].username;
+											_this.list[i].avatar=res.data.result[name]
+										}	
+									}
+									userData.avatar = res.data.result[token];
+									uni.setStorageSync('setUserData',userData)
+								}
+							})
+						}
 						uni.hideLoading()
 					}).onFail(function(data) {
 						uni.showToast({
@@ -617,6 +735,39 @@
 					JIM.getConversation().onSuccess(function(data) {
 						console.log('success:Conversation222222===========' + JSON.stringify(data));
 						_this.list=data.conversations.reverse();
+						var tokenList=[]
+						var len=_this.list.length;
+						for(var i =0;i<len;i++){
+							if(_this.list[i].type==4&&_this.list[i].avatar){//是群聊并且有头像就要获取头像地址
+								_this.getPic(_this.list[i].avatar,i)
+							}else{
+								tokenList.push(_this.list[i].username)
+							}
+						}
+						var userData = uni.getStorageSync("setUserData")
+						var token = userData.token
+						tokenList.push(token)
+						if(tokenList.length>0){
+							uni.request({
+								url:SERVER_API+'appUser/getUserPhotoByToken',
+								data:tokenList,
+								header:{
+									token:token
+								},
+								method:"POST",
+								success(res){
+									console.log(res)
+									for(var i=0;i<len-1;i++){
+										if(_this.list[i].type==3){//是单聊
+											var name= _this.list[i].username;
+											_this.list[i].avatar=res.data.result[name]
+										}	
+									}
+									userData.avatar = res.data.result[token];
+									uni.setStorageSync('setUserData',userData)
+								}
+							})
+						}
 						uni.hideLoading()
 					}).onFail(function(data) {
 						uni.showToast({
@@ -631,6 +782,39 @@
 					JIM.getConversation().onSuccess(function(data) {
 						console.log('success:Conversation222222===========' + JSON.stringify(data));
 						_this.list=data.conversations.reverse();
+						var tokenList=[]
+						var len=_this.list.length;
+						for(var i =0;i<len;i++){
+							if(_this.list[i].type==4&&_this.list[i].avatar){//是群聊并且有头像就要获取头像地址
+								_this.getPic(_this.list[i].avatar,i)
+							}else{
+								tokenList.push(_this.list[i].username)
+							}
+						}
+						var userData = uni.getStorageSync("setUserData")
+						var token = userData.token
+						tokenList.push(token)
+						if(tokenList.length>0){
+							uni.request({
+								url:SERVER_API+'appUser/getUserPhotoByToken',
+								data:tokenList,
+								header:{
+									token:token
+								},
+								method:"POST",
+								success(res){
+									console.log(res)
+									for(var i=0;i<len-1;i++){
+										if(_this.list[i].type==3){//是单聊
+											var name= _this.list[i].username;
+											_this.list[i].avatar=res.data.result[name]
+										}	
+									}
+									userData.avatar = res.data.result[token];
+									uni.setStorageSync('setUserData',userData)
+								}
+							})
+						}
 						uni.hideLoading()
 					}).onFail(function(data) {
 						uni.showToast({

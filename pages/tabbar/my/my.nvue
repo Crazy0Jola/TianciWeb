@@ -2,10 +2,10 @@
 	<view class="page">
 		<free-nav-bar bgColor="bg-white" :showRight="false" :showNav="false" :fixed="false">
 		</free-nav-bar>
-		<free-list-item @click="changeAvator" :cover="url" coverSize="120" title="楚绵" showRight>
+		<free-list-item @click="changeavatar" :cover="avatar||'/static/images/userpic.jpg'" coverSize="120" title="楚绵" showRight>
 			<view class="flex flex-column">
-				<text class="text-dark font-lg font-weight-bold">楚绵</text>
-				<text class="text-light-muted font mt-2">仿微信号：summer</text>
+				<text class="text-dark font-lg font-weight-bold">{{name}}</text>
+				<text class="text-light-muted font mt-2">手机号：{{phone}}</text>
 			</view>
 			<view slot="right">
 				<text class="iconfont font-md text-light-muted">&#xe614;</text>
@@ -44,6 +44,8 @@
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
 	
 	var JIM=getApp().globalData.JIM;	
+	var SERVER_API = getApp().globalData.SERVER_API;
+	var _this;
 	export default {
 		components: {
 			freeNavBar,
@@ -53,15 +55,18 @@
 		},
 		data() {
 			return {
-				url:"",
+				avatar:"",
+				name:"",
+				phone:"",
 			}
 		},
 		onShow(){
-			var imagepath=this.image_cache("https://img.jiguang.cn/im-portal/0.0.1/assets/img/jverify-flow-banner-new.png","b");
-			var p = plus.io.convertLocalFileSystemURL(imagepath);  
-			console.log(p)
-			this.url=p;
+			_this = this;
 			const value = uni.getStorageSync('setUserData');
+			_this.avatar = value.avatar;
+			_this.name = value.name;
+			_this.phone = value.phone;
+			
 			if (value) {
 				//有登录信息
 				console.log("已登录用户：",value);	
@@ -129,7 +134,7 @@
 			test2(){
 				var arr = ['18952158867'];
 				uni.request({
-					url:"http://117.83.152.39:8081/interconnect/appUser/getUserPhotoByPhone",
+					url:SERVER_API+"appUser/getUserPhotoByPhone",
 					method:"POST",
 					header:{
 						"token":"e0b57b9a4e7e49bdab5f5e87fc5c0a0d"
@@ -170,6 +175,7 @@
 				this.$store.dispatch("setUserData","") //清空登录状态
 				try {
 					uni.removeStorageSync("setUserData")
+					uni.removeStorageSync("allUser")
 				} catch (e) {
 					// error
 				}
@@ -177,7 +183,7 @@
 					url:"../../login/login"
 				})
 			},
-			changeAvator(){
+			changeavatar(){
 				
 				uni.chooseImage({
 					count:1,

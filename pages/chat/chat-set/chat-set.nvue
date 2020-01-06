@@ -1,65 +1,78 @@
 <template>
-	<view style="background-color: #EDEDED;">
+	<view class="page">
 		<!-- 导航栏 -->
 		<free-nav-bar title="聊天信息" showBack :showRight="false"></free-nav-bar>
 		<view class="flex flex-wrap py-3 bg-white">
 			
-			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;">
-				<free-avater src="/static/images/demo/demo6.jpg" size="110"></free-avater>
-				<text class="font text-muted mt-1">昵称</text>
+			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;" v-for="(item,index) in memberList" :key="index">
+				<free-avater :src="item.avatar? item.avatar:'/static/images/userpic.jpg'" size="110"></free-avater>
+				<text class="font text-muted mt-1">{{item.nickName}}</text>
 			</view>
 			
-			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;">
+			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;" @click="addMember">
 				<view class="flex align-center justify-center border" 
 				style="width: 120rpx;height: 120rpx;" >
 					<text class="text-light-muted" 
 					style="font-size: 100rpx;">+</text>
 				</view>
 			</view>
+			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;" @click="delMember" v-show="isAdmin">
+				<view class="flex align-center justify-center border" 
+				style="width: 120rpx;height: 120rpx;" >
+					<text class="text-light-muted" 
+					style="font-size: 100rpx;">—</text>
+				</view>
+			</view>
 			
 		</view>
 		<free-divider></free-divider>
-		<free-list-item title="群聊名称" showRight :showLeftIcon="false">
-			<text slot="right" class="font text-muted">我是群聊名称</text>
+		<free-list-item title="群头像" showRight :showRightIcon="false" :showLeftIcon="false" @click="changeGavatar">
+			<view slot="right" class="position-relative p-1">
+				<free-avater :src="gavatar?gavatar:'/static/images/grouppic.jpg'" size="80"
+				></free-avater>
+			</view>
 		</free-list-item>
-		<free-list-item title="群二维码" showRight :showLeftIcon="false">
+		<free-list-item title="群聊名称" showRight :showLeftIcon="false" @click="goEditName">
+			<text slot="right" class="font text-muted">{{gname}}</text>
+		</free-list-item>
+<!-- 		<free-list-item title="群二维码" showRight :showLeftIcon="false">
 			<text slot="right" class="iconfont font-md text-light-muted">&#xe647;</text>
-		</free-list-item>
-		<free-list-item title="群公告" showRight :showLeftIcon="false"></free-list-item>
+		</free-list-item> -->
+		<view class="bg-white flex-column align-stretch" @click="goEditDes">
+			<view class="flex-row align-center  justify-between pr-3 py-3 pl-3" :class="border ? 'border-bottom' : ''">
+				<text class="font-md text-dark">群公告</text>
+				<view class="flex align-center">
+					<!-- 右箭头 -->
+					<text class="iconfont text-light-muted font-md">&#xe605;</text>
+				</view>
+			</view>
+			<view class="mx-4" :style="getDesStyle"><textarea auto-height disabled class="font text-muted" v-model="gdes"></textarea></view>
+		</view>
+			
 		<free-divider></free-divider>
-		<free-list-item title="查找聊天记录" showRight :showLeftIcon="false"></free-list-item>
-		<free-divider></free-divider>
-		<free-list-item title="消息免打扰" showRight :showLeftIcon="false"
+		<!-- <free-list-item title="查找聊天记录" showRight :showLeftIcon="false"></free-list-item> -->
+		<!-- <free-divider></free-divider> -->
+		<free-list-item title="消息免打扰" showRight :showLeftIcon="false" 
 		:showRightIcon="false">
-			<switch slot="right" :checked="false" color="#08C060"/>
+			<switch slot="right" :checked="getNoDisturb"  @change="setNoDisturb" color="#08C060"/>
 		</free-list-item>
-		<free-list-item title="置顶聊天" showRight :showLeftIcon="false"
+		<free-list-item title="置顶聊天" showRight :showLeftIcon="false" 
 		:showRightIcon="false">
-			<switch slot="right" :checked="false" color="#08C060"/>
-		</free-list-item>
-		<free-list-item title="强提醒" showRight :showLeftIcon="false"
-		:showRightIcon="false">
-			<switch slot="right" :checked="false" color="#08C060"/>
+			<switch slot="right" :checked="getIsTop" @change="setTop" color="#08C060"/>
 		</free-list-item>
 		<free-divider></free-divider>
-		<free-list-item title="我在本群的昵称" showRight :showLeftIcon="false">
-			<text slot="right" class="font text-muted">昵称</text>
-		</free-list-item>
-		<free-list-item title="显示群成员昵称" showRight :showLeftIcon="false"
+	<!-- 	<free-list-item title="显示群成员昵称" showRight :showLeftIcon="false"
 		:showRightIcon="false">
 			<switch slot="right" :checked="false" color="#08C060"/>
 		</free-list-item>
 		
-		<free-divider></free-divider>
-		<free-list-item title="清空聊天记录" showRight :showLeftIcon="false"></free-list-item>
+		
 		<free-divider></free-divider>
 		<free-list-item title="投诉" showRight :showLeftIcon="false"></free-list-item>
-		<free-divider></free-divider>
-		<view class="py-3 flex align-center justify-center bg-white">
-			<text class="font-md text-danger">删除并退出</text>
+		<free-divider></free-divider> -->
+		<view class="py-3 flex align-center justify-center bg-white" @click="exitGroup"> 
+			<text class="font-md text-danger">{{isAdmin?'解散群聊':'删除并退出'}}</text>
 		</view>
-		
-		<view style="height: 200rpx;"></view>
 	</view>
 </template>
 
@@ -68,6 +81,11 @@
 	import freeAvater from '@/components/free-ui/free-avater.vue';
 	import freeDivider from "@/components/free-ui/free-divider.vue"
 	import freeListItem from "@/components/free-ui/free-list-item.vue"
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	
+	var JIM = getApp().globalData.JIM;
+	var SERVER_API = getApp().globalData.SERVER_API;
+	var _this;
 	export default {
 		components: {
 			freeNavBar,
@@ -77,11 +95,244 @@
 		},
 		data() {
 			return {
-				
+				gid:"",
+				gname:"",
+				gdes:"",//群公告
+				memberList:[],//成员列表
+				gavatar:'/static/images/grouppic.jpg',//群头像
+				isAdmin:false,
+				myUsername:""
 			}
 		},
-		methods: {
+		computed:{
+			getNoDisturb(){
+				return uni.getStorageSync("noDisturb"+_this.gid)||false
+			},
+			getIsTop(){
+				return uni.getStorageSync(_this.gid+"isTop")||false
+			},
+			getDesStyle(){
+				return _this.gdes?'':'height:0rpx;'
+			}
+		},
+		onShow(){
+			JIM.getGroupInfo({
+				'gid' : _this.gid
+			}).onSuccess(function(data) {
+				console.log(data)
+				console.log(JSON.stringify(data))
+				_this.gdes=data.group_info.desc
+				_this.gname=data.group_info.name
+				if(data.group_info.avatar){
+					JIM.getResource({
+						'media_id' : data.group_info.avatar,
+					}).onSuccess(function(data) {
+						_this.gavatar=data.url;
+					}).onFail(function(data) {
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})
+					});
+				}
+			}).onFail(function(data) {
+				uni.showToast({
+					"title":getCodeMsg(data.code),
+					"position":"bottom"
+				})
+			});
 			
+			JIM.getGroupMembers({
+				'gid' : _this.gid
+			}).onSuccess(function(data) {
+				var tokenList=[]
+				var len = data.member_list.length;
+				_this.memberList=data.member_list;
+				for(var i =0;i<len;i++){
+					if(data.member_list[i].username==_this.myUsername&&data.member_list[i].flag==1){
+						_this.isAdmin=true
+					}
+					tokenList.push(data.member_list[i].username)
+				}			
+				
+				console.log(tokenList)
+				uni.request({
+					url:SERVER_API+'appUser/getUserPhotoByToken',
+					data:tokenList,
+					header:{
+						token:uni.getStorageSync("setUserData").token
+					},
+					method:"POST",
+					success(res){
+						console.log(res)
+						for(var i=0;i<len;i++){
+							var name= _this.memberList[i].username;
+							_this.memberList[i].avatar=res.data.result[name]
+						}
+						console.log(JSON.stringify(_this.memberList))
+					}
+				})
+				
+				//data.code 返回码
+				//data.message 描述
+				//data.member_list[] 成员列表，如下示例
+				//data.member_list[0].username 用户名
+				//data.member_list[0].appkey 用户所属 appkey
+				//data.member_list[0].nickname 用户昵称
+				//data.member_list[0].avatar 用户头像 id
+				//data.member_list[0].flag  0：普通成员 1：群主 2：管理员
+				//data.member_list[0].keep_silence 是否被禁言true|false
+			}).onFail(function(data) {
+				//data.code 返回码
+				//data.message 描述
+			});
+		},
+		onLoad:function(e){
+			_this=this
+			_this.gid=e.gid
+			_this.myUsername=uni.getStorageSync("setUserData").username;
+		},
+		methods: {
+			changeGavatar(){
+				if(_this.isAdmin){
+					uni.chooseImage({
+						count:1,
+						success: (res) => {
+							// 发送到服务器					
+							// 渲染到页面		
+							JIM.updateGroupInfo({
+								'gid' : _this.gid,
+								'avatar': res.tempFilePaths[0]
+							}).onSuccess(function(data) {
+								uni.showToast({
+									"title":"群头像更换成功",
+									"position":"bottom"
+								})
+							}).onFail(function(data) {
+								uni.showToast({
+									"title":getCodeMsg(data.code),
+									"position":"bottom"
+								})
+							});
+										
+						}
+					})
+				}else{
+					uni.previewImage({
+						current:_this.gavatar,
+						urls:[_this.gavatar],
+					})
+				}
+			},
+			goEditName(){
+				if(_this.isAdmin){
+					uni.navigateTo({
+						url:`../../edit/edit/edit?title=群聊名称&value=${_this.gname}&gid=${_this.gid}`
+					})
+				}else{
+					uni.showToast({
+						"title":"只有群主可以编辑群名称",
+						"position":"bottom"
+					})
+				}
+			},
+			goEditDes(){
+				if(_this.isAdmin){
+					uni.navigateTo({
+						url:`../../edit/edit/edit?title=群公告&value=${_this.gdes}&gid=${_this.gid}`
+					})
+				}else{
+					uni.showToast({
+						"title":"只有群主可以编辑群公告",
+						"position":"bottom"
+					})
+				}
+			},
+			setNoDisturb(e){
+				if(e.detail.value){
+					JIM.addGroupNoDisturb({
+						'gid' : _this.gid
+					}).onSuccess(function(data) {
+						uni.setStorageSync("noDisturb"+_this.gid,true)
+					}).onFail(function(data) {
+						
+					});
+				}else{
+					JIM.delGroupNoDisturb({
+						'gid' : _this.gid
+					}).onSuccess(function(data) {
+						uni.setStorageSync("noDisturb"+_this.gid,false)
+					}).onFail(function(data) {
+					
+					});
+				}
+				
+			},
+			setTop(e){
+				if(e.detail.value){
+					uni.setStorageSync(_this.gid+"isTop",true)
+				}else{
+					uni.setStorageSync(_this.gid+"isTop",false)
+				}
+			},
+			addMember(){
+				console.log(_this.gname)
+				uni.navigateTo({
+					url:`../../group/addGroup/addGroup?gid=${_this.gid}&gname=${_this.gname}`
+				})
+			},
+			delMember(){
+				uni.navigateTo({
+					url:`../../group/deleteMember/deleteMember?gid=${_this.gid}&myUsername=${_this.myUsername}&gname=${_this.gname}`
+				})
+			},
+			exitGroup(){
+				uni.showModal({
+				    title: '提示',
+				    content: _this.isAdmin?'确定解散该群聊？':'确定退出该群聊？',
+				    success: function (res) {
+				        if (res.confirm) {				
+							if(_this.isAdmin){
+								JIM.dissolveGroup({
+								'gid' : _this.gid
+								}).onSuccess(function(data) {
+									uni.showToast({
+										"title":"群聊解散成功",
+										"position":"bottom"
+									})
+									uni.switchTab({
+										url:"../../tabbar/index/index"
+									})
+								}).onFail(function(data) {
+									uni.showToast({
+										"title":getCodeMsg(data.code),
+										"position":"bottom"
+									})
+								});
+							}else{
+								JIM.exitGroup({
+									'gid' : _this.gid
+								}).onSuccess(function(data) {
+									uni.showToast({
+										"title":"成功退出群聊+'"+_this.gname+"'",
+										"position":"bottom"
+									})
+									uni.switchTab({
+										url:"../../tabbar/index/index"
+									})
+								}).onFail(function(data) {
+									uni.showToast({
+										"title":getCodeMsg(data.code),
+										"position":"bottom"
+									})
+								});
+							}
+						}else if (res.cancel) {
+							return;
+				        }
+					}
+				})	
+			}
 		}
 	}
 </script>

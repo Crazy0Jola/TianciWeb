@@ -14,7 +14,7 @@
 			
 			<!-- 聊天信息列表组件 -->
 			<block v-for="(item,index) in list" :key="index">
-				<free-chat-item :item="item" :avator="avator" :myUsername="myUsername" :myAvator="myAvator" :index="index" ref="chatItem"
+				<free-chat-item :item="item" :avatar="avatar" :myUsername="myUsername" :myAvatar="myAvatar" :index="index" ref="chatItem"
 				:pretime=" index > 0 ? list[index-1].create_time : 0"
 				@long="long" @preview="previewImage"></free-chat-item>
 			</block>
@@ -62,7 +62,7 @@
 				v-for="(item,index) in emoticonOrActionList"
 				:key="index">
 					<view class="col-3 flex flex-column align-center justify-center" style="height: 255rpx;" v-for="(item2,index2) in item" :key="index2" @click="actionEvent(item2)">
-						<image :src="item2.icon" mode="widthFix"
+						<image :src="item2.icon" mode="aspectFill"
 						style="width: 100rpx;height: 100rpx;"></image>
 						<text class="font-sm text-muted mt-2"
 						>{{item2.name}}</text>
@@ -110,7 +110,7 @@
 	import freeChatItem from '@/components/free-ui/free-chat-item.vue';
 	import freePopup from "@/components/free-ui/free-popup.vue"
 	import freeMainButton from '@/components/free-ui/free-main-button.vue';
-	
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
 	
 	import { mapState,mapMutations } from 'vuex'
 	var _this;
@@ -131,10 +131,12 @@
 				username:"",
 				//群组名字
 				gname:"",
+				//群组id
+				gid:"",
 				//我的用户名
 				myUsername:"",
 				//我的头像
-				myAvator:"/static/images/userpic.jpg",
+				myAvatar:"/static/images/userpic.jpg",
 				// 扩展菜单列表
 				actionList:[
 					[{
@@ -193,6 +195,12 @@
 				// 取消录音
 				unRecord:false
 			}
+		},
+		onBackPress(){
+			uni.switchTab({
+				url:"../../tabbar/index/index"
+			})
+			return true;
 		},
 		onLoad:function(e){
 			_this=this;
@@ -329,23 +337,6 @@
 					}
 				})
 			}
-			// var phone=[];
-			// phone.push("18952158867");
-			// phone.push("18012018031");
-			// uni.request({
-			// 	url: 'http://117.83.152.39:8081/interconnect/appUser/getUserPhotoByPhone',
-			// 	header: {
-			// 		"token": '06874c8b7be14969abac9a18935b18b8',
-			// 		"Content-Type":"application/json"
-			// 	},
-			// 	method:"POST",
-			// 	data:{
-			// 		// phones:JSON.stringify(phone)
-			// 	},
-			// 	success(res) {
-			// 		console.log(res)
-			// 	}
-			// })
 		},
 		mounted() {
 			// #ifdef APP-PLUS-NVUE
@@ -816,12 +807,12 @@
 				// #endif
 			},
 			// 长按消息气泡
-			long({x,y,index}){
-				// 初始化 索引
-				this.propIndex = index
-				// 显示扩展菜单
-				this.$refs.extend.show(x,y)
-			},
+			// long({x,y,index}){
+			// 	// 初始化 索引
+			// 	this.propIndex = index
+			// 	// 显示扩展菜单
+			// 	this.$refs.extend.show(x,y)
+			// },
 			// 操作菜单方法分发
 			clickEvent(event){
 				switch (event){
@@ -926,7 +917,7 @@
 			// 打开聊天信息设置
 			openChatSet(){
 				uni.navigateTo({
-					url: '../chat-set/chat-set',
+					url: `../../chat/chat-set/chat-set?gid=${_this.gid}&gname=${_this.gname}`,
 				});
 			}
 		}

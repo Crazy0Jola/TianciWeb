@@ -134,6 +134,18 @@
             "path" : "pages/group/groupChat/groupChat",
             "style" : {}
         }
+        ,{
+            "path" : "pages/group/deleteMember/deleteMember",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/edit/edit/edit",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/group/groupList/groupList",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

@@ -10,9 +10,9 @@
 		<view class="flex flex-column border-bottom flex-1 py-3 pr-3 border-light-secondary">
 			<view class="flex align-center justify-between mb-1">
 				<text class="font-md">{{item.nickName?item.nickName:item.name}}</text>
-				<text class="font-sm text-light-muted">{{item.mtime|formatTime}}</text>
+				<text class="font-sm text-light-muted" v-if="isConver">{{item.mtime|formatTime}}</text>
 			</view>
-			<text class="font text-ellipsis text-light-muted">{{item.extras.latest_msg}}</text>
+			<text class="font text-ellipsis text-light-muted" v-if="isConver">{{item.extras.latest_msg}}</text>
 		</view>
 	</div>
 	</view>
@@ -42,24 +42,36 @@
 		},
 		props: {
 			item: Object,
-			index:Number
+			index:Number,
+			isConver:{
+				type:Boolean,
+				default:true
+			}
 		},
 		methods:{
 			onClick(e){
-				if(this.item.type==3){//单聊
-					var username = this.item.username;
-					var nickname = this.item.nickName;
-					uni.navigateTo({
-						url: '/pages/chat/chat/chat?username='+username+'&nickname='+nickname,
-					});
-				}else if(this.item.type==4){//群聊
+				if(this.isConver){
+					if(this.item.type==3){//单聊
+						var username = this.item.username;
+						var nickname = this.item.nickName;
+						var avatar = this.item.avatar;
+						uni.navigateTo({
+							url: `/pages/chat/chat/chat?username=${username}&nickname=${nickname}&avatar=${avatar}`,
+						});
+					}else if(this.item.type==4){//群聊
+						var gid = this.item.gid;
+						var ganme = this.item.name;
+						uni.navigateTo({
+							url: '/pages/group/groupChat/groupChat?gid='+gid+'&gname='+ganme,
+						});
+					}
+				}else{
 					var gid = this.item.gid;
 					var ganme = this.item.name;
 					uni.navigateTo({
 						url: '/pages/group/groupChat/groupChat?gid='+gid+'&gname='+ganme,
 					});
-				}
-				
+				}	
 			},
 			long(e){
 				let x = 0

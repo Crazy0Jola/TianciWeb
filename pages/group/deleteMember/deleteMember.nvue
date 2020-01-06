@@ -1,0 +1,256 @@
+<template>
+	<view>
+		
+		<!-- 导航栏 -->
+		<free-nav-bar title="删除成员" showBack :showRight="true">
+			<free-main-button @click="deleteMember" :name="'删除 ('+selectCount+')'" slot="right"></free-main-button>
+		</free-nav-bar>
+		
+	
+		<!-- 通讯录列表 -->
+		<scroll-view scroll-y="true" :style="'height:'+scrollHeight+'px;'"
+		:scroll-into-view="scrollInto">
+			<view v-for="(item,index) in list" :key="index"
+			:id="'item-'+item.letter">
+				<view v-if="item.data.length" 
+				class="py-2 px-3 border-bottom bg-light">
+					<text class="font-md text-dark">{{item.letter}}</text>
+				</view>
+				<free-list-item v-for="(item2,index2) in item.data" 
+				:key="index2" :title="item2.nickName" 
+				:cover="item2.avatar?item2.avatar:'/static/images/userpic.jpg'"
+				:showRightIcon="false" showRight
+				@click="selectItem(item2)">
+					<view slot="right"
+					style="width: 40rpx;height: 40rpx;"
+					class="border rounded-circle flex align-center justify-center mr-4">
+						<view v-if="item2.checked" 
+						style="width: 30rpx;height: 30rpx;"
+						class="main-bg-color rounded-circle"></view>
+					</view>
+				</free-list-item>
+			</view>
+		</scroll-view>
+		
+		<!-- 侧边导航条 -->
+		<view class="position-fixed right-0 bottom-0 bg-light flex flex-column" :style="'top:'+top+'px;'" style="width: 50rpx;" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
+			<view class="flex-1 flex align-center justify-center"
+			v-for="(item,index) in list" :key="index">
+				<text class="font-sm text-muted">{{item.letter}}</text>
+			</view>
+		</view>
+
+		<view class="position-fixed rounded-circle bg-light border flex align-center justify-center" v-if="current"
+		style="width: 150rpx;height: 150rpx;left: 300rpx;"
+		:style="'top:'+modalTop+'px;'">
+			<text class="font-lg">{{current}}</text>
+		</view>
+
+	</view>
+</template>
+
+<script>
+	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
+	import freeListItem from "@/components/free-ui/free-list-item.vue"
+	import freeMainButton from '@/components/free-ui/free-main-button.vue';
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	import {initial} from "@/js_sdk/chineseConversion.js" //引入汉字转拼音
+	
+	var JIM = getApp().globalData.JIM;
+	var SERVER_API = getApp().globalData.SERVER_API;
+	var _this;
+	
+	export default {
+		components: {
+			freeNavBar,
+			freeListItem,
+			freeMainButton
+		},
+		data() {
+			return {
+				gid:'',
+				gname:'',
+				list:[],
+				memberList: [],
+				
+				top:0,
+				scrollHeight:0,
+				scrollInto:'',
+				current:'',
+				selectList:[],
+			}
+		},
+		mounted(){
+			// 监听键盘高度变化
+			uni.onKeyboardHeightChange(res => {
+		
+			})
+		},
+		onShow(){
+		},
+		onLoad:function(e) {
+			_this=this;
+			_this.gid=e.gid;
+			_this.gname=e.gname;
+			console.log(e.gid)
+			_this.list=[];
+			for(var i=0;i<26;i++){
+				var obj = {
+					letter:String.fromCharCode(65+i),
+					data:[]
+				}
+				_this.list.push(obj);
+			}
+			
+			JIM.getGroupMembers({
+				'gid' : _this.gid
+			}).onSuccess(function(data) {
+				var tokenList=[]
+				var len = data.member_list.length;
+				for(var i =0;i<len;i++){
+					if(data.member_list[i].username==e.myUsername&&data.member_list[i].flag==1){
+						
+					}else{
+						_this.memberList.push(data.member_list[i])
+						tokenList.push(data.member_list[i].username)	
+					}
+				}			
+				
+				console.log(tokenList)
+				uni.request({
+					url:SERVER_API+'appUser/getUserPhotoByToken',
+					data:tokenList,
+					header:{
+						token:uni.getStorageSync("setUserData").token
+					},
+					method:"POST",
+					success(res){
+						console.log(res)
+						
+						for(var i=0;i<len-1;i++){
+							var name= _this.memberList[i].username;
+							_this.memberList[i].avatar=res.data.result[name]
+							
+							let letter = initial(_this.memberList[i].nickName)
+							let index = letter.charCodeAt()-65;
+							_this.list[index].data.push(_this.memberList[i])
+						}
+						
+						
+						console.log(JSON.stringify(_this.memberList))
+					}
+				})
+				
+			}).onFail(function(data) {
+
+			});
+			
+			let res = uni.getSystemInfoSync()
+			this.top = res.statusBarHeight + uni.upx2px(90)
+			this.scrollHeight = res.windowHeight - this.top -uni.upx2px(100)
+		
+		},
+		computed: {
+			modalTop(){
+				return (this.scrollHeight - uni.upx2px(150)) / 2
+			},
+			// 每个索引的高度
+			itemHeight() {
+				let count = this.list.length
+				if(count < 1){
+					return 0
+				}
+				return this.scrollHeight /  count
+			},
+			// 选中数量
+			selectCount(){
+				return this.selectList.length
+			}
+		},
+		methods: {
+			deleteMember(){
+				if(this.selectList.length<1){
+					uni.showToast({
+						"title":"请至少选择一位成员",
+						"icon":"none"
+					})
+					return;
+				}
+				console.log("hh")
+				uni.showModal({
+				    title: '提示',
+				    content: '确认删除？',
+				    success: function (res) {
+				        if (res.confirm) {
+				            _this.selectList = _this.selectList.map(res=>{
+				            	return {
+				            		username:res.username,
+				            	}
+				            })
+							console.log(JSON.stringify(_this.selectList))
+				            
+				            JIM.delGroupMembers({
+				            	'gid' : _this.gid,
+				            	'member_usernames' : _this.selectList
+				            }).onSuccess(function(data) {
+				            	uni.showToast({
+				            		"title":"删除成功",
+				            		"position":"bottom"
+				            	})
+				            	uni.navigateTo({
+				            		url:"../groupChat/groupChat?gid="+_this.gid+"&gname="+_this.gname
+				            	})				            
+				            }).onFail(function(data) {
+				            	uni.showToast({
+				            		"title":getCodeMsg(data.code),
+				            		"position":"bottom"
+				            	})
+				            });
+				        } else if (res.cancel) {
+							return;
+				        }
+				    }
+				});
+				
+			},
+			touchstart(e){
+				this.changeScrollInto(e)
+			},
+			touchmove(e){
+				this.changeScrollInto(e)
+			},
+			touchend(e){
+				this.current = ''
+			},
+			// 联动
+			changeScrollInto(e){
+				let Y = e.touches[0].pageY
+				// #ifdef MP
+				Y = Y - this.top
+				// #endif
+				let index = Math.floor(Y / this.itemHeight)
+				let item = this.list[index]
+				if(item){
+					this.scrollInto = 'item-'+item.letter
+					this.current = item.letter
+				}
+			},
+			// 选中/取消选中
+			selectItem(item){
+				item.checked = !item.checked
+				if(item.checked){ // 选中
+					this.selectList.push(item)
+				} else { // 取消选中
+					let index = this.selectList.findIndex(v=> v === item)
+					if(index > -1){
+						this.selectList.splice(index,1)
+					}
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

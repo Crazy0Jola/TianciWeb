@@ -156,6 +156,24 @@
           "usingComponents": {}
         },
         "nvue": true
+      },
+      "pages/group/deleteMember/deleteMember.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
+      },
+      "pages/edit/edit/edit.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
+      },
+      "pages/group/groupList/groupList.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
       }
     },
     "entryPagePath": "pages/tabbar/index/index"

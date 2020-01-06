@@ -1,0 +1,14 @@
+
+.chat-left-icon.data-v-f1d74546{
+	left: 80rpx;top: 20rpx;
+}
+.chat-right-icon.data-v-f1d74546{
+	right: 80rpx;
+	top: 20rpx;
+}
+.chat-animate.data-v-f1d74546{
+	
+	opacity: 0;
+	
+}
+

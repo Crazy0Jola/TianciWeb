@@ -14,7 +14,7 @@
 			
 			<!-- 聊天信息列表组件 -->
 			<block v-for="(item,index) in list" :key="index">
-				<free-chat-item :item="item" :avator="avator" :myUsername="myUsername" :myAvator="myAvator" :index="index" ref="chatItem"
+				<free-chat-item :item="item" :avatar="avatar" :myUsername="myUsername" :myAvatar="myAvatar" :index="index" ref="chatItem"
 				:pretime=" index > 0 ? list[index-1].create_time : 0"
 				@long="long" @preview="previewImage"></free-chat-item>
 			</block>
@@ -62,7 +62,7 @@
 				v-for="(item,index) in emoticonOrActionList"
 				:key="index">
 					<view class="col-3 flex flex-column align-center justify-center" style="height: 255rpx;" v-for="(item2,index2) in item" :key="index2" @click="actionEvent(item2)">
-						<image :src="item2.icon" mode="widthFix"
+						<image :src="item2.icon" mode="aspectFill"
 						style="width: 100rpx;height: 100rpx;"></image>
 						<text class="font-sm text-muted mt-2"
 						>{{item2.name}}</text>
@@ -110,11 +110,12 @@
 	import freeChatItem from '@/components/free-ui/free-chat-item.vue';
 	import freePopup from "@/components/free-ui/free-popup.vue"
 	import freeMainButton from '@/components/free-ui/free-main-button.vue';
-	
+	import getCodeMsg from "@/js_sdk/ErrorCode.js"
 	
 	import { mapState,mapMutations } from 'vuex'
 	var _this;
 	var JIM = getApp().globalData.JIM;
+	var SERVER_API = getApp().globalData.SERVER_API;
 	export default {
 		components: {
 			freeNavBar,
@@ -130,9 +131,9 @@
 				tempurl:"",
 				username:"",
 				nickname:"",
-				avator:"/static/images/userpic.jpg",
+				avatar:"/static/images/userpic.jpg",
 				myUsername:"",
-				myAvator:"/static/images/userpic.jpg",
+				myAvatar:"/static/images/userpic.jpg",
 				// 扩展菜单列表
 				actionList:[
 					[{
@@ -166,10 +167,10 @@
 				KeyboardHeight:0,
 				menus:[{ 
 					name:"复制",
-					event:'',
+					event:'copy',
 				},{ 
 					name:"删除",
-					event:''
+					event:'delete'
 				},{ 
 					name:"撤回",
 					event:'removeChatItem'
@@ -188,6 +189,12 @@
 				unRecord:false
 			}
 		},
+		onBackPress(){
+			uni.switchTab({
+				url:"../../tabbar/index/index"
+			})
+			return true;
+		},
 		onLoad:function(e){
 			uni.$on("get_chat_msg",function(){
 				console.log("===================有新消息来啦=====================")
@@ -205,7 +212,10 @@
 			_this=this;
 			_this.username = e.username;
 			_this.nickname = e.nickname;
-			_this.myUsername = uni.getStorageSync('setUserData').username;
+			_this.avatar = e.avatar;
+			var userData = uni.getStorageSync("setUserData");
+			_this.myAvatar = userData.avatar;
+			_this.myUsername = userData.username;
 		},
 		onUnload(){
 			console.log("=================onUnload==================")
@@ -314,23 +324,6 @@
 					}
 				})
 			}
-			// var phone=[];
-			// phone.push("18952158867");
-			// phone.push("18012018031");
-			// uni.request({
-			// 	url: 'http://117.83.152.39:8081/interconnect/appUser/getUserPhotoByPhone',
-			// 	header: {
-			// 		"token": '06874c8b7be14969abac9a18935b18b8',
-			// 		"Content-Type":"application/json"
-			// 	},
-			// 	method:"POST",
-			// 	data:{
-			// 		// phones:JSON.stringify(phone)
-			// 	},
-			// 	success(res) {
-			// 		console.log(res)
-			// 	}
-			// })
 		},
 		mounted() {
 			// #ifdef APP-PLUS-NVUE
@@ -790,19 +783,29 @@
 				// #endif
 			},
 			// 长按消息气泡
-			long({x,y,index}){
-				// 初始化 索引
-				this.propIndex = index
-				// 显示扩展菜单
-				this.$refs.extend.show(x,y)
-			},
+			// long({x,y,index}){
+			// 	// 初始化 索引
+			// 	this.propIndex = index
+			// 	// 显示扩展菜单
+			// 	this.$refs.extend.show(x,y)
+			// },
 			// 操作菜单方法分发
-			clickEvent(event){
+			clickEvent(event,e){
 				switch (event){
+					case 'copy'://复制
+					if (this.propIndex > -1) {
+						console.log(this.list[this.propIndex].msg_body.text)
+					}
+						break;
 					case 'removeChatItem': // 撤回消息
 					// 拿到当前被操作的信息
 					if (this.propIndex > -1) {
 						this.list[this.propIndex].msg_body.extras.isremove = true
+					}
+						break;
+					case 'delete'://删除
+					if (this.propIndex > -1) {
+						this.list.splice(this.propIndex,1)
 					}
 						break;
 					default:
@@ -900,7 +903,7 @@
 			// 打开聊天信息设置
 			openChatSet(){
 				uni.navigateTo({
-					url: '../chat-set/chat-set',
+					url: '',
 				});
 			}
 		}
