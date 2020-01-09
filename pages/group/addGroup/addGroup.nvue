@@ -16,14 +16,14 @@
 			</view>
 		</view>
 		
-		<view class="noConversation" v-if="list.length==0">
+<!-- 		<view class="noConversation" v-if="isNull">
 			<view>
 				<text class="iconfont text-gray text-center" style="font-size: 200rpx;">&#xe662;</text>
 			</view>
 			<view>
 				<text class=" font-md text-gray text-center">暂无关注好友</text>
 			</view>
-		</view>
+		</view> -->
 		
 		<!-- 通讯录列表 -->
 		<scroll-view scroll-y="true" :style="'height:'+scrollHeight+'px;'"
@@ -95,6 +95,7 @@
 				current:'',
 				selectList:[],
 				isAdd:false,//增加成员
+				isNull:false
 			}
 		},
 		mounted(){
@@ -104,6 +105,7 @@
 			})
 		},
 		onShow(){
+			console.log(_this.isNull)
 			_this.list=[];
 			for(var i=0;i<26;i++){
 				var obj = {
@@ -121,6 +123,11 @@
 				success(res){
 					var result = res.data.result;
 					var len = result.length
+					if(len==0){
+						_this.isNull=true
+					}else{
+						_this.isNull=false
+					}
 					for(var i=0;i<len;i++){
 						let letter = initial(result[i].name)
 						let index = letter.charCodeAt()-65;
@@ -280,5 +287,8 @@
 </script>
 
 <style>
-
+	.noConversation{
+		width: 750rpx;
+		margin-top: 100rpx;
+	}
 </style>

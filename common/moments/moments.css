@@ -6,7 +6,6 @@
 	height: 34upx;
 }
 .post-username{
-	font-size:32upx;
 	font-weight: 600;
 	color: #36648B;
 }
@@ -89,7 +88,6 @@
 	/* left: 20px; */
 	right: 240upx;
 	top: 30upx;
-	font-size: 32upx;
 	font-weight: 600;
 	text-align: right;
 	color: #ffffff;
@@ -112,7 +110,6 @@
 }
 
 #moments .moments__post .post_right {
-	font-size: 32upx;
 	display: table-cell;
 	padding-left: 20upx;
 	width: 100%;
@@ -172,7 +169,6 @@
 
 #moments .moments__post .toolbar .timestamp {
 	color: #757575;
-	font-size: 22upx;
 }
 
 
@@ -223,17 +219,14 @@
 
 #moments .moments__post .footer_content .nickname {
 	color: #36648B;
-	font-size: 24upx
 }
 
 #moments .moments__post .footer_content .comment-nickname {
 	color: #36648B;
-	font-size: 24upx
 }
 
 #moments .moments__post .footer_content .comment-content {
 	color: #000000;
-	font-size: 24upx
 }
 
 .foot {

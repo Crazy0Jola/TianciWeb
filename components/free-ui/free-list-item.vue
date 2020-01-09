@@ -4,7 +4,7 @@
 		<view class="flex align-center justify-center py-2 pl-3"
 		v-if="showLeftIcon">
 			<slot name="icon"></slot>
-			<image :src="cover" v-if="cover"
+			<image @longpress="$emit('imgClick')" :src="cover" v-if="cover"
 			mode="aspectFill" :style="coverStyle"></image>
 		</view>
 		<view class="flex-1 flex align-center  justify-between pr-3 py-3 pl-3" :class="border ? 'border-bottom' : ''">

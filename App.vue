@@ -1,9 +1,7 @@
  <script>
 	import Vue from 'vue'
 	import JMessage from 'js_sdk/jmessage-wxapplet-sdk-1.4.2.min.js'
-	import md5 from 'js_sdk/md5.min.js'
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
-	import simpleCache from "@/js_sdk/Simple-Cache.js"
 	var JIM = new JMessage({
 		debug:true
 	})
@@ -11,10 +9,46 @@
 	export default {
 		globalData:{
 			JIM:JIM,
-			SERVER_API:SERVER_API,
-			simpleCache:simpleCache
+			SERVER_API:SERVER_API
 		},
 		onLaunch: function() {
+			uni.getStorage({
+			    key: 'BM',
+			    success: function (res) {
+			        console.log(res.data);
+			    },
+				fail:function(res){
+					uni.setStorageSync("BM",true)
+				}
+			});
+			uni.getStorage({
+			    key: 'LS',
+			    success: function (res) {
+			        console.log(res.data);
+			    },
+				fail:function(res){
+					uni.setStorageSync("LS",true)
+				}
+			});
+			uni.getStorage({
+			    key: 'HY',
+			    success: function (res) {
+			        console.log(res.data);
+			    },
+				fail:function(res){
+					uni.setStorageSync("HY",true)
+				}
+			});
+			uni.getStorage({
+			    key: 'XZ',
+			    success: function (res) {
+			        console.log(res.data);
+			    },
+				fail:function(res){
+					uni.setStorageSync("XZ",true)
+				}
+			});
+			
 			var appkey='09970876f33e884a3624335c';
 			var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
 			var timestamp=(new Date()).getTime();
@@ -31,12 +65,12 @@
 				success(res) {
 					console.log(res)
 					signature = res.data.result;
+					console.log(appkey,random_str,signature,timestamp)
 					JIM.init({
 							  "appkey"    : appkey,
 							  "random_str": random_str,
 							  "signature" : signature,
 							  "timestamp" : timestamp,
-							  "flag":1
 					}).onSuccess(function(data) {
 						console.log('Init-success:' + JSON.stringify(data));	
 						uni.$emit("JIMinit",{})
@@ -52,7 +86,7 @@
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
 			    'fontFamily': "iconfont",
-			    'src': "url('https://at.alicdn.com/t/font_1587665_c865desruai.ttf')"
+			    'src': "url('https://at.alicdn.com/t/font_1587665_jb7gr7tlgy.ttf')"
 			});
 			// 初始化录音管理器
 			this.$store.commit('initRECORD')

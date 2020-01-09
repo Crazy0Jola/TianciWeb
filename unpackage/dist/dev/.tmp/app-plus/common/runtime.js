@@ -102,11 +102,11 @@
 /******/
 /******/
 /******/ 		// mini-css-extract-plugin CSS loading
-/******/ 		var cssChunks = {"components/im-chat/chatinput":1,"components/watch-login/watch-button":1,"components/watch-login/watch-input":1,"components/free-ui/free-popup":1};
+/******/ 		var cssChunks = {"components/free-ui/free-popup":1,"components/im-chat/chatinput":1,"components/watch-login/watch-button":1,"components/watch-login/watch-input":1};
 /******/ 		if(installedCssChunks[chunkId]) promises.push(installedCssChunks[chunkId]);
 /******/ 		else if(installedCssChunks[chunkId] !== 0 && cssChunks[chunkId]) {
 /******/ 			promises.push(installedCssChunks[chunkId] = new Promise(function(resolve, reject) {
-/******/ 				var href = "" + ({"components/im-chat/chatinput":"components/im-chat/chatinput","components/free-ui/free-nav-bar":"components/free-ui/free-nav-bar","components/watch-login/watch-button":"components/watch-login/watch-button","components/watch-login/watch-input":"components/watch-login/watch-input","components/free-ui/free-icon-button":"components/free-ui/free-icon-button","components/free-ui/free-popup":"components/free-ui/free-popup"}[chunkId]||chunkId) + ".wxss";
+/******/ 				var href = "" + ({"components/free-ui/free-confirm":"components/free-ui/free-confirm","components/free-ui/free-popup":"components/free-ui/free-popup","components/im-chat/chatinput":"components/im-chat/chatinput","components/watch-login/watch-button":"components/watch-login/watch-button","components/watch-login/watch-input":"components/watch-login/watch-input","components/free-ui/free-nav-bar":"components/free-ui/free-nav-bar","components/free-ui/free-icon-button":"components/free-ui/free-icon-button"}[chunkId]||chunkId) + ".wxss";
 /******/ 				var fullhref = __webpack_require__.p + href;
 /******/ 				var existingLinkTags = document.getElementsByTagName("link");
 /******/ 				for(var i = 0; i < existingLinkTags.length; i++) {

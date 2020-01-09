@@ -9,10 +9,10 @@
 			<text class="font text-light-muted">暂无搜索结果</text>
 		</view>
 		<recycle-list for="(item, i) in allList">
-			<cell-slot :key="item.id" @click="test(item)">
+			<cell-slot>
 				<view class="bg-white flex align-stretch">
 					<view class="flex align-center justify-center py-2 pl-3">
-						<image :src="item.portrait?item.portrait:'/static/images/userpic.jpg'" 
+						<image :src="item.photo?item.photo:'/static/images/userpic.jpg'" 
 						mode="aspectFill" style="width: 75rpx;height: 75rpx;"></image>
 					</view>
 					<view class="flex-1 flex flex-column justify-between pr-3 py-3 pl-3 border-bottom">
@@ -20,8 +20,8 @@
 						<text class="font-sm text-gray text-ellipsis">{{item.company}}</text>
 					</view>
 					<view class="flex align-center justify-center py-2 pl-3 mr-2" @click="follow(item.token,item.isFollow,i)">
-						<image :src="item.isFollow?'/static/images/success.png':'/static/images/add.png'" 
-						mode="aspectFill" style="width: 75rpx;height: 75rpx;"></image>
+						<image :src="item.isFollow==1?'/static/images/success.png':'/static/images/add.png'" 
+						mode="aspectFill" style="width: 60rpx;height: 60rpx;"></image>
 					</view>
 				</view>
 			</cell-slot>
@@ -42,7 +42,6 @@
 		computed:{
 			// 最终列表
 			allList(){
-				console.log("hh")
 				return this.keyword==='' ? this.list : this.searchList
 			},
 			// 搜索结果列表
@@ -51,7 +50,7 @@
 					return []
 				}
 				return this.list.filter(item=>{
-					return item.name.indexOf(this.keyword) !== -1
+					return item.name.indexOf(this.keyword) != -1
 				})
 			},
 		},
@@ -82,7 +81,6 @@
 					},
 					method:"POST",
 					success(res) {
-						console.log(res)
 						uni.hideLoading()
 						var data = res.data.result;
 						_this.list = data;
@@ -99,30 +97,33 @@
 			})
 		},
 		methods: {
-			test(item){
-				console.log(JSON.stringify(item))
-			},
 			follow(followId,isFollow,i){
 				console.log(followId+"=="+isFollow+"=="+i)
-				if(!isFollow){
+				if(isFollow==0){
 					uni.request({
 						url:SERVER_API+'appUser/follow',
 						data:{
 							followId:followId
 						},
+						header:{
+							token:uni.getStorageSync("setUserData").token
+						},
 						method:"POST",
 						success(res){
+							console.log(res)
 							if(res.data.code==1){
 								uni.showToast({
 									"title":"关注成功",
 									"position":"bottom"
 								})
 								if(_this.keyword==""){
-									_this.list[i].isFollow=!isFollow
+									_this.list[i].isFollow=1
 								}else{
-									_this.searchList.isFollow=!isFollow
+									_this.searchList[i].isFollow=1
+									_this.keyword=""
 								}
 							}else{
+								console.log(res.data)
 								uni.showToast({
 									"title":res.data.message,
 									"position":"bottom"
@@ -136,17 +137,22 @@
 						data:{
 							followId:followId
 						},
+						header:{
+							token:uni.getStorageSync("setUserData").token
+						},
 						method:"POST",
 						success(res){
+							console.log(res)
 							if(res.data.code==1){
 								uni.showToast({
 									"title":"取消关注",
 									"position":"bottom"
 								})
 								if(_this.keyword==""){
-									_this.list[i].isFollow=!isFollow
+									_this.list[i].isFollow=0
 								}else{
-									_this.searchList.isFollow=!isFollow
+									_this.searchList[i].isFollow=0
+									_this.keyword=""
 								}
 							}else{
 								uni.showToast({

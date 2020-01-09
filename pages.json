@@ -10,7 +10,25 @@
         }
         ,{
             "path" : "pages/tabbar/find/find",
-            "style" : {}
+            "style" : {
+            	"navigationBarTitleText" : "朋友圈",
+            	"enablePullDownRefresh" : true,
+            	"app-plus" : {
+            		"bounce" : "none",
+            		"titleNView" : {
+            			"type" : "transparent",
+            			"buttons" : [
+            				{
+            					"background" : "rgba(255,255,255,0.2)",
+            					"color" : "#696969",
+            					"type" : "none",
+            					"fontSrc" : "/static/fonts/iconfont.ttf",
+            					"text" : "\ue608" //小相机
+            				}
+            			]
+            		}
+            	}
+            }
         }
         ,{
             "path" : "pages/tabbar/my/my",
@@ -56,40 +74,6 @@
             "path" : "pages/mail/user-report/user-report",
             "style" : {}
         }
-        ,{
-			"path" : "pages/find/moments/moments",
-			"style" : {
-				"navigationBarTitleText" : "朋友圈",
-				"enablePullDownRefresh" : true,
-				"app-plus" : {
-					"bounce" : "none",
-					"titleNView" : {
-						"type" : "transparent",
-						"buttons" : [
-							{
-								"background" : "rgba(255,255,255,0.2)",
-								"color" : "#696969",
-								"type" : "none",
-								"fontSrc" : "/static/fonts/iconfont.ttf",
-								"text" : "\ue608" //小相机
-							}
-						]
-					}
-				}
-			}
-		}  
-		,{
-			"path" : "pages/find/publish/publish",
-			"style" : {
-				"navigationBarTitleText" : "发表动态",
-				"app-plus" : {
-					"bounce" : "none",
-					"titleNView" : {
-						"type" : "default"
-					}
-				}
-			}
-		}
 		, {
 		    "path": "pages/login/login",
 		    "style": {}
@@ -146,6 +130,36 @@
             "path" : "pages/group/groupList/groupList",
             "style" : {}
         }
+        ,{
+            "path" : "pages/tabbar/publish/publish",
+            "style" : {
+            	"navigationBarTitleText" : "发表动态",
+				"navigationBarBackgroundColor":"#EDEDED",
+            	"app-plus" : {
+            		"bounce" : "none",
+            		"titleNView" : {
+            			"type" : "default"
+            		}
+            	}
+            }
+        }
+        ,{
+            "path" : "pages/setting/setting",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/mine/mine",
+            "style" : {
+            	"navigationBarTitleText" : "个人中心",
+            	"navigationBarBackgroundColor":"#EDEDED",
+            	"app-plus" : {
+            		"bounce" : "none",
+            		"titleNView" : {
+            			"type" : "default"
+            		}
+            	}
+            }
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -159,7 +173,7 @@
 	},
 	"tabBar":{
 		"color":"#000000",
-		"selectedColor":"#08C261",
+		"selectedColor":"#3578E5",
 		"borderStyle":"black",
 		"backgroundColor":"#F7F7F7",
 		"list":[
@@ -167,7 +181,7 @@
 				"iconPath":"static/tabbar/index.png",
 				"selectedIconPath":"static/tabbar/index-select.png",
 				"pagePath":"pages/tabbar/index/index",
-				"text":"首页"
+				"text":"国政通"
 			},
 			{
 				"iconPath":"static/tabbar/mail.png",
@@ -179,13 +193,13 @@
 				"iconPath":"static/tabbar/find.png",
 				"selectedIconPath":"static/tabbar/find-select.png",
 				"pagePath":"pages/tabbar/find/find",
-				"text":"发现"
+				"text":"朋友圈"
 			},
 			{
 				"iconPath":"static/tabbar/my.png",
 				"selectedIconPath":"static/tabbar/my-select.png",
 				"pagePath":"pages/tabbar/my/my",
-				"text":"我的"
+				"text":"应用仓"
 			}
 		]
 	}

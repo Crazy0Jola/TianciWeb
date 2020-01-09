@@ -17,7 +17,11 @@
             }
         },
 		onLoad:function (e) {
+			console.log(e)
 			this.url = e.url;
+			if(e.type){
+				this.url = e.url+'?type='+e.type;
+			}
 		}
     }
 </script>

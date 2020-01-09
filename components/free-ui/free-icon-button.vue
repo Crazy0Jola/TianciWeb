@@ -2,7 +2,7 @@
 	<view class="flex align-center justify-center" 
  @click="$emit('click')"
 	style="height: 90rpx;width: 90rpx;">
-		<text class="iconfont font-md">{{icon}}</text>
+		<text class="iconfont font-md" :class="iconClass">{{icon}}</text>
 	</view>
 </template>
 
@@ -10,6 +10,10 @@
 	export default {
 		props: {
 			icon: {
+				type: String,
+				default: ''
+			},
+			iconClass: {
 				type: String,
 				default: ''
 			},

@@ -3,32 +3,26 @@
 		<!-- 导航栏 -->
 		<free-nav-bar showBack :showRight="true" bgColor="bg-white">
 			<free-icon-button slot="right"
-			:icon="'\ue6fd'"
-			@click="openAction"></free-icon-button>
+			:icon="'\ue602'" :iconClass="iconClass"
+			@click="like"></free-icon-button>
 		</free-nav-bar>
 		<view class="px-3 py-4 flex align-center bg-white border-bottom">
-			<free-avater src="/static/images/demo/demo6.jpg" size="120"></free-avater>
+			<free-avater :src="userInfo.baseInfo.photo?userInfo.baseInfo.photo:'/static/images/userpic.jpg'" size="120"></free-avater>
 			<view class="flex flex-column ml-3 flex-1">
 				<view class="flex align-center justify-between">
-					<text class="font-lg font-weight-bold mb-1">{{nickname}}</text>
+					<text class="font-lg font-weight-bold mb-1">{{userInfo.baseInfo.name}}</text>
 					<image v-if="star" src="/static/images/star.png"
 					style="width: 40rpx;height: 40rpx;"></image>
 				</view>
-				<text class="font-md text-light-muted">账号：summer</text>
-				<text class="font-md text-light-muted">地区：广东广州</text>
+				<text class="font-md text-light-muted">手机号：{{userInfo.baseInfo.phone||"暂无数据"}}</text>
+				<text class="font-md text-light-muted mt-1">公司：{{userInfo.baseInfo.companyName||"暂无数据"}}</text>
+				<text class="font-md text-light-muted mt-1">职位：{{userInfo.baseInfo.post||"暂无数据"}}</text>
+				<text class="font-md text-light-muted mt-1">个人简介：{{userInfo.baseInfo.description||"暂无数据"}}</text>
 			</view>
 		</view>
-		<free-list-item showRight :showLeftIcon="false" 
-		@click="navigate('mail/user-remark-tag/user-remark-tag')">
-			<view class="flex align-center">
-				<text class="font-md text-dark mr-3">标签</text>
-				<text class="font-md text-light-muted mr-2"
-				v-for="(item,index) in tagList" ::key="index">{{item}}</text>
-				<text class="font-md text-light-muted" v-if="tagList.length < 1">未设置</text>
-			</view>
-		</free-list-item>
+
 		<free-divider></free-divider>
-		<free-list-item showRight :showLeftIcon="false">
+		<!-- <free-list-item showRight :showLeftIcon="false">
 			<view class="flex align-center">
 				<text class="font-md text-dark mr-3">朋友圈</text>
 				<image src="/static/images/demo/cate_01.png" 
@@ -43,21 +37,12 @@
 			</view>
 		</free-list-item>
 		<free-list-item title="更多信息" showRight :showLeftIcon="false"></free-list-item>
-		<free-divider></free-divider>
-		<view class="py-3 flex align-center justify-center bg-white">
+		<free-divider></free-divider> -->
+		<view class="py-3 flex align-center justify-center bg-white" @click="goChat">
 			<text class="iconfont text-primary mr-1" 
-			v-if="!isBlack">&#xe64e;</text>
-			<text class="font-md text-primary">{{isBlack ? '移出黑名单' : '发信息'}}</text>
+			v-if="!isBlack">&#xe6c7;</text>
+			<text class="font-md text-primary">{{isBlack ? '移出黑名单' : '发消息'}}</text>
 		</view>
-		<!-- 操作菜单 -->
-		<free-popup ref="action" bottom transformOrigin="center bottom" maskColor>
-			<scroll-view scroll-y="true" style="height: 580rpx;" 
-			class="bg-white" :show-scrollbar="false">
-				<free-list-item v-for="(item,index) in actions" :key="index" :title="item.title" :showRight="false" :border="false" @click="popupEvent(item)">
-					<text slot="icon" class="iconfont font-lg py-1">{{item.icon}}</text>
-				</free-list-item>
-			</scroll-view>
-		</free-popup>
 		
 		
 	</view>
@@ -69,120 +54,123 @@
 	import freeDivider from "@/components/free-ui/free-divider.vue"
 	import freeListItem from "@/components/free-ui/free-list-item.vue"
 	import freeIconButton from '@/components/free-ui/free-icon-button.vue';
-	import freePopup from '@/components/free-ui/free-popup.vue';
 	
+	var _this;
+	var SERVER_API = getApp().globalData.SERVER_API
 	export default {
 		components: {
 			freeNavBar,
 			freeAvater,
 			freeDivider,
 			freeListItem,
-			freeIconButton,
-			freePopup
+			freeIconButton
+		},
+		computed:{
+			iconClass(){
+				console.log("hhhhhhhh")
+				return _this.isFollow? 'text-red':'text-gray';
+			}
 		},
 		data() {
 			return {
-				nickname:"昵称",
-				star:false,
+				token:"",
+				myToken:"",
 				isBlack:false,
-				tagList:[],
-				actions:[{
-					icon:"\ue6b3",
-					title:"设置备注和标签",
-					type:"navigate",
-					path:"mail/user-remark-tag/user-remark-tag"
-				},{
-					icon:"\ue613",
-					title:"把他推荐给朋友",
-					type:"navigate",
-					path:"mail/send-card/send-card"
-				},{
-					icon:"\ue6b0",
-					title:"设为星标朋友",
-					type:"event",
-					event:"setStar"
-				},{
-					icon:"\ue667",
-					title:"设置朋友圈和动态权限",
-					type:"navigate",
-					path:"mail/user-moments-auth/user-moments-auth"
-				},{
-					icon:"\ue638",
-					title:"加入黑名单",
-					type:"event",
-					event:"setBlack"
-				},{
-					icon:"\ue61c",
-					title:"投诉",
-					type:"navigate",
-					path:"mail/user-report/user-report"
-				}]
+				userInfo:{},
+				isFollow:false
 			}
 		},
-		onLoad() {
-			uni.$on('saveRemarkTag',(e)=>{
-				this.nickname = e.nickname
-				this.tagList = e.tagList
+		onLoad:function (option) {
+			_this=this;
+			_this.token = option.token;
+			_this.myToken = uni.getStorageSync("setUserData").token;
+			uni.request({
+				url:SERVER_API+'appUser/getUserDetailInfo',
+				data:{
+					token:_this.token
+				},
+				method:"POST",
+				header:{
+					token:_this.myToken
+				},
+				success(res) {
+					_this.userInfo = res.data.result;
+					//更新头像
+					if(_this.userInfo.baseInfo.photo){
+						uni.setStorageSync("avatar"+_this.token,_this.userInfo.baseInfo.photo)
+					}
+					_this.isFollow = _this.userInfo.baseInfo.isFollow; 
+					console.log(_this.userInfo)
+				}
 			})
 		},
 		beforeDestroy() {
-			uni.$off('saveRemarkTag')
+			
 		},
 		methods: {
-			// 打开操作菜单
-			openAction(){
-				this.$refs.action.show()
-			},
-			// 跳转
-			navigate(path){
+			goChat(){
+				var username = _this.token;
+				var nickname = _this.userInfo.baseInfo.name;
+				var avatar = "";
 				uni.navigateTo({
-					url: '/pages/'+path,
+					url: `/pages/chat/chat/chat?username=${username}&nickname=${nickname}&avatar=${avatar}`,
 				});
 			},
-			// 操作菜单事件 
-			popupEvent(e){
-				if(!e.type){
-					return
+			like(){
+				if(_this.isFollow==0){
+					uni.request({
+						url:SERVER_API+'appUser/follow',
+						data:{
+							followId:_this.token
+						},
+						header:{
+							token:_this.myToken
+						},
+						method:"POST",
+						success(res){
+							console.log(res)
+							if(res.data.code==1){
+								uni.showToast({
+									"title":"关注成功",
+									"position":"bottom"
+								})
+								_this.isFollow=1;
+							}else{
+								console.log(res.data)
+								uni.showToast({
+									"title":res.data.message,
+									"position":"bottom"
+								})
+							}
+						}
+					})
+				}else{
+					uni.request({
+						url:SERVER_API+'appUser/unfollow',
+						data:{
+							followId:_this.token
+						},
+						header:{
+							token:_this.myToken
+						},
+						method:"POST",
+						success(res){
+							console.log(res)
+							if(res.data.code==1){
+								uni.showToast({
+									"title":"取消关注",
+									"position":"bottom"
+								})
+								_this.isFollow=0
+							}else{
+								uni.showToast({
+									"title":res.data.message,
+									"position":"bottom"
+								})
+							}
+						}
+					})
 				}
-				switch (e.type){
-					case 'navigate':
-					uni.navigateTo({
-						url: '/pages/'+e.path
-					});
-						break;
-					case 'event':
-					this[e.event](e)
-						break;
-				}
-				setTimeout(()=>{
-					// 关闭弹出层
-					this.$refs.action.hide()
-				},300)
-			},
-			// 设为星标
-			setStar(e){
-				this.star = !this.star
-				e.title = this.star ? '取消星标好友' : "设为星标朋友"
-			},
-			// 加入黑名单
-			setBlack(e){
-				let msg = '加入黑名单'
-				if(this.isBlack){
-					msg = '移出黑名单'
-				}
-				uni.showModal({
-					content: '是否要'+msg+'？',
-					success: (res)=> {
-						if (res.confirm) {
-							this.isBlack = !this.isBlack
-							e.title = this.isBlack ? '移出黑名单' : '加入黑名单'
-							uni.showToast({
-								title: msg+'成功',
-								icon: 'none'
-							});
-						} 
-					}
-				});
 			}
 		}
 	}

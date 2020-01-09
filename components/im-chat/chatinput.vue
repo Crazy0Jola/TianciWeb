@@ -1,8 +1,5 @@
 <template>
 	<view class="footer">
-		<!-- <view class="footer-left">
-			<view class="uni-icon uni-icon-mic" @tap="startRecognize"> </view>
-		</view> -->
 		<view class="footer-center">
 			<input class="input-text" type="text" @confirm="sendMessge" v-model="inputValue" :focus="focus" @blur="blur" :placeholder="placeholder"></input>
 		</view>
@@ -35,23 +32,11 @@
 				var that = this;
 				this.$emit('blur')
 			},
-			startRecognize: function () {
-				var options = {};
-				var that = this;
-				options.engine = 'iFly';
-				that.inputValue = "";
-				plus.speech.startRecognize(options, function (s) {
-					console.log(s);
-					that.inputValue += s;
-				}, function (e) {
-					console.log("语音识别失败：" + e.message);
-				});
-			},
 			sendMessge: function () {
 				if (!this.inputValue) {
-					uni.showModal({
-						content:"还没有输入内容哦!",
-						showCancel:false
+					uni.showToast({
+						"title":"还没有输入内容哦!",
+						"position":"bottom"
 					})
 					return;
 				}

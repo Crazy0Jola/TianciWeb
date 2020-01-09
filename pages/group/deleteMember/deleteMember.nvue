@@ -46,6 +46,9 @@
 			<text class="font-lg">{{current}}</text>
 		</view>
 
+		<free-confirm ref="confirm" title="温馨提示">
+			<text class="font-md">确认删除？</text>
+		</free-confirm>
 	</view>
 </template>
 
@@ -53,6 +56,7 @@
 	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
 	import freeListItem from "@/components/free-ui/free-list-item.vue"
 	import freeMainButton from '@/components/free-ui/free-main-button.vue';
+	import freeConfirm from "@/components/free-ui/free-confirm.vue"
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
 	import {initial} from "@/js_sdk/chineseConversion.js" //引入汉字转拼音
 	
@@ -64,7 +68,8 @@
 		components: {
 			freeNavBar,
 			freeListItem,
-			freeMainButton
+			freeMainButton,
+			freeConfirm
 		},
 		data() {
 			return {
@@ -176,41 +181,35 @@
 					})
 					return;
 				}
-				console.log("hh")
-				uni.showModal({
-				    title: '提示',
-				    content: '确认删除？',
-				    success: function (res) {
-				        if (res.confirm) {
-				            _this.selectList = _this.selectList.map(res=>{
-				            	return {
-				            		username:res.username,
-				            	}
-				            })
-							console.log(JSON.stringify(_this.selectList))
-				            
-				            JIM.delGroupMembers({
-				            	'gid' : _this.gid,
-				            	'member_usernames' : _this.selectList
-				            }).onSuccess(function(data) {
-				            	uni.showToast({
-				            		"title":"删除成功",
-				            		"position":"bottom"
-				            	})
-				            	uni.navigateTo({
-				            		url:"../groupChat/groupChat?gid="+_this.gid+"&gname="+_this.gname
-				            	})				            
-				            }).onFail(function(data) {
-				            	uni.showToast({
-				            		"title":getCodeMsg(data.code),
-				            		"position":"bottom"
-				            	})
-				            });
-				        } else if (res.cancel) {
-							return;
-				        }
-				    }
-				});
+
+				
+				this.$refs.confirm.show((close)=>{
+					_this.selectList = _this.selectList.map(res=>{
+						return {
+							username:res.username,
+						}
+					})
+					console.log(JSON.stringify(_this.selectList))
+					
+					JIM.delGroupMembers({
+						'gid' : _this.gid,
+						'member_usernames' : _this.selectList
+					}).onSuccess(function(data) {
+						uni.showToast({
+							"title":"删除成功",
+							"position":"bottom"
+						})
+						uni.navigateTo({
+							url:"../groupChat/groupChat?gid="+_this.gid+"&gname="+_this.gname
+						})				            
+					}).onFail(function(data) {
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})
+					});
+					close()
+				})
 				
 			},
 			touchstart(e){

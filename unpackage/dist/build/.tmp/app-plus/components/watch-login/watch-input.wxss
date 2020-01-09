@@ -934,51 +934,51 @@
 	content: "\E601";
 }
 .main-list{
-	display: -webkit-box;
-	display: -webkit-flex;
-	display: flex;
-	-webkit-box-orient: horizontal;
-	-webkit-box-direction: normal;
-	-webkit-flex-direction: row;
-	        flex-direction: row;
-	-webkit-box-pack: justify;
-	-webkit-justify-content: space-between;
-	        justify-content: space-between;
-	-webkit-box-align: center;
-	-webkit-align-items: center;
-	        align-items: center;
-	height: 36rpx;   /* Input 高度 */
-	color: #333333;
-	padding: 32rpx;
-	margin-top:24rpx;
-	margin-bottom: 24rpx;
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: flex!important;
+	-webkit-box-orient: horizontal!important;
+	-webkit-box-direction: normal!important;
+	-webkit-flex-direction: row!important;
+	        flex-direction: row!important;
+	-webkit-box-pack: justify!important;
+	-webkit-justify-content: space-between!important;
+	        justify-content: space-between!important;
+	-webkit-box-align: center!important;
+	-webkit-align-items: center!important;
+	        align-items: center!important;
+	height: 36rpx!important;   /* Input 高度 */
+	color: #333333!important;
+	padding: 32rpx!important;
+	margin-top:24rpx!important;
+	margin-bottom: 24rpx!important;
 }
 .img{
-	width: 32rpx;
-	height: 32rpx;
-	font-size: 32rpx;
+	width: 32rpx!important;
+	height: 32rpx!important;
+	font-size: 32rpx!important;
 }
 .main-input{
-	-webkit-box-flex: 1;
-	-webkit-flex: 1;
-	        flex: 1;
-	text-align: left;
-	font-size: 28rpx;
+	-webkit-box-flex: 1!important;
+	-webkit-flex: 1!important;
+	        flex: 1!important;
+	text-align: left!important;
+	font-size: 28rpx !important;
 	/* line-height: 100upx; */
-	padding-right: 10rpx;
-	margin-left: 20rpx;
+	padding-right: 10rpx !important;
+	margin-left: 20rpx !important;
 }
 .vercode {
-	color: rgba(0,0,0,0.7);
-	font-size: 24rpx;
-	line-height: 100rpx;
+	color: rgba(0,0,0,0.7)!important;
+	font-size: 24rpx!important;
+	line-height: 100rpx!important;
 }
 .vercode-run {
 	color: rgba(0,0,0,0.4) !important;
 }
 .oBorder{
-    border: none;
-    border-radius: 2.5rem ;
-    box-shadow: 0 0 60rpx 0 rgba(43,86,112,.1);
+    border: none!important;
+    border-radius: 2.5rem !important;
+    box-shadow: 0 0 60rpx 0 rgba(43,86,112,.1)!important ;
 }
 

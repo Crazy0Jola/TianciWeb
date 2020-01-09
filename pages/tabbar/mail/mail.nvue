@@ -4,20 +4,21 @@
 		<!-- 导航栏 -->
 		<free-nav-bar title="通讯录"></free-nav-bar>
 		
-		<view class="noConversation" v-if="list.length==0">
-			<view>
-				<text class="iconfont text-gray text-center" style="font-size: 200rpx;">&#xe662;</text>
-			</view>
-			<view>
-				<text class=" font-md text-gray text-center">暂无关注好友</text>
-			</view>
-		</view>
 		
 		<!-- 通讯录列表 -->
 		<scroll-view scroll-y="true" :style="'height:'+scrollHeight+'px;'"
 		:scroll-into-view="scrollInto">
 			<free-list-item v-for="(item,index) in topList" :key="index"
 			:title="item.title" :cover="item.cover" @click="EventHandle(item.event)"></free-list-item>
+			
+			<!-- <view class="noConversation" v-show="isNull">
+				<view>
+					<text class="iconfont text-gray text-center" style="font-size: 200rpx;">&#xe662;</text>
+				</view>
+				<view>
+					<text class=" font-md text-gray text-center">暂无关注好友</text>
+				</view>
+			</view> -->
 			
 			<view v-for="(item,index) in list" :key="index"
 			:id="'item-'+item.letter">
@@ -27,7 +28,7 @@
 				</view>
 				<free-list-item  v-for="(item2,index2) in item.data" 
 				:key="index2" :title="item2.name" 
-				:cover="item2.photo?item2.photo:'/static/images/userpic.jpg'" @click="goChat(item2.id)"></free-list-item>
+				:cover="item2.photo?item2.photo:'/static/images/userpic.jpg'" @click="goChat(item2)"></free-list-item>
 			</view>
 		</scroll-view>
 		
@@ -84,7 +85,8 @@
 				top:0,
 				scrollHeight:0,
 				scrollInto:'',
-				current:''
+				current:'',
+				isNull:false
 			}
 		},
 		onLoad() {
@@ -92,9 +94,9 @@
 			let res = uni.getSystemInfoSync()
 			this.top = res.statusBarHeight + uni.upx2px(90)
 			this.scrollHeight = res.windowHeight - this.top - 50
-
 		},
 		onShow(){	
+			console.log(_this.isNull)
 			_this.list=[];
 			for(var i=0;i<26;i++){
 				var obj = {
@@ -110,8 +112,14 @@
 				},
 				method:"POST",
 				success(res){
+					console.log(res)
 					var result = res.data.result;
 					var len = result.length
+					if(len==0){
+						_this.isNull=true
+					}else{
+						_this.isNull=false
+					}
 					for(var i=0;i<len;i++){
 						let letter = initial(result[i].name)
 						let index = letter.charCodeAt()-65;
@@ -143,6 +151,13 @@
 				}
 			},
 			goChat(e){
+				console.log(e)
+				var username = e.token;
+				var nickname = e.name;
+				var avatar = e.photo;
+				uni.navigateTo({
+					url: `/pages/chat/chat/chat?username=${username}&nickname=${nickname}&avatar=${avatar}`,
+				});
 				console.log(e)    
 			},
 			touchstart(e){
@@ -173,5 +188,9 @@
 </script>
 
 <style>
-
+	.noConversation{
+		width: 750rpx;
+		height: 500rpx;
+		margin-top: 100rpx;
+	}
 </style>

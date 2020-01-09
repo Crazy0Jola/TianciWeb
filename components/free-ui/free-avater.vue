@@ -17,6 +17,10 @@
 				type:String,
 				default:"rounded"
 			},
+			token:{
+				type:String,
+				default:""
+			},
 			clickType:{
 				type:String,
 				default:"none"
@@ -31,8 +35,15 @@
 			clickEvent() {
 				switch (this.clickType){
 					case 'navigate':
+					if(this.token==uni.getStorageSync("setUserData").token){
+						uni.showToast({
+							"title":"您戳到了自己",
+							"position":"bottom"
+						})
+						return;
+					}
 					uni.navigateTo({
-						url: '/pages/mail/user-base/user-base'
+						url: `/pages/mail/user-base/user-base?token=${this.token}`
 					});
 						break;
 					default:

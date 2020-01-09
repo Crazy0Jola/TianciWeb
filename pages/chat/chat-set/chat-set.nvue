@@ -1,29 +1,30 @@
 <template>
-	<view class="page">
+	<view>
 		<!-- 导航栏 -->
 		<free-nav-bar title="聊天信息" showBack :showRight="false"></free-nav-bar>
 		<view class="flex flex-wrap py-3 bg-white">
 			
 			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;" v-for="(item,index) in memberList" :key="index">
-				<free-avater :src="item.avatar? item.avatar:'/static/images/userpic.jpg'" size="110"></free-avater>
+				<free-avater clickType="navigate" :token="item.username" :src="item.avatar? item.avatar:'/static/images/userpic.jpg'" size="110"></free-avater>
 				<text class="font text-muted mt-1">{{item.nickName}}</text>
 			</view>
 			
+			<view class="flex felx-column align-start  justify-start">
 			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;" @click="addMember">
 				<view class="flex align-center justify-center border" 
-				style="width: 120rpx;height: 120rpx;" >
+				style="width: 130rpx;height: 130rpx;" >
 					<text class="text-light-muted" 
 					style="font-size: 100rpx;">+</text>
 				</view>
 			</view>
-			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;" @click="delMember" v-show="isAdmin">
+			<view class="flex flex-column align-end justify-center mb-2" style="width: 150rpx;" @click="delMember" v-if="isAdmin">
 				<view class="flex align-center justify-center border" 
-				style="width: 120rpx;height: 120rpx;" >
+				style="width: 130rpx;height: 130rpx;" >
 					<text class="text-light-muted" 
 					style="font-size: 100rpx;">—</text>
 				</view>
 			</view>
-			
+			</view>
 		</view>
 		<free-divider></free-divider>
 		<free-list-item title="群头像" showRight :showRightIcon="false" :showLeftIcon="false" @click="changeGavatar">
@@ -73,6 +74,11 @@
 		<view class="py-3 flex align-center justify-center bg-white" @click="exitGroup"> 
 			<text class="font-md text-danger">{{isAdmin?'解散群聊':'删除并退出'}}</text>
 		</view>
+		<free-divider></free-divider>
+		
+		<free-confirm ref="confirm" title="温馨提示">
+			<text class="font-md">{{isAdmin?'确定解散该群聊？':'确定退出该群聊？'}}</text>
+		</free-confirm>
 	</view>
 </template>
 
@@ -81,6 +87,7 @@
 	import freeAvater from '@/components/free-ui/free-avater.vue';
 	import freeDivider from "@/components/free-ui/free-divider.vue"
 	import freeListItem from "@/components/free-ui/free-list-item.vue"
+	import freeConfirm from "@/components/free-ui/free-confirm.vue"
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
 	
 	var JIM = getApp().globalData.JIM;
@@ -91,7 +98,8 @@
 			freeNavBar,
 			freeAvater,
 			freeDivider,
-			freeListItem
+			freeListItem,
+			freeConfirm
 		},
 		data() {
 			return {
@@ -287,50 +295,43 @@
 				})
 			},
 			exitGroup(){
-				uni.showModal({
-				    title: '提示',
-				    content: _this.isAdmin?'确定解散该群聊？':'确定退出该群聊？',
-				    success: function (res) {
-				        if (res.confirm) {				
-							if(_this.isAdmin){
-								JIM.dissolveGroup({
-								'gid' : _this.gid
-								}).onSuccess(function(data) {
-									uni.showToast({
-										"title":"群聊解散成功",
-										"position":"bottom"
-									})
-									uni.switchTab({
-										url:"../../tabbar/index/index"
-									})
-								}).onFail(function(data) {
-									uni.showToast({
-										"title":getCodeMsg(data.code),
-										"position":"bottom"
-									})
-								});
-							}else{
-								JIM.exitGroup({
-									'gid' : _this.gid
-								}).onSuccess(function(data) {
-									uni.showToast({
-										"title":"成功退出群聊+'"+_this.gname+"'",
-										"position":"bottom"
-									})
-									uni.switchTab({
-										url:"../../tabbar/index/index"
-									})
-								}).onFail(function(data) {
-									uni.showToast({
-										"title":getCodeMsg(data.code),
-										"position":"bottom"
-									})
-								});
-							}
-						}else if (res.cancel) {
-							return;
-				        }
+				this.$refs.confirm.show((close)=>{
+					if(_this.isAdmin){
+						JIM.dissolveGroup({
+						'gid' : _this.gid
+						}).onSuccess(function(data) {
+							uni.showToast({
+								"title":"群聊解散成功",
+								"position":"bottom"
+							})
+							uni.switchTab({
+								url:"../../tabbar/index/index"
+							})
+						}).onFail(function(data) {
+							uni.showToast({
+								"title":getCodeMsg(data.code),
+								"position":"bottom"
+							})
+						});
+					}else{
+						JIM.exitGroup({
+							'gid' : _this.gid
+						}).onSuccess(function(data) {
+							uni.showToast({
+								"title":"成功退出群聊'"+_this.gname+"'",
+								"position":"bottom"
+							})
+							uni.switchTab({
+								url:"../../tabbar/index/index"
+							})
+						}).onFail(function(data) {
+							uni.showToast({
+								"title":getCodeMsg(data.code),
+								"position":"bottom"
+							})
+						});
 					}
+					close()
 				})	
 			}
 		}

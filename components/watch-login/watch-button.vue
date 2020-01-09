@@ -22,7 +22,7 @@
 			bgColor:{
 				//按钮背景颜色
 				type: String,
-				default: "linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.6))",
+				default: "linear-gradient(to right, rgba(53,120,229,1), rgba(53,120,229,0.7))",
 			},
 			fontColor:{
 				//按钮字体颜色

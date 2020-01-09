@@ -139,6 +139,10 @@
 
 
 
+
+
+
+
 /*每个页面公共css */
 /* 图标 */
 .iconfont{
@@ -523,8 +527,26 @@
 .font-italic { font-style: italic;}
 /*斜体*/
 /* 文字颜色 */
+.text-sq{color:rgb(93,120,255);}
+.text-qy{color:rgb(50,205,50);}
+.text-tcb{color:rgb(243,154,24);}
+.text-ws{color:rgb(205,133,63);}
+.text-zb{color:rgb(255,182,193);}
+.text-ys{color:rgb(77,77,77);}
+.text-wy{color:rgb(255,192,203);}
+.text-sy{color:rgb(30,144,255);}
+.text-jj{color:rgb(212,35,122);}
+.text-qyfw{color:rgb(244,234,42);}
+.text-zwfw{color:rgb(19,34,122);}
+.text-shfw{color:rgb(250,128,114);}
+.text-bm{color:rgb(31,203,184);}
+.text-ls{color:rgb(191,191,191);}
+.text-hy{color:rgb(173,216,230);}
+.text-xz{color:rgb(44,44,44);}
+.text-yq{color:rgb(216,30,6);}
 .text-gray {color: #aaaaaa;}
 .text-white {color: #ffffff;}
+.text-red {color:rgb(216,30,6);}
 .text-primary {color: #007bff;}
 .text-hover-primary { color: #0056b3;}
 .text-secondary {color: #6c757d;}
@@ -679,11 +701,11 @@
 }
 /* 2. 主背景色（原谅绿） */
 .main-bg-color{
-	background-color: #08C060;
+	background-color: #3578E5;
 }
 /* 3. 主文字色（原谅绿） */
 .main-text-color{
-	color: #08C060;
+	color: #3578E5;
 }
 .border-main{
 	border-color: #08C060!important;

@@ -1,11 +1,12 @@
 {
   "pages": [
-    "pages/find/moments/moments",
-    "pages/find/publish/publish",
+    "pages/tabbar/find/find",
     "pages/login/login",
     "pages/login/forget",
     "pages/login/register",
-    "pages/webview/webview"
+    "pages/webview/webview",
+    "pages/tabbar/publish/publish",
+    "pages/mine/mine"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -17,7 +18,7 @@
   },
   "tabBar": {
     "color": "#000000",
-    "selectedColor": "#08C261",
+    "selectedColor": "#3578E5",
     "borderStyle": "black",
     "backgroundColor": "#F7F7F7",
     "list": [
@@ -37,13 +38,13 @@
         "iconPath": "static/tabbar/find.png",
         "selectedIconPath": "static/tabbar/find-select.png",
         "pagePath": "pages/tabbar/find/find",
-        "text": "发现"
+        "text": "朋友圈"
       },
       {
         "iconPath": "static/tabbar/my.png",
         "selectedIconPath": "static/tabbar/my-select.png",
         "pagePath": "pages/tabbar/my/my",
-        "text": "我的"
+        "text": "应用仓"
       }
     ]
   },
@@ -56,12 +57,6 @@
         "nvue": true
       },
       "pages/tabbar/mail/mail.html": {
-        "window": {
-          "usingComponents": {}
-        },
-        "nvue": true
-      },
-      "pages/tabbar/find/find.html": {
         "window": {
           "usingComponents": {}
         },
@@ -156,6 +151,30 @@
           "usingComponents": {}
         },
         "nvue": true
+      },
+      "pages/group/deleteMember/deleteMember.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
+      },
+      "pages/edit/edit/edit.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
+      },
+      "pages/group/groupList/groupList.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
+      },
+      "pages/setting/setting.html": {
+        "window": {
+          "usingComponents": {}
+        },
+        "nvue": true
       }
     },
     "entryPagePath": "pages/tabbar/index/index"
@@ -166,7 +185,7 @@
     "alwaysShowBeforeRender": true,
     "autoclose": false
   },
-  "appname": "仿微信",
-  "compilerVersion": "2.4.6",
+  "appname": "国政通",
+  "compilerVersion": "2.5.1",
   "usingComponents": {}
 }

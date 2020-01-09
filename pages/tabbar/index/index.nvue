@@ -74,7 +74,8 @@
 						event:"delChat"
 					}
 				],
-				list:[]
+				list:[],
+				myUsername:'',
 			}
 		},
 		onLoad() {
@@ -100,7 +101,6 @@
 					}
 					var userData = uni.getStorageSync("setUserData")
 					var token = userData.token
-					tokenList.push(token)
 					if(tokenList.length>0){
 						uni.request({
 							url:SERVER_API+'appUser/getUserPhotoByToken',
@@ -111,14 +111,12 @@
 							method:"POST",
 							success(res){
 								console.log(res)
-								for(var i=0;i<len-1;i++){
+								for(var i=0;i<len;i++){
 									if(_this.list[i].type==3){//是单聊
 										var name= _this.list[i].username;
 										_this.list[i].avatar=res.data.result[name]
 									}	
 								}
-								userData.avatar = res.data.result[token];
-								uni.setStorageSync('setUserData',userData)
 							}
 						})
 					}
@@ -159,7 +157,6 @@
 					}
 					var userData = uni.getStorageSync("setUserData")
 					var token = userData.token
-					tokenList.push(token)
 					if(tokenList.length>0){
 						uni.request({
 							url:SERVER_API+'appUser/getUserPhotoByToken',
@@ -170,14 +167,12 @@
 							method:"POST",
 							success(res){
 								console.log(res)
-								for(var i=0;i<len-1;i++){
+								for(var i=0;i<len;i++){
 									if(_this.list[i].type==3){//是单聊
 										var name= _this.list[i].username;
 										_this.list[i].avatar=res.data.result[name]
 									}	
 								}
-								userData.avatar = res.data.result[token];
-								uni.setStorageSync('setUserData',userData)
 							}
 						})
 					}
@@ -273,6 +268,7 @@
 				});
 			},
 			login(username,password){
+				_this.myUsername = username;
 				uni.showLoading({
 					title:"读取消息列表中..."
 				})
@@ -308,7 +304,7 @@
 							
 							if(type==3){//如果是单聊消息
 								username = data.messages[i].from_username;
-								list = uni.getStorageSync(username);	//获取该用户的聊天记录缓存
+								list = uni.getStorageSync(_this.myUsername+username);	//获取该用户的聊天记录缓存
 								
 								
 								//如果是文字 直接push
@@ -316,7 +312,7 @@
 									if(list){
 										list.push(content);
 										console.log("======文字push")
-										uni.setStorageSync(username,list);	
+										uni.setStorageSync(_this.myUsername+username,list);	
 									}
 								}else{//否则，需要查询资源url并进行替换
 									JIM.getResource({
@@ -334,7 +330,7 @@
 															if(list){
 																list.push(content);
 																console.log("===============资源push")
-																uni.setStorageSync(username,list);	
+																uni.setStorageSync(_this.myUsername+username,list);	
 																uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
 															
 															}
@@ -362,14 +358,14 @@
 								gid = data.messages[i].from_gid;
 								console.log("=============="+gid)
 								console.log("group"+gid)
-								list = uni.getStorageSync("group"+gid); //获取该群聊的聊天记录缓存
+								list = uni.getStorageSync(_this.myUsername+gid); //获取该群聊的聊天记录缓存
 								console.log(list)
 								//如果是文字 直接push
 								if(content.msg_type=="text"){
 									if(list){
 										console.log("hhh")
 										list.push(content);
-										uni.setStorageSync("group"+gid,list);	
+										uni.setStorageSync(_this.myUsername+gid,list);	
 									}
 									
 								}else{//否则，需要查询资源url并进行替换
@@ -388,7 +384,7 @@
 															content.msg_body.media_id=savedFilePath;
 															if(list){
 																list.push(content);
-																uni.setStorageSync("group"+gid,list);	
+																uni.setStorageSync(_this.myUsername+gid,list);	
 																console.log("push通知========================")
 																uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据				
 															}
@@ -452,7 +448,7 @@
 				        	
 				        	if(data[i].msg_type==3){//如果是单聊
 				        		var username = data[i].from_username
-				        		var list = uni.getStorageSync(username);//获取该对象的聊天记录
+				        		var list = uni.getStorageSync(_this.myUsername+username);//获取该对象的聊天记录
 				        		
 				        		//遍历该用户的消息
 				        		for(var j=0;j<data[i].msgs.length;j++){
@@ -460,7 +456,7 @@
 				        			if(content.msg_type=="text"){//如果是文字直接push
 				        				if(list){
 				        					list.push(content);
-				        					uni.setStorageSync(username,list);	
+				        					uni.setStorageSync(_this.myUsername+username,list);	
 				        				}
 				        			}else{//或者还要获取资源url进行替换
 				        				JIM.getResource({
@@ -477,7 +473,7 @@
 																content.msg_body.media_id=savedFilePath;
 																if(list){
 																	list.push(content);
-																	uni.setStorageSync(username,list);	
+																	uni.setStorageSync(_this.myUsername+username,list);	
 																}
 															}
 														});
@@ -499,7 +495,7 @@
 				        		});	 
 				        	}else if(data[i].msg_type==4){//如果是群聊
 				        		var gid = data[i].from_gid
-				        		var list = uni.getStorageSync("group"+gid);//获取该对象的聊天记录
+				        		var list = uni.getStorageSync(_this.myUsername+gid);//获取该对象的聊天记录
 				        		
 				        		//遍历该群的消息
 				        		for(var j=0;j<data[i].msgs.length;j++){
@@ -507,7 +503,7 @@
 				        			if(content.msg_type=="text"){//如果是文字直接push
 				        				if(list){
 				        					list.push(content);
-				        					uni.setStorageSync("group"+gid,list);	
+				        					uni.setStorageSync(_this.myUsername+gid,list);	
 				        				}
 				        			}else{//或者不是文字还要获取资源url进行替换
 				        				JIM.getResource({
@@ -524,7 +520,7 @@
 				        										content.msg_body.media_id=savedFilePath;
 				        										if(list){
 				        											list.push(content);
-				        											uni.setStorageSync("group"+gid,list);	
+				        											uni.setStorageSync(_this.myUsername+gid,list);	
 				        										}
 				        									}
 				        								});
@@ -746,7 +742,6 @@
 						}
 						var userData = uni.getStorageSync("setUserData")
 						var token = userData.token
-						tokenList.push(token)
 						if(tokenList.length>0){
 							uni.request({
 								url:SERVER_API+'appUser/getUserPhotoByToken',
@@ -757,14 +752,12 @@
 								method:"POST",
 								success(res){
 									console.log(res)
-									for(var i=0;i<len-1;i++){
+									for(var i=0;i<len;i++){
 										if(_this.list[i].type==3){//是单聊
 											var name= _this.list[i].username;
 											_this.list[i].avatar=res.data.result[name]
 										}	
 									}
-									userData.avatar = res.data.result[token];
-									uni.setStorageSync('setUserData',userData)
 								}
 							})
 						}
@@ -793,7 +786,6 @@
 						}
 						var userData = uni.getStorageSync("setUserData")
 						var token = userData.token
-						tokenList.push(token)
 						if(tokenList.length>0){
 							uni.request({
 								url:SERVER_API+'appUser/getUserPhotoByToken',
@@ -804,14 +796,12 @@
 								method:"POST",
 								success(res){
 									console.log(res)
-									for(var i=0;i<len-1;i++){
+									for(var i=0;i<len;i++){
 										if(_this.list[i].type==3){//是单聊
 											var name= _this.list[i].username;
 											_this.list[i].avatar=res.data.result[name]
 										}	
 									}
-									userData.avatar = res.data.result[token];
-									uni.setStorageSync('setUserData',userData)
 								}
 							})
 						}

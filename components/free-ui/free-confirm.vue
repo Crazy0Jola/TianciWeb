@@ -1,13 +1,13 @@
 <template>
 	<free-popup ref="confirm" center maskColor transformOrigin="center center">
 		<view class="bg-white rounded" style="width: 600rpx;">
-			<view class="p-4 flex flex-column">
+			<view class="p-4 flex flex-column justify-center align-center">
 				<text class="font-md font-weight-bold mb-3">{{title}}</text>
 				<slot></slot>
 			</view>
 			<!-- 底部 -->
 			<view style="height: 100rpx;" class="border-top flex align-stretch">
-				<view class="flex-1 border-right flex align-center justify-center" @click="cancel">
+				<view v-if="showCancel" class="flex-1 border-right flex align-center justify-center" @click="cancel">
 					<text class="font-md text-muted">取消</text>
 				</view>
 				<view class="flex-1 flex align-center justify-center"
@@ -28,7 +28,11 @@
 		props: {
 			title: {
 				type: String,
-				default: "提示"
+				default: "温馨提示"
+			},
+			showCancel: {
+				type: Boolean,
+				default: true
 			},
 		},
 		data() {

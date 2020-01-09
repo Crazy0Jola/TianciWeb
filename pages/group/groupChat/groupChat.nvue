@@ -14,7 +14,7 @@
 			
 			<!-- 聊天信息列表组件 -->
 			<block v-for="(item,index) in list" :key="index">
-				<free-chat-item :item="item" :avatar="avatar" :myUsername="myUsername" :myAvatar="myAvatar" :index="index" ref="chatItem"
+				<free-chat-item :item="item" :avatar="item.avatar" :myUsername="myUsername" :myAvatar="myAvatar" :index="index" ref="chatItem"
 				:pretime=" index > 0 ? list[index-1].create_time : 0"
 				@long="long" @preview="previewImage"></free-chat-item>
 			</block>
@@ -206,14 +206,16 @@
 			_this=this;
 			_this.gid = e.gid;
 			_this.gname = e.gname;
-			_this.myUsername = uni.getStorageSync('setUserData').username;
+			var userData = uni.getStorageSync("setUserData");
+			_this.myAvatar = userData.photo;
+			_this.myUsername = userData.username;
 			
 			console.log("gid++++"+_this.gid+"----gname+"+_this.gname)
 			
 			uni.$on("get_group_msg",function(){
 				console.log("hhhhhhhhhhhhhhhhhhhhhh")
-				console.log("group"+_this.gid)
-				var msg = uni.getStorageSync("group"+_this.gid);
+				console.log(_this.myUsername+_this.gid)
+				var msg = uni.getStorageSync(_this.myUsername+_this.gid);
 				console.log(JSON.stringify(msg))
 				_this.list=msg;
 				var pageToBottomTimer = setTimeout(()=>{
@@ -235,7 +237,7 @@
 			// var imagepath=_this.image_cache("https://img.jiguang.cn/im-portal/0.0.1/assets/img/jverify-flow-banner-new.png","a");
 			// var p = plus.io.convertLocalFileSystemURL(imagepath);  
 			// console.log(p)
-			var msg = uni.getStorageSync("group"+_this.gid);
+			var msg = uni.getStorageSync(_this.myUsername+_this.gid);
 			JIM.resetUnreadCount({
 				'gid' : _this.gid
 			});
@@ -330,7 +332,7 @@
 						    	_this.setPic(elem.msg_body.media_id,index);
 						    }
 						})
-						uni.setStorageSync("group"+_this.gid,_this.$data.list);					
+						uni.setStorageSync(_this.myUsername+_this.gid,_this.$data.list);					
 						_this.pageToBottom();
 						uni.hideLoading()					
 												
@@ -493,7 +495,7 @@
 									success: function (res) {
 										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
 										_this.$data.list[index].msg_body.media_id=savedFilePath;
-										uni.setStorageSync("group"+_this.gid,_this.$data.list);
+										uni.setStorageSync(_this.myUsername+_this.gid,_this.$data.list);
 									}
 								});
 							}
@@ -566,7 +568,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync("group"+_this.gid,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.gid,_this.list);
 					
 					}).onFail(function(data) {
 						uni.showToast({
@@ -616,7 +618,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync("group"+_this.gid,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.gid,_this.list);
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
@@ -673,7 +675,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync("group"+_this.gid,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.gid,_this.list);
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
@@ -722,7 +724,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync("group"+_this.gid,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.gid,_this.list);
 					
 					}).onFail(function(data) {
 						uni.showToast({
@@ -781,7 +783,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync("group"+_this.gid,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.gid,_this.list);
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),

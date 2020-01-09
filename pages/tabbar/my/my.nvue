@@ -1,37 +1,91 @@
 <template>
-	<view class="page">
-		<free-nav-bar bgColor="bg-white" :showRight="false" :showNav="false" :fixed="false">
-		</free-nav-bar>
-		<free-list-item @click="changeavatar" :cover="avatar||'/static/images/userpic.jpg'" coverSize="120" title="楚绵" showRight>
-			<view class="flex flex-column">
+	<view>
+		
+		<free-nav-bar title="应用仓"><view slot="right">
+						<free-icon-button @click="goSetting"
+						:icon="'\ue611'"></free-icon-button>
+					</view></free-nav-bar>
+		<free-list-item @imgClick="changeAvatar" @click="goUserInfo" :cover="avatar||'/static/images/userpic.jpg'" coverSize="120" showRight>
+			<view class="flex flex-column" @click="goUserInfo">
 				<text class="text-dark font-lg font-weight-bold">{{name}}</text>
 				<text class="text-light-muted font mt-2">手机号：{{phone}}</text>
 			</view>
-			<view slot="right">
+			<view slot="right" @click="goUserInfo">
 				<text class="iconfont font-md text-light-muted">&#xe614;</text>
 			</view>
 		</free-list-item>
 		<free-divider></free-divider>
-		<free-list-item title="支付" showRight>
-			<text slot="icon" class="iconfont font-lg py-1">&#xe66c;</text>
+		
+		<free-list-item title="社圈" showRight @click="openSQ">
+			<text slot="icon" class="iconfont font-lg py-1 text-sq">&#xe631;</text>
+		</free-list-item>
+		<free-list-item  title="企业名录" showRight @click="openQY">
+			<text slot="icon" class="iconfont font-lg py-1 text-qy">&#xe702;</text>
+		</free-list-item>
+		<free-list-item v-if="getTCB()" title="天赐币" showRight @click="openTCB">
+			<text slot="icon" class="iconfont font-lg py-1 text-tcb">&#xe629;</text>
+		</free-list-item>
+		<free-list-item v-if="getWS()" title="微视" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-ws">&#xe65d;</text>
+		</free-list-item>
+		<free-list-item v-if="getZB()" title="直播" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-zb">&#xe61e;</text>
+		</free-list-item>
+		<free-list-item v-if="getYS()" title="影视" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-ys">&#xe610;</text>
+		</free-list-item>
+		<free-list-item v-if="getWY()" title="网游" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-wy">&#xe6cf;</text>
+		</free-list-item>
+		<free-list-item v-if="getSY()" title="手游" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-sy">&#xe69e;</text>
+		</free-list-item>
+		<!-- <free-divider></free-divider> -->
+		<free-list-item v-if="getJJ()" title="国际接机" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-jj">&#xe6aa;</text>
+		</free-list-item>
+		<free-list-item v-if="getQYFW()" title="企业服务" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-qyfw">&#xe6e2;</text>
+		</free-list-item>
+		<free-list-item v-if="getZWFW()" title="政务服务" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-zwfw">&#xe668;</text>
+		</free-list-item>
+		<free-list-item v-if="getSHFW()" title="生活服务" showRight @click="openNone">
+			<text slot="icon" class="iconfont font-lg py-1 text-shfw">&#xe60e;</text>
+		</free-list-item>
+		<!-- <free-divider></free-divider> -->
+		<free-list-item v-if="getBM()" title="部门组织" showRight @click="openBM">
+			<text slot="icon" class="iconfont font-lg py-1 text-bm">&#xecd2;</text>
+		</free-list-item>
+		<free-list-item v-if="getLS()" title="历史朝代" showRight @click="openLS">
+			<text slot="icon" class="iconfont font-lg py-1 text-ls">&#xe60c;</text>
+		</free-list-item>
+		<free-list-item v-if="getHY()" title="行业划分" showRight @click="openHY">
+			<text slot="icon" class="iconfont font-lg py-1 text-hy">&#xe60f;</text>
+		</free-list-item>
+		<free-list-item v-if="getXZ()" title="行政划分" showRight @click="openXZ">
+			<text slot="icon" class="iconfont font-lg py-1 text-xz">&#xe603;</text>
 		</free-list-item>
 		<free-divider></free-divider>
-		<free-list-item title="收藏" showRight @click="test4">
-			<text slot="icon" class="iconfont font-lg py-1">&#xea2d;</text>
-		</free-list-item>
-		<free-list-item title="相册" showRight @click="test3">
-			<text slot="icon" class="iconfont font-lg py-1">&#xe608;</text>
-		</free-list-item>
-		<free-list-item title="表情" showRight @click="test2">
-			<text slot="icon" class="iconfont font-lg py-1">&#xe605;</text>
+		<free-list-item title="我要邀请" showRight @click="openYQ">
+			<text slot="icon" class="iconfont font-lg py-1 text-yq">&#xe652;</text>
 		</free-list-item>
 		<free-divider></free-divider>
-		<free-list-item title="设置" showRight @click="test">
-			<text slot="icon" class="iconfont font-lg py-1">&#xe612;</text>
-		</free-list-item>
-		<free-list-item title="退出登录" showRight @click="exit">
-			<text slot="icon" class="iconfont font-lg py-1">&#xe612;</text>
-		</free-list-item>
+		
+		<view class="bg-white flex align-stretch" @click="exit">
+			<view class="flex-1 flex align-center  justify-center pr-3 py-3 pl-3">
+					<text class="font-md text-red">退出登录</text>
+			</view>
+		</view>
+		<free-divider></free-divider>
+		
+		<free-confirm ref="confirm" title="温馨提示">
+			<text class="font-md">确认退出登录？</text>
+		</free-confirm>
+		
+		<free-confirm ref="none" title="温馨提示" :showCancel="false">
+			<text class="font-md">抱歉，您暂无权限查看</text>
+		</free-confirm>
 		
 	</view>
 </template>
@@ -41,6 +95,7 @@
 	import freeIconButton from "@/components/free-ui/free-icon-button.vue"
 	import freeListItem from "@/components/free-ui/free-list-item.vue"
 	import freeDivider from "@/components/free-ui/free-divider.vue"
+	import freeConfirm from "@/components/free-ui/free-confirm.vue"
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
 	
 	var JIM=getApp().globalData.JIM;	
@@ -51,19 +106,26 @@
 			freeNavBar,
 			freeIconButton,
 			freeListItem,
-			freeDivider
+			freeDivider,
+			freeConfirm
 		},
 		data() {
 			return {
 				avatar:"",
 				name:"",
-				phone:"",
+				phone:""
 			}
 		},
-		onShow(){
+		onLoad(){
 			_this = this;
+			_this.getFirst=0
+			_this.getSecond=0
+			_this.getThird=0
+		},
+		onShow(){
+			this.$forceUpdate();
 			const value = uni.getStorageSync('setUserData');
-			_this.avatar = value.avatar;
+			_this.avatar = value.photo;
 			_this.name = value.name;
 			_this.phone = value.phone;
 			
@@ -79,130 +141,165 @@
 				});
 			}
 		},
+		computed:{
+			
+		},
 		methods: {
-			//图片缓存
-			image_cache(image_url,media_id) {	
-				var url;
-				uni.getStorage({
-					key: media_id,
-					success:function(res){
-						url = res.data.tempFilePath;	
-					},
-					fail:function(res){
-						// 本地没有缓存 需要下载 
-						uni.downloadFile({
-							url: image_url,
-							success: (res) => {
-								if (res.statusCode === 200) {	
-									url = res.tempFilePath;
-									uni.setStorage({
-										key:media_id,
-										data:res,
-										success:function(res){
-											
-										}
-									})
-								}
-							}
-						}); 
-					}
-				})
-				return url;
-			},
-			test4(){
-				var url = "https://dlop.im.jiguang.cn/qiniu/file/j/5C31DCED0025DB78CA38C55C7B84B5FF.mp4\?e=1577949080&token=pNf8Uh3lsdBw4BGIUE1tgWT8dPKDDyzuOGEgtEJi:vEqmBKPVnRTqgkpsP-DZkBTID1o=";
-				uni.navigateTo({
-					url: `/pages/chat/video/video?url=${url}`,
-				});
-			},
-			test(){
-				JIM.addGroupMembers({
-					'gid' : 42084214,
-					'member_usernames' : [{'username':'test3'}]
-				}).onSuccess(function(data) {
-					console.log("==========="+JSON.stringify(data)+"=========")
-				//data.code 返回码
-				//data.message 描述
-				}).onFail(function(data) {
-					uni.showToast({
-						"title":getCodeMsg(data.code),
-						"position":"bottom"
-					})
-				//同上
-				});
-			},
-			test2(){
-				var arr = ['18952158867'];
-				uni.request({
-					url:SERVER_API+"appUser/getUserPhotoByPhone",
-					method:"POST",
-					header:{
-						"token":"e0b57b9a4e7e49bdab5f5e87fc5c0a0d"
-					},
-					data:JSON.stringify(arr),
-					success(data){
-						console.log(JSON.stringify(data))
-					}
-				})
-			},
-			test3(){
-				 JIM.updateSelfInfo({
-				            'username' : "13771504601",
-				        }).onSuccess(function(data) {
-							console.log(JSON.stringify(data))
-				            //data.code 返回码
-				            //data.message 描述
-				            //data.user_info.username
-				            //data.user_info.appkey
-				            //data.user_info.nickname
-				            //data.user_info.avatar 头像
-				            //data.user_info.birthday 生日，默认空
-				            //data.user_info.gender 性别 0 - 未知， 1 - 男 ，2 - 女
-				            //data.user_info.signature 用户签名
-				            //data.user_info.region 用户所属地区
-				            //data.user_info.address 用户地址
-				            //data.user_info.mtime 用户信息最后修改时间
-				            //data.extras 自定义json字段
-				          }).onFail(function(data) {
-				           uni.showToast({
-				           	"title":getCodeMsg(data.code),
-				           	"position":"bottom"
-				           })
-				        });
-			},
-			exit(){
-				JIM.loginOut();
-				this.$store.dispatch("setUserData","") //清空登录状态
-				try {
-					uni.removeStorageSync("setUserData")
-					uni.removeStorageSync("allUser")
-				} catch (e) {
-					// error
-				}
-				uni.navigateTo({
-					url:"../../login/login"
-				})
-			},
-			changeavatar(){
-				
+			changeAvatar(){
 				uni.chooseImage({
 					count:1,
-					success: (res) => {
-						// 发送到服务器					
-						// 渲染到页面						
-						JIM.updateSelfAvatar({'avatar' : res.tempFilePaths[0]}).onSuccess(function(data) {
-						    console.log('success:' + JSON.stringify(data));				
-						  
-						}).onFail(function(data) {
-						    uni.showToast({
-						    	"title":getCodeMsg(data.code),
-						    	"position":"bottom"
-						    })			
-						});
+					success: (res) => {			
+						var images = [];
+						var image_obj = {name:'portrait',uri:res.tempFilePaths[0]};
+						images.push(image_obj);
+						uni.uploadFile({
+							url: SERVER_API+'appUser/modifyUserInfo',
+							files:images,
+							header:{
+								"token":uni.getStorageSync("setUserData").token
+							},
+							success: (uploadFileRes) => {
+								console.log(uploadFileRes)
+								var res = JSON.parse(uploadFileRes.data)
+								if(res.code==1){
+									uni.showToast({
+										"title":"更换头像成功",
+									})
+									var userData = uni.getStorageSync("setUserData");
+									userData.photo = res.result.photo
+									uni.setStorageSync("setUserData",userData)
+								}
+							},
+							fail:(res) =>{
+								uni.showToast({
+									"title":res.data.message,
+									"position":"bottom"
+								})
+							}						
+						})					
 					}
 				})
-				
-			}
+			},
+			goUserInfo(){
+				uni.navigateTo({
+					url:"../../mine/mine"
+				})
+			},
+			getSQ(){
+				return uni.getStorageSync("QY")||false;;
+			},
+			getQY(){
+				return uni.getStorageSync("QY")||false;
+			},
+			getTCB(){
+				return uni.getStorageSync("TCB")||false;
+			},
+			getWS(){
+				return uni.getStorageSync("WS")||false;
+			},
+			getZB(){
+				return uni.getStorageSync("ZB")||false;
+			},
+			getYS(){
+				return uni.getStorageSync("YS")||false;
+			},
+			getWY(){
+				return uni.getStorageSync("WY")||false;
+			},
+			getSY(){
+				return uni.getStorageSync("SY")||false;
+			},
+			getJJ(){
+				return uni.getStorageSync("JJ")||false;
+			},
+			getQYFW(){
+				return uni.getStorageSync("QYFW")||false;
+			},
+			getZWFW(){
+				return uni.getStorageSync("ZWFW")||false;
+			},
+			getSHFW(){
+				return uni.getStorageSync("SHFW")||false;
+			},
+			getBM(){
+				return uni.getStorageSync("BM")||false;
+			},
+			getLS(){
+				return uni.getStorageSync("LS")||false;
+			},
+			getHY(){
+				return uni.getStorageSync("HY")||false;
+			},
+			getXZ(){
+				return uni.getStorageSync("XZ")||false;
+			},
+			openSQ(){
+				uni.navigateTo({
+					url: '../../webview/webview?url=http://117.83.152.39:8085/',
+				});
+			},
+			openQY(){
+				uni.navigateTo({
+					url: '../../webview/webview?url=http://117.83.152.39:8082/',
+				});
+			},
+			openTCB(){
+				uni.navigateTo({
+					url: '../../webview/webview?url=http://117.83.152.39:8081/home/tcb.html',
+				});
+			},
+			openBM(){
+				uni.navigateTo({
+					url: '../../webview/webview?url=http://117.83.152.39:8083/&type=1',
+				});
+			},
+			openLS(){
+				uni.navigateTo({
+					url: '../../webview/webview?url=http://117.83.152.39:8083/&type=2',
+				});
+			},
+			openHY(){
+				uni.navigateTo({
+					url: '../../webview/webview?url=http://117.83.152.39:8083/&type=4',
+				});
+			},
+			openXZ(){
+				uni.navigateTo({
+					url: '../../webview/webview?url=http://117.83.152.39:8083/&type=3',
+				});
+			},
+			openYQ(){
+				uni.navigateTo({
+					url: '../../webview/webview?url=http://117.83.152.39:8081/download/download.html',
+				});
+			},
+			openNone(){
+				this.$refs.none.show((close)=>{
+					close()
+				})
+			},
+			goSetting(){
+				uni.navigateTo({
+					url: '../../setting/setting'
+				})
+			},
+			exit(){
+				this.$refs.confirm.show((close)=>{
+					JIM.loginOut();
+					this.$store.dispatch("setUserData","") //清空登录状态
+					try {
+						uni.removeStorageSync("setUserData")
+						uni.removeStorageSync("allUser")
+					} catch (e) {
+						// error
+					}
+					uni.navigateTo({
+						url:"../../login/login"
+					})
+					close()
+				})
+			},
+			
 		}
 	}
 </script>

@@ -15,8 +15,8 @@
 		:class="isother ? 'justify-start' : 'justify-end'">
 			<!-- 好友 -->
 			<template v-if="isother">
-				<free-avater size="70" :src="avatar||'/static/images/userpic.jpg'"
-				clickType="navigate"></free-avater>
+				<free-avater size="70" :src="getAvatar"
+				clickType="navigate" :token="item.from_id"></free-avater>
 				
 				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-left-icon">&#xe601;</text>
 			</template>
@@ -56,7 +56,7 @@
 			<!-- 本人 -->
 			<template v-if="!isother">
 				<text v-if="hasLabelClass" class="iconfont text-chat-item font-md position-absolute chat-right-icon">&#xe619;</text>
-				<free-avater size="70" :src="myAvatar||'/static/images/userpic.jpg'"
+				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic.jpg'"
 				clickType="navigate"></free-avater>
 			</template>
 		</view>
@@ -72,6 +72,7 @@
 	import { mapState,mapActions } from 'vuex'
 	
 	var JIM = getApp().globalData.JIM;
+	var SERVER_API = getApp().globalData.SERVER_API
 	var _this;
 	export default {
 		components: {
@@ -100,6 +101,32 @@
 			}
 		},
 		computed: {
+			getAvatar(){//获取头像
+				var tokenList=[];
+				var token = this.item.from_id
+				tokenList.push(token);
+				var avatar = uni.getStorageSync("avatar"+token)
+				if(avatar){
+					return avatar
+				}else{
+					uni.request({
+						url:SERVER_API+'appUser/getUserPhotoByToken',
+						data:tokenList,
+						header:{
+							token:uni.getStorageSync("setUserData").token
+						},
+						method:"POST",
+						success(res){
+							console.log(res)
+							console.log(token)
+							var resAvatar = res.data.result[token]
+							uni.setStorageSync("avatar"+token,resAvatar)
+							return resAvatar||"/static/images/userpic.jpg"
+						}
+					})
+				}
+				return "/static/images/userpic.jpg"
+			},
 			// 是否是他人
 			isother() {
 				// 获取他人id

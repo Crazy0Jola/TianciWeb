@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "个人中心",
+  "navigationBarBackgroundColor": "#EDEDED",
+  "bounce": "none",
+  "titleNView": {
+    "type": "default"
+  },
+  "usingComponents": {}
+}

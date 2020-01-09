@@ -198,7 +198,7 @@
 		onLoad:function(e){
 			uni.$on("get_chat_msg",function(){
 				console.log("===================有新消息来啦=====================")
-				var msg = uni.getStorageSync(_this.username);
+				var msg = uni.getStorageSync(_this.myUsername+_this.username);
 				_this.list=msg;
 				var pageToBottomTimer = setTimeout(()=>{
 					_this.pageToBottom()
@@ -210,11 +210,12 @@
 				clearTimeout(pageToBottomTimer)
 			},500)
 			_this=this;
+			console.log(e.avatar)
 			_this.username = e.username;
 			_this.nickname = e.nickname;
 			_this.avatar = e.avatar;
 			var userData = uni.getStorageSync("setUserData");
-			_this.myAvatar = userData.avatar;
+			_this.myAvatar = userData.photo;
 			_this.myUsername = userData.username;
 		},
 		onUnload(){
@@ -226,7 +227,7 @@
 			// var imagepath=_this.image_cache("https://img.jiguang.cn/im-portal/0.0.1/assets/img/jverify-flow-banner-new.png","a");
 			// var p = plus.io.convertLocalFileSystemURL(imagepath);  
 			// console.log(p)
-			var msg = uni.getStorageSync(_this.username);
+			var msg = uni.getStorageSync(_this.myUsername+_this.username);
 			JIM.resetUnreadCount({
 				'username' : _this.username
 			});
@@ -317,7 +318,7 @@
 						    	_this.setPic(elem.msg_body.media_id,index);
 						    }
 						})
-						uni.setStorageSync(_this.username,_this.$data.list);
+						uni.setStorageSync(_this.myUsername+_this.username,_this.$data.list);
 						_this.pageToBottom();
 						uni.hideLoading()					
 												
@@ -462,7 +463,7 @@
 									success: function (res) {
 										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
 										_this.$data.list[index].msg_body.media_id=savedFilePath;
-										uni.setStorageSync(_this.username,_this.$data.list);									
+										uni.setStorageSync(_this.myUsername+_this.username,_this.$data.list);									
 									}
 								});
 							}
@@ -536,7 +537,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync(_this.username,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.username,_this.list);
 					
 					}).onFail(function(data) {
 						uni.showToast({
@@ -589,7 +590,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync(_this.username,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.username,_this.list);
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
@@ -647,7 +648,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync(_this.username,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.username,_this.list);
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
@@ -697,7 +698,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync(_this.username,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.username,_this.list);
 					
 					}).onFail(function(data) {
 						uni.showToast({
@@ -757,7 +758,7 @@
 						   'extras' : {'latest_msg':latest_msg}
 						});
 						
-						uni.setStorageSync(_this.username,_this.list);
+						uni.setStorageSync(_this.myUsername+_this.username,_this.list);
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
@@ -903,7 +904,7 @@
 			// 打开聊天信息设置
 			openChatSet(){
 				uni.navigateTo({
-					url: '',
+					url: `/pages/mail/user-base/user-base?token=${_this.username}`
 				});
 			}
 		}
