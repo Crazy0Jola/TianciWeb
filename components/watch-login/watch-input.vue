@@ -1,5 +1,5 @@
 <template>
-	<view class="main-list oBorder" :class="myClass" :style="myStyle">
+	<view class="main-list oBorder flex-1">
 		<!-- 文本框 -->
 		<input 
 			class="main-input" 
@@ -38,8 +38,6 @@
 			}
 		},
 		props:{
-			myStyle:String,
-			myClass:String,
 			type: String, //类型
 			value: String, //值
 			placeholder: String, //框内提示
@@ -164,7 +162,9 @@
 
 <style>
 	@import url("./css/icon.css");
-	
+	.flex-1{
+		flex: 1;
+	}
 	.main-list{
 		display: flex!important;
 		flex-direction: row!important;

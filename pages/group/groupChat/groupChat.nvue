@@ -148,21 +148,13 @@
 						icon:"/static/images/extends/video.png",
 						event:"uploadVideo"
 					},{
-						name:"收藏",
-						icon:"/static/images/extends/shoucan.png",
-						event:""
-					},{
 						name:"名片",
 						icon:"/static/images/extends/man.png",
-						event:""
-					},{
-						name:"语音通话",
-						icon:"/static/images/extends/phone.png",
-						event:""
+						event:"noFun"
 					},{
 						name:"位置",
 						icon:"/static/images/extends/path.png",
-						event:""
+						event:"noFun"
 					}]
 				],
 				//表情列表
@@ -628,7 +620,7 @@
 						break;		
 								
 					case 'audio':
-					if(options.time<=2){
+					if(options.time<=1){
 						uni.showToast({
 							title:"说话时间太短啦",
 							icon:"none"
@@ -867,6 +859,12 @@
 						break;
 					case 'sendEmoticon': // 发送表情包
 					this.send('emoticon',e.icon)
+						break;
+					case 'noFun'://暂无功能
+					uni.showToast({
+						"title":"功能待开发",
+						"position":"bottom"
+					})
 						break;
 				}
 			},

@@ -933,6 +933,11 @@
 .cuIcon-btn:before {
 	content: "\E601";
 }
+.flex-1{
+	-webkit-box-flex: 1;
+	-webkit-flex: 1;
+	        flex: 1;
+}
 .main-list{
 	display: -webkit-box!important;
 	display: -webkit-flex!important;

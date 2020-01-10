@@ -106,6 +106,7 @@
 				var token = this.item.from_id
 				tokenList.push(token);
 				var avatar = uni.getStorageSync("avatar"+token)
+				
 				if(avatar){
 					return avatar
 				}else{
@@ -120,7 +121,10 @@
 							console.log(res)
 							console.log(token)
 							var resAvatar = res.data.result[token]
-							uni.setStorageSync("avatar"+token,resAvatar)
+							if(resAvatar==""){
+								console.log("hhh")
+								uni.setStorageSync("avatar"+token,"/static/images/userpic.jpg")
+							}	
 							return resAvatar||"/static/images/userpic.jpg"
 						}
 					})

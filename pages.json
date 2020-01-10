@@ -50,30 +50,6 @@
             "path" : "pages/mail/user-base/user-base",
             "style" : {}
         }
-        ,{
-            "path" : "pages/mail/user-remark-tag/user-remark-tag",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/mail/user-tag-set/user-tag-set",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/mail/user-moments-auth/user-moments-auth",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/mail/send-card/send-card",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/mail/mail/mail",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/mail/user-report/user-report",
-            "style" : {}
-        }
 		, {
 		    "path": "pages/login/login",
 		    "style": {}

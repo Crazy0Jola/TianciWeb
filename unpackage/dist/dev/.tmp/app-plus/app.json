@@ -92,42 +92,6 @@
         },
         "nvue": true
       },
-      "pages/mail/user-remark-tag/user-remark-tag.html": {
-        "window": {
-          "usingComponents": {}
-        },
-        "nvue": true
-      },
-      "pages/mail/user-tag-set/user-tag-set.html": {
-        "window": {
-          "usingComponents": {}
-        },
-        "nvue": true
-      },
-      "pages/mail/user-moments-auth/user-moments-auth.html": {
-        "window": {
-          "usingComponents": {}
-        },
-        "nvue": true
-      },
-      "pages/mail/send-card/send-card.html": {
-        "window": {
-          "usingComponents": {}
-        },
-        "nvue": true
-      },
-      "pages/mail/mail/mail.html": {
-        "window": {
-          "usingComponents": {}
-        },
-        "nvue": true
-      },
-      "pages/mail/user-report/user-report.html": {
-        "window": {
-          "usingComponents": {}
-        },
-        "nvue": true
-      },
       "pages/friend/addFriend/addFriend.html": {
         "window": {
           "usingComponents": {},

@@ -49,7 +49,9 @@
 	
 	var JIM = getApp().globalData.JIM;
 	var SERVER_API = getApp().globalData.SERVER_API;
-	
+	var music = null;
+	music = uni.createInnerAudioContext(); //创建播放器对象
+	music.src= "/static/audio/message.mp3"; //选择播放的音频
 	export default {
 		data() {
 			return {
@@ -89,318 +91,29 @@
 					success(res){
 						console.log(res)
 						if(res.data.code==1){
-							_this.myUsername = res.data.result.token;
-							JIM.login({
-							    'username' :_this.myUsername,
-								'password':password
-							}).onSuccess(function(data) {						
-							    console.log('success:' + JSON.stringify(data));		   
-							    JIM.onMsgReceive(function(data) {
-							    	console.log("在线========"+JSON.stringify(data)+"===================================")
-							    	for(var i=0;i<data.messages.length;i++){
-							    		var content = data.messages[i].content;
-							    		var type = data.messages[i].msg_type;
-							    		var latest_msg,list,username,gid;
-							    		// 分类型进行判断
-							    		if(content.msg_type=="text"){
-							    			latest_msg = content.msg_body.text;
-							    		}
-							    		if(content.msg_type=="image"){
-							    			latest_msg = "[图片]"
-							    		}
-							    		if(content.msg_type=="file"){
-							    			if(content.msg_body.extras.isAudio){
-							    				latest_msg = "[语音]"
-							    			}
-							    			if(content.msg_body.extras.isVideo){
-							    				latest_msg = "[短视频]"
-							    			}
-							    		}
-							    		
-							    		console.log("============"+latest_msg+"+=============")
-							    		
-							    		
-							    		if(type==3){//如果是单聊消息
-							    			username = data.messages[i].from_username;
-							    			list = uni.getStorageSync(_this.myUsername+username);	//获取该用户的聊天记录缓存
-							    			
-							    			
-							    			//如果是文字 直接push
-							    			if(content.msg_type=="text"){
-							    				if(list){
-							    					list.push(content);
-							    					console.log("======文字push")
-							    					uni.setStorageSync(_this.myUsername+username,list);	
-							    				}
-							    			}else{//否则，需要查询资源url并进行替换
-							    				JIM.getResource({
-							    					'media_id' : content.msg_body.media_id,
-							    				}).onSuccess(function(data) {
-							    					uni.downloadFile({
-							    						url: data.url,
-							    						success: (res) => {
-							    							if (res.statusCode === 200) {	
-							    								uni.saveFile({
-							    									tempFilePath: res.tempFilePath,
-							    									success: function (res) {
-							    										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-							    										content.msg_body.media_id=savedFilePath;
-							    										if(list){
-							    											list.push(content);
-							    											console.log("===============资源push")
-							    											uni.setStorageSync(_this.myUsername+username,list);	
-							    											uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
-							    										
-							    										}
-							    									}
-							    								});
-							    							}
-							    						}
-							    					});	
-							    				}).onFail(function(data) {
-							    					uni.showToast({
-							    						"title":getCodeMsg(data.code),
-							    						"position":"bottom"
-							    					})
-							    				});	
-							    			}
-							    
-							    			console.log("==========latest_mgs"+latest_msg)
-							    			JIM.updateConversation({
-							    			   'username' : username,
-							    			   'extras' : {'latest_msg':latest_msg}
-							    			});
-							    	
-							    		}else if(type==4){//如果是群聊消息
-							    		
-							    			gid = data.messages[i].from_gid;
-							    			console.log("=============="+gid)
-							    			console.log("group"+gid)
-							    			list = uni.getStorageSync(_this.myUsername+gid); //获取该群聊的聊天记录缓存
-							    			console.log(list)
-							    			//如果是文字 直接push
-							    			if(content.msg_type=="text"){
-							    				if(list){
-							    					console.log("hhh")
-							    					list.push(content);
-							    					uni.setStorageSync(_this.myUsername+gid,list);	
-							    				}
-							    				
-							    			}else{//否则，需要查询资源url并进行替换
-							    			
-							    				JIM.getResource({
-							    					'media_id' : content.msg_body.media_id,
-							    				}).onSuccess(function(data) {
-							    					uni.downloadFile({
-							    						url: data.url,
-							    						success: (res) => {
-							    							if (res.statusCode === 200) {	
-							    								uni.saveFile({
-							    									tempFilePath: res.tempFilePath,
-							    									success: function (res) {
-							    										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-							    										content.msg_body.media_id=savedFilePath;
-							    										if(list){
-							    											list.push(content);
-							    											uni.setStorageSync(_this.myUsername+gid,list);	
-							    											console.log("push通知========================")
-							    											uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据				
-							    										}
-							    									}
-							    								});
-							    							}
-							    						}
-							    					});		
-							    				}).onFail(function(data) {
-							    					uni.showToast({
-							    						"title":getCodeMsg(data.code),
-							    						"position":"bottom"
-							    					})
-							    				});	
-							    			}
-							    			
-							    			JIM.updateConversation({
-							    			   'gid' : gid,
-							    			   'extras' : {'latest_msg':latest_msg}
-							    			});
-							    		
-							    		}
-							    							
-							    	}
-							    			
-							    	console.log("主页通知。。。。。。。。。。。。。。。。")
-							    	uni.$emit('get_index_msg',{})				
-							    	
-							    	if(type==3){
-							    		console.log("通知333333333333333333")
-							    		uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
-							    	}else if(type==4){
-							    		console.log("通知444444444444444444444444")
-							    		uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据
-							    		
-							    	}
-							    });
-							
-								
-								JIM.onSyncConversation(function(data) { //离线消息同步监听
-							        console.log( "zzzzzzzzz"+JSON.stringify(data));
-									for(var i=0;i<data.length;i++){
-										var latest_msg;
-										var last_content= data[i].msgs[data[i].msgs.length-1].content;
-										// 分类型进行判断
-										if(last_content.msg_type=="text"){
-											latest_msg = last_content.msg_body.text;
-										}
-										if(last_content.msg_type=="image"){
-											latest_msg = "[图片]"
-										}
-										if(last_content.msg_type=="file"){
-											if(last_content.msg_body.extras.isAudio){
-												latest_msg = "[语音]"
-											}
-											if(last_content.msg_body.extras.isVideo){
-												latest_msg = "[短视频]"
-											}
-										}
-										
-										
-										if(data[i].msg_type==3){//如果是单聊
-											var username = data[i].from_username
-											var list = uni.getStorageSync(_this.myUsername+username);//获取该对象的聊天记录
-											
-											//遍历该用户的消息
-											for(var j=0;j<data[i].msgs.length;j++){
-												var content = data[i].msgs[j].content;
-												if(content.msg_type=="text"){//如果是文字直接push
-													if(list){
-														list.push(content);
-														uni.setStorageSync(_this.myUsername+username,list);	
-													}
-												}else{//或者还要获取资源url进行替换
-													JIM.getResource({
-														'media_id' : content.msg_body.media_id,
-													}).onSuccess(function(data) {
-														uni.downloadFile({
-															url: data.url,
-															success: (res) => {
-																if (res.statusCode === 200) {	
-																	uni.saveFile({
-																		tempFilePath: res.tempFilePath,
-																		success: function (res) {
-																			var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-																			content.msg_body.media_id=savedFilePath;
-																			if(list){
-																				list.push(content);
-																				uni.setStorageSync(_this.myUsername+username,list);	
-																			}
-																		}
-																	});
-																}
-															}
-														});
-													}).onFail(function(data) {
-														uni.showToast({
-															"title":getCodeMsg(data.code),
-															"position":"bottom"
-														})
-													});
-												}
-											}	
-											//更新会话，将最后一条消息存入
-											JIM.updateConversation({
-											 'username' : username,
-											 'extras' : {'latest_msg':latest_msg}
-											});	 
-										}else if(data[i].msg_type==4){//如果是群聊
-											var gid = data[i].from_gid
-											var list = uni.getStorageSync(_this.myUsername+gid);//获取该对象的聊天记录
-											
-											//遍历该群的消息
-											for(var j=0;j<data[i].msgs.length;j++){
-												var content = data[i].msgs[j].content;
-												if(content.msg_type=="text"){//如果是文字直接push
-													if(list){
-														list.push(content);
-														uni.setStorageSync(_this.myUsername+gid);	
-													}
-												}else{//或者不是文字还要获取资源url进行替换
-													JIM.getResource({
-														'media_id' : content.msg_body.media_id,
-													}).onSuccess(function(data) {											
-														uni.downloadFile({
-															url: data.url,
-															success: (res) => {
-																if (res.statusCode === 200) {	
-																	uni.saveFile({
-																		tempFilePath: res.tempFilePath,
-																		success: function (res) {
-																			var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-																			content.msg_body.media_id=savedFilePath;
-																			if(list){
-																				list.push(content);
-																				uni.setStorageSync(_this.myUsername+gid,list);	
-																			}
-																		}
-																	});
-																}
-															}
-														}); 
-													}).onFail(function(data) {
-														uni.showToast({
-															"title":getCodeMsg(data.code),
-															"position":"bottom"
-														})
-													});
-												}
-											}	
-											//更新会话，将最后一条消息存入
-											JIM.updateConversation({
-											 'gid' : gid,
-											 'extras' : {'latest_msg':latest_msg}
-											});	 
-										}
-							
-									}
+							let userdata=res.data.result;
+							userdata.username=res.data.result.token;
+							userdata.password=password;
 									
-							    });    
-								
-								let userdata=res.data.result;
-								userdata.username=res.data.result.token;
-								userdata.password=password;
-										
-								_this.$store.dispatch("setUserData",userdata); //存入状态
-								try {
-									uni.setStorageSync('setUserData', userdata); //存入缓存
-								} catch (e) {
-									// error
-								}
-								_this.isRotate=false;
-								uni.showToast({
-									icon: 'success',
-									title: '登录成功!'
-								});
-								uni.switchTab({
-									url: '../tabbar/index/index',
-								});
-								
-							}).onFail(function(data) {
-							     console.log('error:' + JSON.stringify(data));
-								 uni.showToast({
-								 	icon: 'none',
-								 	position: 'bottom',
-								 	title: getCodeMsg(data.code)
-								 });
-								 _this.isRotate=false;
-							}).onTimeout(function(data) {
-							    console.log('timeout:' + JSON.stringify(data));
-								uni.showToast({
-									icon: 'none',
-									position: 'bottom',
-									title: '登录超时！'
-								});
-								_this.isRotate=false;
-							});		
-
+							_this.$store.dispatch("setUserData",userdata); //存入状态
+							try {
+								uni.setStorageSync('setUserData', userdata); //存入缓存
+							} catch (e) {
+								// error
+							}
+							var userLogin = {
+								phone:_this.phoneData,
+								password:_this.passData
+							}
+							uni.setStorageSync("userLogin",userLogin)
+							_this.isRotate=false;
+							uni.showToast({
+								icon: 'success',
+								title: '登录成功!'
+							});
+							uni.switchTab({
+								url: '../tabbar/index/index',
+							});
 						}else{
 							uni.showToast({
 								"title":"用户名或密码错误",

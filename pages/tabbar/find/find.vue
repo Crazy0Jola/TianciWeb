@@ -12,7 +12,7 @@
 
 		<view class="moments__post" v-for="(post,index) in posts" :key="post.id" :id="post.id">
 			<view class="post-left">
-				<image mode="aspectFill" class="post_header" :src="post.photo"></image>
+				<image mode="aspectFill" class="post_header" :src="post.photo||'/static/images/userpic.jpg'"></image>
 			</view>
 
 			<view class="post_right">
@@ -39,7 +39,7 @@
 				<view class="post-footer">
 					<view class="footer_content" v-if="post.praiseUserList.length!=0">
 						<image class="liked" src="../../../static/moments/liked.png"></image>
-						<text class="nickname" v-for="(user,index_like) in post.praiseUserList" :key="index_like">{{user.userRealName}}</text>
+						<text class="nickname" v-for="(user,index_like) in post.praiseUserList" :key="index_like">{{index_like==0?'':','}}{{user.userRealName}}</text>
 					</view>
 					<view @longpress="long" v-if="post.commentList.length!=0" :id="comment.id" :data-commentContent="comment.content" :data-commentIndex="comment_index" :data-postIndex="index" :data-userId="comment.commentUserId" class="footer_content" v-for="(comment,comment_index) in post.commentList" :key="comment_index" @tap="reply(comment.id,index,comment_index)">
 						<view v-if="comment.parentId"><text   class="comment-nickname">{{comment.commentUserName}}</text>回复<text class="comment-nickname">{{comment.parentName}}: </text><text class="comment-content">{{comment.content}}</text></text></view>

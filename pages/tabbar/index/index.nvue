@@ -55,6 +55,9 @@
 	var _this;
 	var JIM=getApp().globalData.JIM;
 	var SERVER_API=getApp().globalData.SERVER_API;
+	var music = null;
+	music = uni.createInnerAudioContext(); //创建播放器对象
+	music.src= "/static/audio/message.mp3"; //选择播放的音频
 	export default {
 		components:{
 			freeNavBar,
@@ -267,7 +270,7 @@
 					})
 				});
 			},
-			login(username,password){
+			async login(username,password){
 				_this.myUsername = username;
 				uni.showLoading({
 					title:"读取消息列表中..."
@@ -277,8 +280,10 @@
 					'password':password
 				}).onSuccess(function(data) {		
 					
-				    JIM.onMsgReceive(function(data) {
+				    JIM.onMsgReceive( async function(data) {
 						console.log("在线========"+JSON.stringify(data)+"===================================")
+					
+						var noDisturb = false;
 						for(var i=0;i<data.messages.length;i++){
 							var content = data.messages[i].content;
 							var type = data.messages[i].msg_type;
@@ -315,40 +320,11 @@
 										uni.setStorageSync(_this.myUsername+username,list);	
 									}
 								}else{//否则，需要查询资源url并进行替换
-									JIM.getResource({
-										'media_id' : content.msg_body.media_id,
-									}).onSuccess(function(data) {
-										uni.downloadFile({
-											url: data.url,
-											success: (res) => {
-												if (res.statusCode === 200) {	
-													uni.saveFile({
-														tempFilePath: res.tempFilePath,
-														success: function (res) {
-															var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-															content.msg_body.media_id=savedFilePath;
-															if(list){
-																list.push(content);
-																console.log("===============资源push")
-																uni.setStorageSync(_this.myUsername+username,list);	
-																uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
-															
-															}
-														}
-													});
-												}
-											}
-										});	
-									}).onFail(function(data) {
-										uni.showToast({
-											"title":getCodeMsg(data.code),
-											"position":"bottom"
-										})
-									});	
+									_this.setPic(content.msg_body.media_id,username,content,list,3)
 								}
 
 								console.log("==========latest_mgs"+latest_msg)
-								JIM.updateConversation({
+							    JIM.updateConversation({
 								   'username' : username,
 								   'extras' : {'latest_msg':latest_msg}
 								});
@@ -356,6 +332,9 @@
 							}else if(type==4){//如果是群聊消息
 							
 								gid = data.messages[i].from_gid;
+								if(uni.getStorageSync("noDisturb"+gid,)){
+									noDisturb=true;
+								}
 								console.log("=============="+gid)
 								console.log("group"+gid)
 								list = uni.getStorageSync(_this.myUsername+gid); //获取该群聊的聊天记录缓存
@@ -369,36 +348,7 @@
 									}
 									
 								}else{//否则，需要查询资源url并进行替换
-								
-									JIM.getResource({
-										'media_id' : content.msg_body.media_id,
-									}).onSuccess(function(data) {
-										uni.downloadFile({
-											url: data.url,
-											success: (res) => {
-												if (res.statusCode === 200) {	
-													uni.saveFile({
-														tempFilePath: res.tempFilePath,
-														success: function (res) {
-															var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-															content.msg_body.media_id=savedFilePath;
-															if(list){
-																list.push(content);
-																uni.setStorageSync(_this.myUsername+gid,list);	
-																console.log("push通知========================")
-																uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据				
-															}
-														}
-													});
-												}
-											}
-										});		
-									}).onFail(function(data) {
-										uni.showToast({
-											"title":getCodeMsg(data.code),
-											"position":"bottom"
-										})
-									});	
+									_this.setPic(content.msg_body.media_id,gid,content,list,4)
 								}
 								
 								JIM.updateConversation({
@@ -421,10 +371,21 @@
 							uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据
 							
 						}
+						
+						if(!noDisturb){
+							//消息来了响铃
+							music.play(); //执行播放
+							//消息来了震动
+							uni.vibrateLong({
+							    success: function () {
+							        console.log('success');
+							    }
+							});
+						}
 				    });
 					
 					
-					JIM.onSyncConversation(function(data) { //离线消息同步监听
+					JIM.onSyncConversation(async function(data) { //离线消息同步监听
 						console.log("SSSSSSSSSSSSSSSSSS"+JSON.stringify(data))
 				        for(var i=0;i<data.length;i++){
 				        	var latest_msg;
@@ -459,33 +420,7 @@
 				        					uni.setStorageSync(_this.myUsername+username,list);	
 				        				}
 				        			}else{//或者还要获取资源url进行替换
-				        				JIM.getResource({
-				        					'media_id' : content.msg_body.media_id,
-				        				}).onSuccess(function(data) {
-											uni.downloadFile({
-												url: data.url,
-												success: (res) => {
-													if (res.statusCode === 200) {	
-														uni.saveFile({
-															tempFilePath: res.tempFilePath,
-															success: function (res) {
-																var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-																content.msg_body.media_id=savedFilePath;
-																if(list){
-																	list.push(content);
-																	uni.setStorageSync(_this.myUsername+username,list);	
-																}
-															}
-														});
-													}
-												}
-											});	
-				        				}).onFail(function(data) {
-				        					uni.showToast({
-				        						"title":getCodeMsg(data.code),
-				        						"position":"bottom"
-				        					})
-				        				});
+				        				_this.setPic(content.msg_body.media_id,username,content,list,3)
 				        			}
 				        		}	
 				        		//更新会话，将最后一条消息存入
@@ -506,33 +441,7 @@
 				        					uni.setStorageSync(_this.myUsername+gid,list);	
 				        				}
 				        			}else{//或者不是文字还要获取资源url进行替换
-				        				JIM.getResource({
-				        					'media_id' : content.msg_body.media_id,
-				        				}).onSuccess(function(data) {
-				        					uni.downloadFile({
-				        						url: data.url,
-				        						success: (res) => {
-				        							if (res.statusCode === 200) {	
-				        								uni.saveFile({
-				        									tempFilePath: res.tempFilePath,
-				        									success: function (res) {
-				        										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-				        										content.msg_body.media_id=savedFilePath;
-				        										if(list){
-				        											list.push(content);
-				        											uni.setStorageSync(_this.myUsername+gid,list);	
-				        										}
-				        									}
-				        								});
-				        							}
-				        						}
-				        					}); 
-				        				}).onFail(function(data) {
-				        					uni.showToast({
-				        						"title":getCodeMsg(data.code),
-				        						"position":"bottom"
-				        					})
-				        				});
+				        				_this.setPic(content.msg_body.media_id,gid,content,list,4)
 				        			}
 				        		}	
 				        		//更新会话，将最后一条消息存入
@@ -673,6 +582,44 @@
 				} catch (e) {
 					// error
 				} 
+			},
+			
+			setPic(media_id,username,content,list,type){
+				JIM.getResource({
+					'media_id' : media_id,
+				}).onSuccess(function(data) {
+					uni.downloadFile({
+						url: data.url,
+						success: (res) => {
+							if (res.statusCode === 200) {	
+								uni.saveFile({
+									tempFilePath: res.tempFilePath,
+									success: function (res) {
+										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+										content.msg_body.media_id=savedFilePath;
+										if(list){
+											list.push(content);
+											console.log("===============资源push")
+											uni.setStorageSync(_this.myUsername+username,list);	
+											if(type==3){
+												uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
+											}else if(type==4){
+												uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据
+												
+											}
+											
+										}
+									}
+								});
+							}
+						}
+					});	
+				}).onFail(function(data) {
+					uni.showToast({
+						"title":getCodeMsg(data.code),
+						"position":"bottom"
+					})
+				});	
 			},
 			long({x,y,index}){
 				// 初始化 索引

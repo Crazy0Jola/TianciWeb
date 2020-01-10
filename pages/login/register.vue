@@ -30,15 +30,13 @@
 					placeholder="登录密码"
 					isShowPass
 				></wInput>
-				<view class="flex">
+				<view class="flex flex-row">
 					<wInput
-							myClass="flex-sub"
 							v-model="name"
 							type="text"
 							placeholder="姓名"
 						></wInput>
 					<view class="flex-sub mt-4 ml-3">
-						<text style="font-size: 28upx;">性别：</text>
 						<switch class="switch-sex" @change="SwitchSex" :class="skin?'checked':''" :checked="skin?true:false"></switch>
 					</view>
 				</view>
@@ -267,6 +265,13 @@
 <style>
 	@import url("./css/main.css");
 	@import url("../../colorui/icon.css");
+	.flex {
+		display: flex;
+	}
+	
+	.flex-sub {
+		flex: 1;
+	}
 	/* ==================
 			 开关
 	 ==================== */
