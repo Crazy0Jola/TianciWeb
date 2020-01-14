@@ -86,7 +86,7 @@
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
 			    'fontFamily': "iconfont",
-			    'src': "url('https://at.alicdn.com/t/font_1587665_jb7gr7tlgy.ttf')"
+			    'src': "url('https://at.alicdn.com/t/font_1587665_dmuoexg582.ttf')"
 			});
 			// 初始化录音管理器
 			this.$store.commit('initRECORD')

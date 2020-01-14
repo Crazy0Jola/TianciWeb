@@ -23,7 +23,7 @@
             					"color" : "#696969",
             					"type" : "none",
             					"fontSrc" : "/static/fonts/iconfont.ttf",
-            					"text" : "\ue608" //小相机
+            					"text" : "\ue6b5" //小相机
             				}
             			]
             		}
@@ -40,7 +40,14 @@
         }
         ,{
             "path" : "pages/chat/video/video",
-            "style" : {}
+            "style": { 
+				"navigationBarTitleText": "uni-app",
+				"app-plus": { 
+					 "bounce":"none", 
+					 "titleNView": false, 
+					 "animationType": "slide-in-bottom" 
+				}
+			}
         }
         ,{
             "path" : "pages/chat/chat-set/chat-set",
@@ -127,6 +134,46 @@
             "path" : "pages/mine/mine",
             "style" : {
             	"navigationBarTitleText" : "个人中心",
+            	"navigationBarBackgroundColor":"#EDEDED",
+            	"app-plus" : {
+            		"bounce" : "none",
+            		"titleNView" : {
+            			"type" : "default"
+            		}
+            	}
+            }
+        }
+        ,{
+            "path" : "pages/mail/send-card/send-card",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/location/send-location/send-location",
+            "style" : {
+            	"navigationBarTitleText" : "发送位置",
+            	"navigationBarBackgroundColor":"#EDEDED",
+            	"app-plus" : {
+            		"bounce" : "none",
+            		"titleNView" : {
+            			"type" : "default",
+						"buttons" : [
+							{
+								"background" : "rgb(53,120,229)",
+								"color" : "#696969",
+								"type" : "none",
+								"fontSrc" : "/static/fonts/iconfont.ttf",
+								"text" : "\ue88a" //发送
+							}
+						]
+            		}
+            	}
+				
+            }
+        }
+        ,{
+            "path" : "pages/location/address-search/address-search",
+            "style" : {
+            	"navigationBarTitleText" : "搜索地址",
             	"navigationBarBackgroundColor":"#EDEDED",
             	"app-plus" : {
             		"bounce" : "none",

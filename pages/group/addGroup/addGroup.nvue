@@ -230,6 +230,7 @@
 							'gid' : data.gid,
 							'member_usernames' : _this.selectList
 						}).onSuccess(function(data) {
+							uni.hideKeyboard();
 							uni.navigateTo({
 								url:"../groupChat/groupChat?gid="+_this.gid+"&gname="+_this.gname
 							})

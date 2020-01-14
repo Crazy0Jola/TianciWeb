@@ -1,0 +1,194 @@
+<template>
+	<view>
+		<!-- 导航栏 -->
+		<free-nav-bar title="发送名片" showBack :showRight="false">
+		</free-nav-bar>
+		
+		<!-- 通讯录列表 -->
+		<scroll-view scroll-y="true" :style="'height:'+scrollHeight+'px;'"
+		:scroll-into-view="scrollInto">	
+			<view v-for="(item,index) in list" :key="index"
+			:id="'item-'+item.letter">
+				<view v-if="item.data.length" 
+				class="py-2 px-3 border-bottom bg-light">
+					<text class="font-md text-dark">{{item.letter}}</text>
+				</view>
+				<free-list-item  v-for="(item2,index2) in item.data" 
+				:key="index2" :title="item2.name" 
+				:cover="item2.photo?item2.photo:'/static/images/userpic.jpg'" @click="selectItem(item2)"></free-list-item>
+			</view>
+		</scroll-view>
+		
+		<!-- 侧边导航条 -->
+		<view class="position-fixed right-0 bottom-0 bg-light flex flex-column" :style="'top:'+top+'px;'" style="width: 50rpx;" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
+			<view class="flex-1 flex align-center justify-center"
+			v-for="(item,index) in list" :key="index">
+				<text class="font-sm text-muted">{{item.letter}}</text>
+			</view>
+		</view>
+		
+		<view class="position-fixed rounded-circle bg-light border flex align-center justify-center" v-if="current"
+		style="width: 150rpx;height: 150rpx;left: 300rpx;"
+		:style="'top:'+modalTop+'px;'">
+			<text class="font-lg">{{current}}</text>
+		</view>
+		
+		
+		<free-confirm ref="confirm" title="发送给：">
+			<scroll-view scroll-x="true" class="flex"
+			:show-scrollbar="false">
+				<text class="font-md">{{targetName}}</text>
+			</scroll-view>
+			<view class="my-3 bg-light flex justify-center align-center rounded p-2">
+				<free-avater :src="avatar" size="60"></free-avater>
+				<text class="font text-light-muted ml-1">[个人名片]{{name}}</text>
+			</view>
+		</free-confirm>
+		
+	</view>
+</template>
+
+<script>
+	import freeNavBar from '@/components/free-ui/free-nav-bar.vue';
+	import freeMainButton from '@/components/free-ui/free-main-button.vue';
+	import freeListItem from '@/components/free-ui/free-list-item.vue';
+	import freeConfirm from '@/components/free-ui/free-confirm.vue';
+	import freeAvater from '@/components/free-ui/free-avater.vue';
+	import {initial} from "@/js_sdk/chineseConversion.js" //引入汉字转拼音
+	var _this;
+	var SERVER_API = getApp().globalData.SERVER_API
+	export default {
+		components: {
+			freeNavBar,
+			freeMainButton,
+			freeListItem,
+			freeConfirm,
+			freeAvater
+		},
+		data() {
+			return {
+				keyword:"",
+				list:[],
+
+				top:0,
+				scrollHeight:0,
+				scrollInto:'',
+				current:'',
+				
+				//名片
+				targetName:'',
+				avatar:'',
+				name:'',
+			}
+		},
+		onLoad:function(e) {
+			_this=this;
+			_this.targetName = e.name
+			let res = uni.getSystemInfoSync()
+			this.top = res.statusBarHeight + uni.upx2px(90)
+			this.scrollHeight = res.windowHeight - this.top
+			
+			_this.list=[];
+			for(var i=0;i<26;i++){
+				var obj = {
+					letter:String.fromCharCode(65+i),
+					data:[]
+				}
+				_this.list.push(obj);
+			}
+			uni.request({
+				url:SERVER_API+"appUser/contact",
+				header:{
+					"token":uni.getStorageSync("setUserData").token
+				},
+				method:"POST",
+				success(res){
+					var result = res.data.result;
+					console.log(res)
+					var len = result.length
+					if(len==0){
+						_this.isNull=true
+					}else{
+						_this.isNull=false
+					}
+					for(var i=0;i<len;i++){
+						let letter = initial(result[i].name)
+						let index = letter.charCodeAt()-65;
+						_this.list[index].data.push(result[i])
+					}
+					
+				}
+			})
+		},
+		computed: {
+			modalTop(){
+				return (this.scrollHeight - uni.upx2px(150)) / 2
+			},
+			// 每个索引的高度
+			itemHeight() {
+				let count = this.list.length
+				if(count < 1){
+					return 0
+				}
+				return this.scrollHeight /  count
+			}
+		},
+		methods: {
+			// 发送
+			selectItem(item){
+				_this.name = item.name;
+				var token = item.token
+				if(item.photo){
+					_this.avatar = item.photo
+					uni.setStorageSync("avatar"+token,item.photo)
+				}else{
+					uni.setStorageSync("avatar"+token,"/static/images/userpic.jpg")
+					_this.avatar = "/static/images/userpic.jpg"
+				}
+				
+				this.$refs.confirm.show((close)=>{
+
+					let pages = getCurrentPages()
+					let prePages = pages[pages.length - 2].$vm
+
+					prePages.cardName=_this.name;
+					prePages.cardAvatar=_this.avatar
+					prePages.cardToken=token
+					
+					prePages.sendCardFlag = true
+					uni.navigateBack({
+						delta: 1
+					})
+					close()
+				})
+			},
+			touchstart(e){
+				this.changeScrollInto(e)
+			},
+			touchmove(e){
+				this.changeScrollInto(e)
+			},
+			touchend(e){
+				this.current = ''
+			},
+			// 联动
+			changeScrollInto(e){
+				let Y = e.touches[0].pageY
+				// #ifdef MP
+				Y = Y - this.top
+				// #endif
+				let index = Math.floor(Y / this.itemHeight)
+				let item = this.list[index]
+				if(item){
+					
+					this.scrollInto = 'item-'+item.letter
+					this.current = item.letter
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

@@ -150,11 +150,11 @@
 					},{
 						name:"名片",
 						icon:"/static/images/extends/man.png",
-						event:"noFun"
+						event:"sendCard"
 					},{
 						name:"位置",
 						icon:"/static/images/extends/path.png",
-						event:"noFun"
+						event:"sendLocation"
 					}]
 				],
 				//表情列表
@@ -185,7 +185,26 @@
 				isRecording:false,
 				RecordingStartY:0,
 				// 取消录音
-				unRecord:false
+				unRecord:false,
+				
+				//位置
+				title:"",
+				address:"",
+				longitude: 116.39782706452439,
+				latitude:39.90374012232956,
+				scale:16,
+				sendLocationFlag:false ,//是否需要发送位置
+				
+				//名片
+				cardName:'',
+				cardAvatar:'',
+				cardToken:'',
+				sendCardFlag:false,
+				
+				//视频相关
+				windowHeight:'',
+				windowWidth:'',
+				videoData:{},
 			}
 		},
 		onBackPress(){
@@ -215,25 +234,19 @@
 					clearTimeout(pageToBottomTimer)
 				},200)
 			})
-			var pageToBottomTimer = setTimeout(()=>{
-				_this.pageToBottom()
-				clearTimeout(pageToBottomTimer)
-			},500)
-			
-			
+			_this.pageToBottom()
 		},
 		onUnload(){
 			uni.$off("get_group_msg")
 		},
-		onShow(){						
-			// var imagepath=_this.image_cache("https://img.jiguang.cn/im-portal/0.0.1/assets/img/jverify-flow-banner-new.png","a");
-			// var p = plus.io.convertLocalFileSystemURL(imagepath);  
-			// console.log(p)
+		onShow(){			
+			_this=this;
+			
 			var msg = uni.getStorageSync(_this.myUsername+_this.gid);
 			JIM.resetUnreadCount({
 				'gid' : _this.gid
 			});
-			if(msg){
+			if(msg.length>0){
 				_this.list=msg;
 				console.log(JSON.stringify(msg))
 				// var pageToBottomTimer = setTimeout(()=>{
@@ -301,7 +314,6 @@
 						"Authorization": 'Basic MDk5NzA4NzZmMzNlODg0YTM2MjQzMzVjOmU4ZTg3M2U2MDI0NTMxNWE3MGVkZTRiMg=='
 					},
 					success(res) {
-						console.log("===="+JSON.stringify(res))
 						var msg = res.data.messages
 						// msg.forEach(function(item){
 						// 	if(item.msg_type=="image"){
@@ -320,16 +332,130 @@
 						
 						
 						_this.$data.list.map(function(elem,index){
-						    if(elem.msg_type!="text"){
+						    if(elem.msg_type!="text"&&elem.msg_type!="location"&&elem.msg_body.msg_type!='card'){
 						    	_this.setPic(elem.msg_body.media_id,index);
 						    }
 						})
-						uni.setStorageSync(_this.myUsername+_this.gid,_this.$data.list);					
+						uni.setStorageSync(_this.myUsername+_this.gid,_this.$data.list);	
+						uni.hideLoading()
 						_this.pageToBottom();
-						uni.hideLoading()					
 												
 					}
 				})
+			}
+			if(this.title&&this.sendLocationFlag){
+				console.log(this.title+"="+this.address+"="+this.longitude+"="+this.latitude)
+				JIM.sendGroupLocation({
+					'target_gid' : _this.gid,		
+					'latitude' : _this.latitude,
+					'longitude' : _this.longitude,
+					'scale' : _this.scale,
+					'label' : _this.address,			
+					'extras':{
+						'title':_this.title,
+						'isremove':false,
+					}
+				}).onSuccess(function(res , msg) {
+					var obj = {
+						"from_id": _this.myUsername,
+						"create_time": (new Date()).getTime(),				
+						"msg_type": "location",
+						"target_id": _this.gid,
+						"msg_id":res.msg_id,
+						"msg_body":{
+							"latitude": _this.latitude,
+							"scale": _this.scale,
+							"extras": {
+								"title": _this.title,
+								'isremove':false,
+							},
+							"label": _this.address,
+							"longitude":_this.longitude
+						}
+					}
+					
+					_this.list.push(obj)
+					
+					_this.sendLocationFlag=false;
+					
+					// 置于底部
+					var pageToBottomTimer = setTimeout(()=>{
+						_this.pageToBottom()
+						clearTimeout(pageToBottomTimer)
+					},200)
+					
+					JIM.updateConversation({
+					   'gid' : _this.gid,
+					   'extras' : {'latest_msg':"[位置]"+_this.title}
+					});
+					
+					uni.setStorageSync(_this.myUsername+_this.gid,_this.list);
+					
+				}).onFail(function(data) {
+					uni.showToast({
+						"title":getCodeMsg(data.code),
+						"position":"bottom"
+					})
+					console.log(data+"=======================")
+				});
+			}
+			
+			if(this.cardName&&this.sendCardFlag){
+				console.log(this.cardName+"="+this.cardAvatar+"="+this.cardToken)
+				
+				JIM.sendGroupCustom({
+					'target_gid' : _this.gid,
+					'custom' : {
+						msg_type:"card",
+						cardName:_this.cardName,
+						cardAvatar:_this.cardAvatar,
+						cardToken:_this.cardToken,
+						extras:{
+							isremove:false
+						}
+					}
+				}).onSuccess(function(res , msg) {
+					console.log(msg.content)
+					var obj = {
+						"from_id": _this.myUsername,
+						"create_time": msg.content.create_time,				
+						"target_id": _this.gid,
+						"msg_id":res.msg_id,
+						"msg_body":{
+							msg_type:"card",
+							cardName:_this.cardName,
+							cardAvatar:_this.cardAvatar,
+							cardToken:_this.cardToken,
+							extras:{
+								isremove:false
+							}
+						}
+					}
+			
+					_this.sendCardFlag=false
+					console.log(JSON.stringify(obj))
+					
+					_this.list.push(obj)
+					console.log(JSON.stringify(_this.list))
+					// 置于底部
+					var pageToBottomTimer = setTimeout(()=>{
+						_this.pageToBottom()
+						clearTimeout(pageToBottomTimer)
+					},200)
+					
+					JIM.updateConversation({
+					   'gid' : _this.gid,
+					   'extras' : {'latest_msg':"[个人名片]"+_this.cardName}
+					});
+					
+					uni.setStorageSync(_this.myUsername+_this.gid,_this.list);
+				}).onFail(function(data) {
+					uni.showToast({
+						"title":getCodeMsg(data.code),
+						"position":"bottom"
+					})
+					console.log(data+"=======================")
+				});
 			}
 		},
 		mounted() {
@@ -496,8 +622,9 @@
 				}).onFail(function(data){
 					uni.showToast({
 						"title":getCodeMsg(data.code),
-						"position":bottom
+						"position":"bottom"
 					})
+					console.log(data+"=======================")
 				});		
 			},
 			// 打开扩展菜单或者表情包
@@ -565,8 +692,9 @@
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
-							"position":"bottom"
+							"position":"bottom",
 						})
+						console.log(data+"=======================")
 					});
 						break;
 						
@@ -614,8 +742,9 @@
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
-							"position":"bottom"
+							"position":"bottom",
 						})
+						console.log(data+"=======================")
 					});
 						break;		
 								
@@ -671,8 +800,9 @@
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
-							"position":"bottom"
+							"position":"bottom",
 						})
+						console.log(data+"=======================")
 					});
 						break;	
 						
@@ -721,8 +851,9 @@
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
-							"position":"bottom"
+							"position":"bottom",
 						})
+						console.log(data+"=======================")
 					});
 									
 						break;
@@ -763,7 +894,7 @@
 						_this.list.push(obj)
 						
 						uni.hideLoading()
-						
+						_this.sendLocationFlag=false
 						// 置于底部
 						var pageToBottomTimer = setTimeout(()=>{
 							_this.pageToBottom()
@@ -779,8 +910,9 @@
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
-							"position":"bottom"
+							"position":"bottom",
 						})
+						console.log(data+"=======================")
 					});
 						break;	
 				}
@@ -791,14 +923,35 @@
 				_this=this;
 				// #ifdef APP-PLUS-NVUE
 				console.log("pageToBottom")
-				this.$nextTick(()=>{
-					let chatItem = _this.$refs.chatItem
-					let lastIndex = chatItem.length > 0 ? chatItem.length - 1 : 0
-					if (chatItem[lastIndex]) {
-						dom.scrollToElement(chatItem[lastIndex],{})
-					}
-				})
+				var Timer = setTimeout(function(){
+					_this.$nextTick(()=>{
+						let chatItem = _this.$refs.chatItem
+						let lastIndex = chatItem.length > 0 ? chatItem.length - 1 : 0
+						if (chatItem[lastIndex]) {
+							dom.scrollToElement(chatItem[lastIndex],{})
+						}
+					})
+					clearTimeout(Timer);
+				},500)
+				
 				// #endif
+			},
+			//获取时间
+			getCurrentDate(){
+				var date = new Date(); 
+				var y=date.getFullYear();
+			    var m=date.getMonth()+1;
+			    var d=date.getDate();
+			    var h=date.getHours();
+			    var n=date.getMinutes();
+			    var s = date.getSeconds();
+			    var nowStr = y+(m<10?'0'+m:m)+(d<10?'0'+d:d);
+				var time=(h<10?'0'+h:h)+''+(n<10?'0'+n:n)+''+(s<10?'0'+s:s);
+				var date={
+					date:nowStr,
+					time:time
+				};
+				return date;
 			},
 			// 长按消息气泡
 			// long({x,y,index}){
@@ -839,32 +992,40 @@
 					})
 						break;
 					case 'uploadVideo': // 发送短视频
-					uni.chooseVideo({
-						maxDuration:10,
-						success:(res)=>{
-							if(res.duration>11){
-								uni.showToast({
-									"title":"请选择10s以内的短视频！"
-								})
-								return;
-							}
-							console.log(res)
-							this.send('video',res.tempFilePath)
-							
-							// 渲染页面
-							// 发送到服务端（获取视频封面，返回url）
-							// 修改本地的发送状态
+					const PPVideo = uni.requireNativePlugin('PP-Video');
+					PPVideo.show({
+						minTime: 2,
+						maxTime: 15,
+						bit: 1024*800,
+						vWidth: _this.windowWidth,
+						vHeight:_this.windowHeight ,
+						isBeautiful: false,
+						isBeautifulBtn: true,
+						isFlashBtn: true,
+						isShowTime: true,
+						beautifulValue: 10,
+						bottomHeight:500,
+						isBefore: false //默认前置
+					}, result => {
+						if (result.code == 200) {
+							_this.videoData = result;
+							_this.send('video',result.data.videoPath)
 						}
-					})
+						console.log(JSON.stringify(result))
+					});
 						break;
 					case 'sendEmoticon': // 发送表情包
 					this.send('emoticon',e.icon)
 						break;
-					case 'noFun'://暂无功能
-					uni.showToast({
-						"title":"功能待开发",
-						"position":"bottom"
-					})
+					case 'sendCard'://发送名片
+						uni.navigateTo({
+							url:`../../mail/send-card/send-card?name=${_this.gname}`
+						})
+						break;
+					case 'sendLocation'://发送位置
+						uni.navigateTo({
+							url:"../../location/send-location/send-location"
+						})
 						break;
 				}
 			},

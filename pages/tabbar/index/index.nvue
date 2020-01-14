@@ -127,8 +127,10 @@
 				}).onFail(function(data) {
 					uni.showToast({
 						"title":getCodeMsg(data.code),
-						"position":"bottom"
+						"position":"bottom",
+						
 					})
+					console.log("====================hhhhhhhhhhhhhhh")
 				});
 			})
 		},
@@ -183,8 +185,10 @@
 				}).onFail(function(data) {
 					uni.showToast({
 						"title":getCodeMsg(data.code),
-						"position":"bottom"
+						"position":"bottom",
+						
 					})
+					console.log("====================hhhhhhhhhhhhhhh")
 				});
 
 			}else{
@@ -224,8 +228,10 @@
 								}).onFail(function(data) {
 								    uni.showToast({
 								    	"title":getCodeMsg(data.code),
-								    	"position":"bottom"
-								    })	    
+								    	"position":"bottom",
+										
+								    })	
+										console.log("====================hhhhhhhhhhhhhhh")
 								});
 							}
 						})
@@ -266,8 +272,10 @@
 				}).onFail(function(res) {
 					uni.showToast({
 						"title":getCodeMsg(res.code),
-						"position":"bottom"
+						"position":"bottom",
+						
 					})
+					console.log("====================hhhhhhhhhhhhhhh")
 				});
 			},
 			async login(username,password){
@@ -303,6 +311,12 @@
 									latest_msg = "[短视频]"
 								}
 							}
+							if(content.msg_type=="location"){
+								latest_msg = "[位置]"+content.msg_body.extras.title
+							}
+							if(content.msg_body.msg_type=="card"){
+								latest_msg = "[个人名片]"+content.msg_body.cardName
+							}
 							
 							console.log("============"+latest_msg+"+=============")
 							
@@ -313,10 +327,9 @@
 								
 								
 								//如果是文字 直接push
-								if(content.msg_type=="text"){
+								if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"){
 									if(list){
 										list.push(content);
-										console.log("======文字push")
 										uni.setStorageSync(_this.myUsername+username,list);	
 									}
 								}else{//否则，需要查询资源url并进行替换
@@ -340,7 +353,7 @@
 								list = uni.getStorageSync(_this.myUsername+gid); //获取该群聊的聊天记录缓存
 								console.log(list)
 								//如果是文字 直接push
-								if(content.msg_type=="text"){
+								if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"){
 									if(list){
 										console.log("hhh")
 										list.push(content);
@@ -405,7 +418,12 @@
 				        			latest_msg = "[短视频]"
 				        		}
 				        	}
-				        	
+							if(last_content.msg_type=="location"){
+								latest_msg = "[位置]"+last_content.msg_body.extras.title
+							}
+				        	if(last_content.msg_body.msg_type=="card"){
+				        		latest_msg = "[个人名片]"+last_content.msg_body.cardName
+				        	}
 				        	
 				        	if(data[i].msg_type==3){//如果是单聊
 				        		var username = data[i].from_username
@@ -414,7 +432,7 @@
 				        		//遍历该用户的消息
 				        		for(var j=0;j<data[i].msgs.length;j++){
 				        			var content = data[i].msgs[j].content;
-				        			if(content.msg_type=="text"){//如果是文字直接push
+				        			if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"){//如果是文字或者位置直接push
 				        				if(list){
 				        					list.push(content);
 				        					uni.setStorageSync(_this.myUsername+username,list);	
@@ -435,7 +453,7 @@
 				        		//遍历该群的消息
 				        		for(var j=0;j<data[i].msgs.length;j++){
 				        			var content = data[i].msgs[j].content;
-				        			if(content.msg_type=="text"){//如果是文字直接push
+				        			if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"){//如果是文字直接push
 				        				if(list){
 				        					list.push(content);
 				        					uni.setStorageSync(_this.myUsername+gid,list);	
@@ -495,8 +513,10 @@
 							}).onFail(function(data) {
 								uni.showToast({
 									"title":getCodeMsg(data.code),
-									"position":"bottom"
+									"position":"bottom",
+									
 								})
+								console.log("====================hhhhhhhhhhhhhhh")
 							});
 							clearTimeout(conversationTimer)
 						},500)
@@ -544,8 +564,10 @@
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
-							"position":"bottom"
+							"position":"bottom",
+							
 						})
+						console.log("====================hhhhhhhhhhhhhhh")
 					});
 					
 				}).onFail(function(data) {
@@ -617,8 +639,10 @@
 				}).onFail(function(data) {
 					uni.showToast({
 						"title":getCodeMsg(data.code),
-						"position":"bottom"
+						"position":"bottom",
+						
 					})
+					console.log("====================hhhhhhhhhhhhhhh")
 				});	
 			},
 			long({x,y,index}){
@@ -712,8 +736,10 @@
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
-							"position":"bottom"
+							"position":"bottom",
+							
 						})
+						console.log("====================hhhhhhhhhhhhhhh")
 					});
 				}else if(item.type==4){
 					var isTop = uni.getStorageSync(item.gid+"isTop")||false;
@@ -756,8 +782,10 @@
 					}).onFail(function(data) {
 						uni.showToast({
 							"title":getCodeMsg(data.code),
-							"position":"bottom"
+							"position":"bottom",
+							
 						})
+						console.log("====================hhhhhhhhhhhhhhh")
 					});
 				}
 				

@@ -119,6 +119,7 @@
 								"title":"用户名或密码错误",
 								"position":"bottom"
 							})
+							console.log("=======hhh============")
 							_this.isRotate=false;
 						}
 					}
@@ -149,9 +150,7 @@
 				
 				
 				_this.isRotate=true
-				
-				console.log("hh")
-				
+								
 				if(JIM.isInit()){
 					_this.login(_this.phoneData,_this.passData)
 				}else{
@@ -184,6 +183,7 @@
 									"title":getCodeMsg(data.code),
 									"position":"bottom"
 								})
+								console.log("=======hhh============")
 							});
 						}
 					})

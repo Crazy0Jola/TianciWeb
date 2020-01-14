@@ -5,11 +5,11 @@
 		class="flex align-center justify-center pb-4 pt-2">
 			<text class="font-sm text-light-muted">{{showTime}}</text>
 		</view>
-		<!-- 撤回消息 -->
+<!-- 		撤回消息
 		<view v-if="item.msg_body.extras.isremove" ref="isremove"
 		class="flex align-center justify-center pb-4 pt-1 chat-animate">
 			<text class="font-sm text-light-muted">你撤回了一条信息</text>
-		</view>
+		</view> -->
 		<!-- 气泡 -->
 		<view v-else class="flex align-start position-relative mb-3"
 		:class="isother ? 'justify-start' : 'justify-end'">
@@ -21,7 +21,33 @@
 				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-left-icon">&#xe601;</text>
 			</template>
 			
-			<div class=" rounded" :class="labelClass" style="max-width:500rpx;" :style="labelStyle">
+			<!-- 个人名片 -->
+			<div v-if="item.msg_body.msg_type=='card'" class=" rounded" :class="isother ? 'p-2 bg-white ml-3' : 'p-2 bg-white mr-3'" style="width:400rpx;" >
+				<view class="flex align-center" @click="openUser">
+					<image :src="item.msg_body.cardAvatar"
+					style="width: 100rpx;height: 100rpx;" 
+					class="mx-1"></image>
+					<view class="flex flex-column flex-3">
+						<text class="font-md text-ellipsis flex-1">{{item.msg_body.cardName}}</text>
+						<text class="font-sm text-gray flex-1 flex-wrap" >个人名片</text>
+					</view>
+				</view>
+			</div>
+			
+			<!-- 位置 -->
+			<div v-else-if="item.msg_type=='location'" class=" rounded" :class="isother ? 'p-2 bg-white ml-3' : 'p-2 bg-white mr-3'" style="max-width:500rpx;" >
+				<view class="flex align-center" @click="openLocation">
+					<image src="/static/images/map.png"
+					style="width: 80rpx;height: 80rpx;" 
+					class="mx-1"></image>
+					<view class="flex flex-column flex-3">
+						<text class="font-md text-ellipsis flex-1">{{item.msg_body.extras.title}}</text>
+						<text class="font-sm text-gray flex-1 flex-wrap" >{{item.msg_body.label}}</text>
+					</view>
+				</view>
+			</div>
+						
+			<div v-else class=" rounded" :class="labelClass" style="max-width:500rpx;" :style="labelStyle">
 				<!-- 表情包  -->
 				<free-image  v-if="item.msg_body.extras.isEmotion" :src="item.msg_body.extras.emotion" @click="preview(item.msg_body.extras.emotion)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
 
@@ -45,20 +71,39 @@
 				</view>
 				
 				<!-- 视频 -->
-				<view v-else-if="this.item.msg_body.extras.isVideo"
+				<view v-else-if="item.msg_body.extras.isVideo"
 				class="position-relative rounded"
 				@click="openVideo">
 					<free-image src="" imageClass="rounded" :maxWidth="300" :maxHeight="350" @load="loadPoster"></free-image>
 					<text class="iconfont text-white position-absolute" style="font-size: 80rpx;width: 80rpx;height: 80rpx;" :style="posterIconStyle">&#xe61d;</text>
-				</view>
+				</view>		
 				
 			</div>
+			
+			
+			
 			<!-- 本人 -->
-			<template v-if="!isother">
+			<template v-if="!isother&&item.msg_type!='location'&&item.msg_body.msg_type!='card'">
 				<text v-if="hasLabelClass" class="iconfont text-chat-item font-md position-absolute chat-right-icon">&#xe619;</text>
 				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic.jpg'"
 				clickType="navigate"></free-avater>
 			</template>
+			
+			<!-- 本人 位置-->
+			<template v-if="!isother&&item.msg_type=='location'">
+				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-right-icon">&#xe619;</text>
+				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic.jpg'"
+				clickType="navigate"></free-avater>
+			</template>
+			
+			<!-- 本人 名片-->
+			<template v-if="!isother&&item.msg_body.msg_type=='card'">
+				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-right-icon">&#xe619;</text>
+				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic.jpg'"
+				clickType="navigate"></free-avater>
+			</template>
+			
+			
 		</view>
 		
 	</div>
@@ -124,7 +169,10 @@
 							if(resAvatar==""){
 								console.log("hhh")
 								uni.setStorageSync("avatar"+token,"/static/images/userpic.jpg")
-							}	
+							}else{
+								console.log("ggggg")
+								uni.setStorageSync("avatar"+token,resAvatar)
+							}
 							return resAvatar||"/static/images/userpic.jpg"
 						}
 					})
@@ -287,6 +335,25 @@
 				uni.navigateTo({
 					url: '/pages/chat/video/video?url='+this.item.msg_body.media_id,
 				});
+			},
+			openLocation(){
+				_this = this;
+				uni.openLocation({
+					'latitude':_this.item.msg_body.latitude,
+					'longitude':_this.item.msg_body.longitude,
+					'scale':_this.item.msg_body.scale,
+					'name':_this.item.msg_body.extras.title,
+					'address':_this.item.msg_body.label,
+					success: function () {
+						console.log('success');
+					}
+				})
+			},
+			openUser(){
+				_this = this;
+				uni.navigateTo({
+					url:"/pages/mail/user-base/user-base?token="+_this.item.msg_body.cardToken
+				})
 			}
 		}
 	}
