@@ -49,9 +49,6 @@
 	
 	var JIM = getApp().globalData.JIM;
 	var SERVER_API = getApp().globalData.SERVER_API;
-	var music = null;
-	music = uni.createInnerAudioContext(); //创建播放器对象
-	music.src= "/static/audio/message.mp3"; //选择播放的音频
 	export default {
 		data() {
 			return {
@@ -176,7 +173,7 @@
 									  "timestamp" : timestamp,
 									  "flag":1
 							}).onSuccess(function(data) {
-								console.log('Init-success:' + JSON.stringify(data));	
+								console.log('Init-success:3333333333333333' + JSON.stringify(data));	
 								_this.login(_this.phoneData,_this.passData)
 							}).onFail(function(data) {
 								uni.showToast({

@@ -111,10 +111,12 @@
 	import freePopup from "@/components/free-ui/free-popup.vue"
 	import freeMainButton from '@/components/free-ui/free-main-button.vue';
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	import permision from "@/js_sdk/wa-permission/permission.js"
 	
 	import { mapState,mapMutations } from 'vuex'
 	var _this;
 	var JIM = getApp().globalData.JIM;
+	var SERVER_API = getApp().globalData.SERVER_API;
 	export default {
 		components: {
 			freeNavBar,
@@ -202,9 +204,7 @@
 				sendCardFlag:false,
 				
 				//视频相关
-				windowHeight:'',
-				windowWidth:'',
-				videoData:{},
+				poster:'',//视频封面
 			}
 		},
 		onBackPress(){
@@ -215,6 +215,7 @@
 		},
 		onLoad:function(e){
 			_this=this;
+			this.requestAndroidPermission('android.permission.RECORD_AUDIO')
 			_this.gid = e.gid;
 			_this.gname = e.gname;
 			var userData = uni.getStorageSync("setUserData");
@@ -240,8 +241,7 @@
 			uni.$off("get_group_msg")
 		},
 		onShow(){			
-			_this=this;
-			
+			_this=this
 			var msg = uni.getStorageSync(_this.myUsername+_this.gid);
 			JIM.resetUnreadCount({
 				'gid' : _this.gid
@@ -332,7 +332,7 @@
 						
 						
 						_this.$data.list.map(function(elem,index){
-						    if(elem.msg_type!="text"&&elem.msg_type!="location"&&elem.msg_body.msg_type!='card'){
+						    if(elem.msg_type!="text"&&elem.msg_type!="location"&&elem.msg_body.msg_type!='card'&&!elem.msg_body.extras.isVideo){
 						    	_this.setPic(elem.msg_body.media_id,index);
 						    }
 						})
@@ -573,34 +573,19 @@
 				}
 				this.emoticonList = arr
 			},
-			//图片缓存
-			image_cache(image_url,media_id) {	
-				var url;
-				uni.getStorage({
-					key: media_id,
-					success:function(res){
-						url = res.data.tempFilePath;	
-					},
-					fail:function(res){
-						// 本地没有缓存 需要下载 
-						uni.downloadFile({
-							url: image_url,
-							success: (res) => {
-								if (res.statusCode === 200) {	
-									url = res.tempFilePath;
-									uni.setStorage({
-										key:media_id,
-										data:res,
-										success:function(res){
-											
-										}
-									})
-								}
+			async requestAndroidPermission(permisionId) {
+				var result = await permision.requestAndroidPermission(permisionId)				
+				if (result == -1) {
+					uni.showModal({
+						content:'录音权限被拒绝，将影响正常使用，请去设置页面开启！',
+						showCancel: false,
+						success(res) {
+							if(res.confirm){
+								permision.gotoAppPermissionSetting()
 							}
-						}); 
-					}
-				})
-				return url;
+						}
+					});
+				}
 			},
 			setPic(media_id,index){
 				JIM.getResource({'media_id' :media_id}).onSuccess(function(data){
@@ -721,9 +706,7 @@
 								"extras": {
 									'isremove':false,
 								},
-							},
-							"my":true,
-							"data":data,
+							}
 						}
 						_this.list.push(obj)
 						uni.hideLoading()
@@ -779,9 +762,7 @@
 									'time':options.time,
 									'isAudio':true
 								}
-							},
-							"my":true,
-							"data":data,
+							}
 						}
 						_this.list.push(obj)
 						
@@ -828,9 +809,7 @@
 									"isEmotion":true,
 									"isremove":false
 								},
-							},
-							"my":true,
-							"data":data,
+							}
 						}		
 						
 						_this.list.push(obj)				
@@ -871,7 +850,8 @@
 						"extras": {
 							"video": "mp4",
 							'isremove':false,
-							"isVideo":true
+							"isVideo":true,
+							"poster":_this.poster
 						},
 					}).onSuccess(function(res,msg) {
 						console.log(JSON.stringify(msg)+"===================")
@@ -885,11 +865,11 @@
 								"extras": {
 									"video": "mp4",
 									'isremove':false,
-									"isVideo":true
+									"isVideo":true,
+									"poster":_this.poster
 								}
 							},
-							"my":true,
-							"data":data,
+							"my":true
 						}
 						_this.list.push(obj)
 						
@@ -992,13 +972,14 @@
 					})
 						break;
 					case 'uploadVideo': // 发送短视频
+					
 					const PPVideo = uni.requireNativePlugin('PP-Video');
 					PPVideo.show({
-						minTime: 2,
-						maxTime: 15,
+						minTime: 1,
+						maxTime: 10,
 						bit: 1024*800,
-						vWidth: _this.windowWidth,
-						vHeight:_this.windowHeight ,
+						vWidth: 720,
+						vHeight:1280,
 						isBeautiful: false,
 						isBeautifulBtn: true,
 						isFlashBtn: true,
@@ -1007,11 +988,32 @@
 						bottomHeight:500,
 						isBefore: false //默认前置
 					}, result => {
-						if (result.code == 200) {
-							_this.videoData = result;
-							_this.send('video',result.data.videoPath)
-						}
 						console.log(JSON.stringify(result))
+						if (result.code == 200) {
+							var images = [];
+							var image_obj = {name:'file',uri:'file://'+result.data.thumbnail};
+							images.push(image_obj);
+							uni.uploadFile({
+								url:SERVER_API+'appWeb/uploadVideo',
+								files:images,//有files时,会忽略filePath和name
+								header:{
+									"token":uni.getStorageSync("setUserData").token
+								},
+								success: (uploadFileRes) => {
+									var res = JSON.parse(uploadFileRes.data)	
+									if(res.code==1){
+										_this.poster = res.result
+										_this.send('video','file://'+result.data.videoPath)
+									}
+								},
+								fail:(e) =>{
+									console.log(JSON.stringify(e))
+									return;
+								}
+							})
+							
+						}
+						
 					});
 						break;
 					case 'sendEmoticon': // 发送表情包
@@ -1023,6 +1025,12 @@
 						})
 						break;
 					case 'sendLocation'://发送位置
+						if(!permision.checkSystemEnableLocation()){
+							uni.showToast({
+								"title":'未开启GPS位置服务，将会影响精确度',
+								"position":"bottom"
+							})
+						}
 						uni.navigateTo({
 							url:"../../location/send-location/send-location"
 						})

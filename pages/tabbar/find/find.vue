@@ -18,12 +18,20 @@
 			<view class="post_right">
 				<text class="post-username font-md">{{post.publisherName}}</text>
 				<view id="paragraph" class="paragraph">{{post.content}}</view>
-				<!-- 相册 -->
-				<view class="thumbnails">
+				<!-- 视频 -->
+				<view class="thumbnails" v-if="isVideo(post.urlList)">
+					<view class="my-gallery" style="position: relative;">
+						<image class="gallery_img" lazy-load mode="aspectFill" :src="post.urlList[0].url.lastIndexOf('.mp4')==-1? post.urlList[0].url:post.urlList[1].url " @tap="openVideo(post.urlList[0].url.lastIndexOf('.mp4')==-1? post.urlList[1].url:post.urlList[0].url ,post.id)"></image>
+						<image mode="aspectFill" src="/static/video/play.png" @tap="openVideo(post.urlList[0].url.lastIndexOf('.mp4')==-1? post.urlList[1].url:post.urlList[0].url ,post.id)" style="width: 80upx;height: 80upx; position: absolute;top:160upx;left:85upx"></image>
+					</view>
+				</view>
+				<!-- 图片 -->
+				<view class="thumbnails" v-else>
 					<view :class="post.urlList.length === 1?'my-gallery':'thumbnail'" v-for="(image, index_images) in post.urlList" :key="index_images">
 						<image class="gallery_img" lazy-load mode="aspectFill" :src="image.url" :data-src="image.url" @tap="previewImage(post.urlList,index_images)"></image>
 					</view>
 				</view>
+				
 				<!-- 资料条 -->
 				<view class="toolbar">
 					<text class="timestamp font-small">{{getCreateTime(index)}}</text>
@@ -133,14 +141,6 @@
 			}
 		},
 		mounted() {
-			
-			uni.getStorage({
-				key: 'posts',
-				success: function (res) {
-					console.log(res.data);
-					this.posts = res.data;
-				}
-			});
 
 		},
 		onLoad() {
@@ -251,6 +251,7 @@
 			    },
 			    success: (res) => {
 				   _this.posts=res.data.result;
+				   console.log(JSON.stringify(_this.posts))
 				   var len = _this.posts.length;
 				   if(len<10){
 					   _this.loadMoreText="暂无更多";
@@ -274,9 +275,23 @@
 		},
 		onNavigationBarButtonTap(e) {//监听标题栏点击事件
 			if (e.index == 0) {
-				uni.navigateTo({
-					url: '../publish/publish'
-				})
+				uni.showActionSheet({
+				    itemList: ['照片', '视频'],
+				    success: function (res) {
+						if(res.tapIndex==0){
+							uni.navigateTo({
+								url: '../publish/publish?type=photo'
+							})
+						}else if(res.tapIndex==1){
+							uni.navigateTo({
+								url: '../publish/publish?type=video'
+							})
+						}
+				    },
+				    fail: function (res) {
+				        console.log(res.errMsg);
+				    }
+				});		
 			}
 		},
 		computed:{
@@ -324,6 +339,19 @@
 			}
 		},
 		methods: {
+			isVideo(list){
+				if(list.length>2){
+					return false;
+				}else{
+					if(list[0].url.lastIndexOf('.mp4')!=-1){
+						return true;
+					}
+					if(list[1].url.lastIndexOf('.mp4')!=-1){
+						return true;
+					}
+					return false;
+				}
+			},
 			// 分发菜单事件
 			clickEvent(event){
 				switch (event){
@@ -589,6 +617,11 @@
 					current: current,
 					urls: new_imageList
 				});
+			},
+			openVideo(url,id){
+				uni.navigateTo({
+					url:'../../chat/video/video?url='+url+'&id='+id
+				})
 			}
 		}
 	}

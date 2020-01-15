@@ -1,0 +1,126 @@
+<template>
+	<view class="position-relative">
+			<video :src="url" controls auto-play style="width: 750rpx;"
+			:style="'height:'+windowHeight+'px;'" @ended="back"></video>
+			<view class="position-absolute rounded flex align-center justify-center" style="width: 80rpx;height: 80rpx;left: 20rpx;top: 50rpx;background-color: rgba(255,255,255,0.3);" @click="back">
+				<text class="iconfont text-white font-lg">&#xe606;</text>
+			</view>
+		</view>
+</template>
+
+<script>
+	var JIM=getApp().globalData.JIM
+	export default {
+		data() {
+			return {
+				url:"",
+				windowHeight:500
+			}
+		},
+		onLoad(e) {
+			console.log(e)
+			var _this=this;
+			if (e.url === '') {
+				this.back()
+				return uni.showToast({
+					title: '非法视频',
+					icon: 'none'
+				});
+			}
+			console.log(e.my)
+			if(e.my=="true"){
+				_this.url = e.url;
+			}else if(e.my=="false"){
+				console.log("hhh")
+				uni.getStorage({
+					key: e.url,
+					success:function(res){
+						_this.url = res.data;	
+					},
+					fail:function(res){
+						JIM.getResource({
+							'media_id' : e.url,
+						}).onSuccess(function(data) {
+							uni.showLoading({
+							    title: '加载中'
+							});
+							uni.downloadFile({
+								url: data.url,
+								success: (res) => {
+									if (res.statusCode === 200) {	
+										uni.saveFile({
+											tempFilePath: res.tempFilePath,
+											success: function (res) {
+												var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+												console.log(savedFilePath)
+												_this.url=savedFilePath;
+												uni.setStorageSync(e.url,"file://"+savedFilePath)
+												uni.hideLoading()
+											}
+										});
+									}
+								}
+							});	
+						}).onFail(function(data) {
+							uni.showToast({
+								"title":getCodeMsg(data.code),
+								"position":"bottom"
+							})
+						});	
+					}
+				})
+			}
+			
+			if(e.id){
+				console.log("hhhhhh")
+				uni.getStorage({
+					key: e.id,
+					success:function(res){
+						_this.url = res.data;	
+					},
+					fail:function(res){
+						uni.showLoading({
+						    title: '加载中'
+						});
+						console.log(e.url)
+						uni.downloadFile({
+							url: e.url,
+							success: (res) => {
+								console.log(res)
+								if (res.statusCode === 200) {	
+									uni.saveFile({
+										tempFilePath: res.tempFilePath,
+										success: function (res) {
+											var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+											console.log(savedFilePath)
+											_this.url=savedFilePath;
+											uni.setStorageSync(e.id,"file://"+savedFilePath)
+											uni.hideLoading()
+										}
+									});
+								}
+							},
+							fail:(res)=>{
+								console.log(res)
+							}
+						});	
+					}
+				})
+			}
+			// 动态获取高度
+			let res = uni.getSystemInfoSync()
+			this.windowHeight = res.windowHeight
+		},
+		methods: {
+			back(){
+				uni.navigateBack({
+					delta: 1
+				});
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

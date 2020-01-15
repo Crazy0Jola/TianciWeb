@@ -2,6 +2,7 @@
 	import Vue from 'vue'
 	import JMessage from 'js_sdk/jmessage-wxapplet-sdk-1.4.2.min.js'
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	
 	var JIM = new JMessage({
 		debug:true
 	})
@@ -11,77 +12,44 @@
 			JIM:JIM,
 			SERVER_API:SERVER_API
 		},
-		onLaunch: function() {
+		onLaunch: function() {	
 			uni.getStorage({
-			    key: 'BM',
-			    success: function (res) {
-			        console.log(res.data);
-			    },
+				key: 'BM',
+				success: function (res) {
+					console.log(res.data);
+				},
 				fail:function(res){
 					uni.setStorageSync("BM",true)
 				}
 			});
 			uni.getStorage({
-			    key: 'LS',
-			    success: function (res) {
-			        console.log(res.data);
-			    },
+				key: 'LS',
+				success: function (res) {
+					console.log(res.data);
+				},
 				fail:function(res){
 					uni.setStorageSync("LS",true)
 				}
 			});
 			uni.getStorage({
-			    key: 'HY',
-			    success: function (res) {
-			        console.log(res.data);
-			    },
+				key: 'HY',
+				success: function (res) {
+					console.log(res.data);
+				},
 				fail:function(res){
 					uni.setStorageSync("HY",true)
 				}
 			});
 			uni.getStorage({
-			    key: 'XZ',
-			    success: function (res) {
-			        console.log(res.data);
-			    },
+				key: 'XZ',
+				success: function (res) {
+					console.log(res.data);
+				},
 				fail:function(res){
 					uni.setStorageSync("XZ",true)
 				}
 			});
-			
-			var appkey='09970876f33e884a3624335c';
-			var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
-			var timestamp=(new Date()).getTime();
-			var signature;
-			uni.request({
-				url: SERVER_API+'appUser/getJMKey',
-				header: {
-					"token": '1ab5f25e6e44485fb69646158126b6f6',
-					"Content-Type":"application/json"
-				},
-				data:{
-					timestamp:timestamp
-				},
-				success(res) {
-					console.log(res)
-					signature = res.data.result;
-					console.log(appkey,random_str,signature,timestamp)
-					JIM.init({
-							  "appkey"    : appkey,
-							  "random_str": random_str,
-							  "signature" : signature,
-							  "timestamp" : timestamp,
-					}).onSuccess(function(data) {
-						console.log('Init-success:' + JSON.stringify(data));	
-						uni.$emit("JIMinit",{})
-					}).onFail(function(data) {
-						uni.showToast({
-							"title":getCodeMsg(data.code),
-							"position":"bottom"
-						})	    
-					});
-				}
-			})
+		
 			// 加载公共图标库
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
@@ -119,15 +87,18 @@
 			})
 			
 			JIM.onDisconnect(function(){
-			  uni.showToast({
-				"title":"网络中断，请检查网络",
-				"position":"bottom"
-			  })
+				uni.showToast({
+					"title":"网络中断，请检查网络",
+					"position":"bottom"
+				})
+				uni.switchTab({
+					url:"pages/tabbar/index/index"
+				})
 			});
 			
 		},
 		onShow: function() {
-			uni.setStorageSync("token","1772b438615944e09c42603130e04cbe")
+			// console.log(plus.push.getClientInfo().clientid)
 			
 			uni.getStorageInfo({
 				success: function (res) {
@@ -157,7 +128,7 @@
 								  "timestamp" : timestamp,
 								  "flag":1
 						}).onSuccess(function(data) {
-							console.log('Init-success:' + JSON.stringify(data));	
+							console.log('Init-success:22222222222222222' + JSON.stringify(data));	
 							uni.$emit("reInit",{})
 							uni.hideLoading()
 						}).onFail(function(data) {
@@ -174,7 +145,7 @@
 		},
 		onHide: function() {
 			console.log('App Hide')
-		},
+		}
 		
 	}
 </script>

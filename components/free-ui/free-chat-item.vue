@@ -5,11 +5,11 @@
 		class="flex align-center justify-center pb-4 pt-2">
 			<text class="font-sm text-light-muted">{{showTime}}</text>
 		</view>
-<!-- 		撤回消息
+		<!-- 撤回消息 -->
 		<view v-if="item.msg_body.extras.isremove" ref="isremove"
 		class="flex align-center justify-center pb-4 pt-1 chat-animate">
 			<text class="font-sm text-light-muted">你撤回了一条信息</text>
-		</view> -->
+		</view>
 		<!-- 气泡 -->
 		<view v-else class="flex align-start position-relative mb-3"
 		:class="isother ? 'justify-start' : 'justify-end'">
@@ -74,7 +74,7 @@
 				<view v-else-if="item.msg_body.extras.isVideo"
 				class="position-relative rounded"
 				@click="openVideo">
-					<free-image src="" imageClass="rounded" :maxWidth="300" :maxHeight="350" @load="loadPoster"></free-image>
+					<free-image :src="item.msg_body.extras.poster" imageClass="rounded" :maxWidth="300" :maxHeight="350" @load="loadPoster"></free-image>
 					<text class="iconfont text-white position-absolute" style="font-size: 80rpx;width: 80rpx;height: 80rpx;" :style="posterIconStyle">&#xe61d;</text>
 				</view>		
 				
@@ -332,8 +332,13 @@
 			},
 			// 打开视频
 			openVideo(){
+				console.log(this.item.msg_body.extras.poster)
+				var my='false';
+				if(this.item.my){
+					my='true';
+				}
 				uni.navigateTo({
-					url: '/pages/chat/video/video?url='+this.item.msg_body.media_id,
+					url: '/pages/chat/video/video?url='+this.item.msg_body.media_id+'&my='+my,
 				});
 			},
 			openLocation(){
