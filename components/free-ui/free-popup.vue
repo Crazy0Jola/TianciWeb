@@ -115,7 +115,7 @@
 					    duration: 100, //ms
 					    timingFunction: 'ease',
 					    }, function () {
-					       console.log('动画执行结束');
+					       
 					    })
 				})
 				// #endif
@@ -133,8 +133,7 @@
 				duration: 100, //ms
 				timingFunction: 'ease',
 				}, ()=> {
-					this.status = false
-				   console.log('动画执行结束');
+					this.status = false	
 				})
 				// #endif
 				// #ifndef APP-PLUS-NVUE

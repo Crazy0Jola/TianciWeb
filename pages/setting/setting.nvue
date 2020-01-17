@@ -149,7 +149,7 @@
 		},
 		methods: {
 			setSQ(e){
-				uni.setStorageSync("SQ",e.detail.value)
+				uni.setStorageSync("SQ",e.detail.value)	
 			},
 			setQY(e){
 				uni.setStorageSync("QY",e.detail.value)
@@ -174,27 +174,43 @@
 			},
 			setJJ(e){
 				uni.setStorageSync("JJ",e.detail.value)
+				var num = uni.getStorageSync("second")||0
+				uni.setStorageSync("second",e.detail.value? ++num:--num)
 			},
 			setQYFW(e){
 				uni.setStorageSync("QYFW",e.detail.value)
+				var num = uni.getStorageSync("second")||0
+				uni.setStorageSync("second",e.detail.value? ++num:--num)
 			},
 			setZWFW(e){
 				uni.setStorageSync("ZWFW",e.detail.value)
+				var num = uni.getStorageSync("second")||0
+				uni.setStorageSync("second",e.detail.value? ++num:--num)
 			},
 			setSHFW(e){
 				uni.setStorageSync("SHFW",e.detail.value)
+				var num = uni.getStorageSync("second")||0
+				uni.setStorageSync("second",e.detail.value? ++num:--num)
 			},
 			setBM(e){
 				uni.setStorageSync("BM",e.detail.value)
+				var num = uni.getStorageSync("third")||0
+				uni.setStorageSync("third",e.detail.value? ++num:--num)
 			},
 			setLS(e){
 				uni.setStorageSync("LS",e.detail.value)
+				var num = uni.getStorageSync("third")||0
+				uni.setStorageSync("third",e.detail.value? ++num:--num)
 			},
 			setHY(e){
 				uni.setStorageSync("HY",e.detail.value)
+				var num = uni.getStorageSync("third")||0
+				uni.setStorageSync("third",e.detail.value? ++num:--num)
 			},
 			setXZ(e){
 				uni.setStorageSync("XZ",e.detail.value)
+				var num = uni.getStorageSync("third")||0
+				uni.setStorageSync("third",e.detail.value? ++num:--num)
 			}
 		}
 	}

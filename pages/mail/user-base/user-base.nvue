@@ -38,6 +38,15 @@
 		</free-list-item>
 		<free-list-item title="更多信息" showRight :showLeftIcon="false"></free-list-item>
 		<free-divider></free-divider> -->
+		<free-list-item title="消息免打扰" showRight :showLeftIcon="false"
+		:showRightIcon="false">
+			<switch slot="right" :checked="getNoDisturb"  @change="setNoDisturb" color="#3578E5"/>
+		</free-list-item>
+		<free-list-item title="置顶聊天" showRight :showLeftIcon="false" 
+		:showRightIcon="false">
+			<switch slot="right" :checked="getIsTop" @change="setTop" color="#3578E5"/>
+		</free-list-item>
+		<free-divider></free-divider>
 		<view class="py-3 flex align-center justify-center bg-white" @click="goChat">
 			<text class="iconfont text-primary mr-1" 
 			v-if="!isBlack">&#xe6c7;</text>
@@ -69,7 +78,13 @@
 			iconClass(){
 				console.log("hhhhhhhh")
 				return _this.isFollow? 'text-red':'text-gray';
-			}
+			},
+			getNoDisturb(){
+				return uni.getStorageSync("noDisturb"+_this.myToken+_this.token)||false
+			},
+			getIsTop(){
+				return uni.getStorageSync("isTop"+_this.myToken+_this.token)||false
+			},
 		},
 		data() {
 			return {
@@ -108,6 +123,13 @@
 			
 		},
 		methods: {
+			setNoDisturb(e){
+				uni.setStorageSync("noDisturb"+_this.myToken+_this.token,e.detail.value)		
+			},
+			setTop(e){
+				console.log(e.detail.value)
+				uni.setStorageSync("isTop"+_this.myToken+_this.token,e.detail.value)
+			},
 			goChat(){
 				var username = _this.token;
 				var nickname = _this.userInfo.baseInfo.name;

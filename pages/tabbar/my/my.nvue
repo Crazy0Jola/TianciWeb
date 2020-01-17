@@ -40,7 +40,7 @@
 		<free-list-item v-if="getSY()" title="手游" showRight @click="openNone">
 			<text slot="icon" class="iconfont font-lg py-1 text-sy">&#xe69e;</text>
 		</free-list-item>
-		<!-- <free-divider></free-divider> -->
+		<free-divider></free-divider>
 		<free-list-item v-if="getJJ()" title="国际接机" showRight @click="openNone">
 			<text slot="icon" class="iconfont font-lg py-1 text-jj">&#xe6aa;</text>
 		</free-list-item>
@@ -53,7 +53,7 @@
 		<free-list-item v-if="getSHFW()" title="生活服务" showRight @click="openNone">
 			<text slot="icon" class="iconfont font-lg py-1 text-shfw">&#xe60e;</text>
 		</free-list-item>
-		<!-- <free-divider></free-divider> -->
+		<free-divider v-if="getSecond()"></free-divider>
 		<free-list-item v-if="getBM()" title="部门组织" showRight @click="openBM">
 			<text slot="icon" class="iconfont font-lg py-1 text-bm">&#xecd2;</text>
 		</free-list-item>
@@ -66,7 +66,7 @@
 		<free-list-item v-if="getXZ()" title="行政划分" showRight @click="openXZ">
 			<text slot="icon" class="iconfont font-lg py-1 text-xz">&#xe603;</text>
 		</free-list-item>
-		<free-divider></free-divider>
+		<free-divider v-if="getThird()"></free-divider>
 		<free-list-item title="我要邀请" showRight @click="openYQ">
 			<text slot="icon" class="iconfont font-lg py-1 text-yq">&#xe652;</text>
 		</free-list-item>
@@ -118,9 +118,6 @@
 		},
 		onLoad(){
 			_this = this;
-			_this.getFirst=0
-			_this.getSecond=0
-			_this.getThird=0
 		},
 		onShow(){
 			this.$forceUpdate();
@@ -232,6 +229,22 @@
 			},
 			getXZ(){
 				return uni.getStorageSync("XZ")||false;
+			},
+			getSecond(){
+				var num = uni.getStorageSync("second")|| 0;
+				if( num>0){
+					return true;
+				}else{
+					return false;
+				}			
+			},
+			getThird(){
+				var num = uni.getStorageSync("third")|| 0;
+				if( num>0){
+					return true;
+				}else{
+					return false;
+				}			
 			},
 			openSQ(){
 				uni.navigateTo({

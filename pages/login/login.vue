@@ -79,7 +79,8 @@
 					url:SERVER_API+"appUser/userLogin",
 					data:{
 						phone:username,
-						password:password
+						password:password,
+						pushId:plus.push.getClientInfo().clientid
 					},
 					method:"POST",
 					header:{

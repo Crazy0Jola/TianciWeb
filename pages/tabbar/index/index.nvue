@@ -42,7 +42,6 @@
 			</view>
 		</free-popup>
 		
-		
 	</view>
 </template>
 
@@ -77,10 +76,12 @@
 				],
 				list:[],
 				myUsername:'',
+				
 			}
 		},
 		onLoad() {
 			this.requestAndroidPermission('android.permission.CAMERA')
+			_this = this;
 			uni.$on("JIMinit",function(){
 				_this.isLogin();
 			})
@@ -142,9 +143,8 @@
 			_this= this;
 			_this.isLogin()
 			if(JIM.isLogin()){
-				// uni.showLoading({
-				// 	title:"读取消息列表中..."
-				// })
+				
+				
 				
 				//获取会话列表
 				JIM.getConversation().onSuccess(function(data) {
@@ -189,13 +189,14 @@
 					})
 					console.log("====================hhhhhhhhhhhhhhh")
 				});
-
+			
 			}else{
 				const value = uni.getStorageSync('setUserData');
 				if (value) {
 					//有登录信息
 					console.log("已登录用户：",value);	
 					if(JIM.isInit()){
+						console.log("hhh")
 						_this.login(value.username,value.password)			
 					}else{
 						var appkey='09970876f33e884a3624335c';
@@ -212,9 +213,7 @@
 								timestamp:timestamp
 							},
 							success(res) {
-								console.log(res)
 								signature = res.data.result;
-								console.log(signature)
 								JIM.init({
 										  "appkey"    : appkey,
 										  "random_str": random_str,
@@ -225,11 +224,11 @@
 									console.log('Init-success:444444444444444444' + JSON.stringify(data));	
 									_this.login(value.username,value.password)	
 								}).onFail(function(data) {
-								    uni.showToast({
-								    	"title":getCodeMsg(data.code),
-								    	"position":"bottom",
+									uni.showToast({
+										"title":getCodeMsg(data.code),
+										"position":"bottom",
 										
-								    })	
+									})	
 										console.log("====================hhhhhhhhhhhhhhh")
 								});
 							}
@@ -237,6 +236,7 @@
 					}		
 				}
 			}
+			
 		},
  		computed:{
 			// 动态获取菜单高度
@@ -250,11 +250,7 @@
 			},
 			isTop(){
 				return function(username){
-					if(uni.getStorageSync(username+"isTop")){
-						return uni.getStorageSync(username+"isTop")
-					}else{
-						return false;
-					}
+					return uni.getStorageSync("isTop"+_this.myUsername+username)			
 				}
 			}
 		},
@@ -303,12 +299,13 @@
 					
 				    JIM.onMsgReceive( async function(data) {
 						console.log("在线========"+JSON.stringify(data)+"===================================")
-					
-						var noDisturb = false;
+					    var onShow = uni.getStorageSync("onShow")
 						for(var i=0;i<data.messages.length;i++){
+							var noDisturb = false;
 							var content = data.messages[i].content;
 							var type = data.messages[i].msg_type;
 							var latest_msg,list,username,gid;
+							var name;
 							// 分类型进行判断
 							if(content.msg_type=="text"){
 								latest_msg = content.msg_body.text;
@@ -333,18 +330,28 @@
 							
 							console.log("============"+latest_msg+"+=============")
 							
+							var clientIds = []
+							clientIds.push(plus.push.getClientInfo().clientid)
+							console.log(JSON.stringify(clientIds))
 							
 							if(type==3){//如果是单聊消息
+								console.log(JSON.stringify(data.messages[i]))
 								username = data.messages[i].from_username;
+								console.log(_this.myUsername)
+								console.log(username)
 								list = uni.getStorageSync(_this.myUsername+username);	//获取该用户的聊天记录缓存
-								
+								console.log("=========list==============")
+								console.log(JSON.stringify(list))
+								noDisturb=uni.getStorageSync("noDisturb"+_this.myUsername+username);
 								
 								//如果是文字 直接push
 								if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"||content.msg_body.extras.isVideo){
 									if(list){
+										console.log("zzzzzzzzzz")
 										list.push(content);
 										uni.setStorageSync(_this.myUsername+username,list);	
 									}
+									
 									if(!noDisturb){
 										//消息来了响铃
 										var music = null;
@@ -353,13 +360,33 @@
 										music.play(); //执行播放
 										//消息来了震动
 										uni.vibrateLong({
-										    success: function () {
-										        console.log('success');
-										    }
+											success: function () {
+												console.log('success');
+											}
 										});
-									}
+										if(!onShow){
+											uni.request({
+												url:SERVER_API+'appWeb/pushMessage',
+												method:"POST",
+												header:{
+													token:uni.getStorageSync("setUserData").token
+												},
+												data:{
+													title:content.from_name,
+													content:latest_msg,
+													clientIds:clientIds
+												},
+												success(res) {
+													console.log(res)
+												},
+												fail(res) {
+													console.log(res)
+												}
+											})
+										}	
+									}	
 								}else{//否则，需要查询资源url并进行替换
-									_this.setPic(content.msg_body.media_id,username,content,list,3,noDisturb)
+									_this.setPic(content.msg_body.media_id,username,content,list,3,noDisturb,latest_msg,true,onShow)
 								}
 
 								console.log("==========latest_mgs"+latest_msg)
@@ -371,9 +398,7 @@
 							}else if(type==4){//如果是群聊消息
 							
 								gid = data.messages[i].from_gid;
-								if(uni.getStorageSync("noDisturb"+gid)){
-									noDisturb=true;
-								}
+								noDisturb=uni.getStorageSync("noDisturb"+_this.myUsername+gid);
 								console.log("=============="+gid)
 								console.log("group"+gid)
 								list = uni.getStorageSync(_this.myUsername+gid); //获取该群聊的聊天记录缓存
@@ -385,20 +410,58 @@
 										list.push(content);
 										uni.setStorageSync(_this.myUsername+gid,list);	
 									}	
+									
+									if(!noDisturb){
+										//消息来了响铃
+										var music = null;
+										music = uni.createInnerAudioContext(); //创建播放器对象
+										music.src= "/static/audio/message.mp3"; //选择播放的音频
+										music.play(); //执行播放
+										//消息来了震动
+										uni.vibrateLong({
+											success: function () {
+												console.log('success');
+											}
+										});
+										if(!onShow){
+											uni.request({
+												url:SERVER_API+'appWeb/pushMessage',
+												method:"POST",
+												header:{
+													token:uni.getStorageSync("setUserData").token
+												},
+												data:{
+													title:"[群聊]:"+content.target_name,
+													content:latest_msg,
+													clientIds:clientIds
+												},
+												success(res) {
+													console.log(res)
+												},
+												fail(res) {
+													console.log(res)
+												}
+											})
+										}
+									}			
 								}else{//否则，需要查询资源url并进行替换
-									_this.setPic(content.msg_body.media_id,gid,content,list,4,noDisturb)
+									_this.setPic(content.msg_body.media_id,gid,content,list,4,noDisturb,latest_msg,true,onShow)
 								}
 								
 								JIM.updateConversation({
 								   'gid' : gid,
 								   'extras' : {'latest_msg':latest_msg}
-								});
-							
+								});		
+									
 							}
-												
+							
+					
 						}
 								
 						console.log("主页通知。。。。。。。。。。。。。。。。")
+						
+						
+						
 						uni.$emit('get_index_msg',{})				
 						
 						if(type==3){
@@ -454,7 +517,7 @@
 				        					uni.setStorageSync(_this.myUsername+username,list);	
 				        				}
 				        			}else{//或者还要获取资源url进行替换
-				        				_this.setPic(content.msg_body.media_id,username,content,list,3,true)
+				        				_this.setPic(content.msg_body.media_id,username,content,list,3,true,latest_msg,false,true)
 				        			}
 				        		}	
 				        		//更新会话，将最后一条消息存入
@@ -475,7 +538,7 @@
 				        					uni.setStorageSync(_this.myUsername+gid,list);	
 				        				}
 				        			}else{//或者不是文字还要获取资源url进行替换
-				        				_this.setPic(content.msg_body.media_id,gid,content,list,4,true)
+				        				_this.setPic(content.msg_body.media_id,gid,content,list,4,true,latest_msg,false,true)
 				        			}
 				        		}	
 				        		//更新会话，将最后一条消息存入
@@ -564,7 +627,6 @@
 								},
 								method:"POST",
 								success(res){
-									console.log(res)
 									for(var i=0;i<len-1;i++){
 										if(_this.list[i].type==3){//是单聊
 											var name= _this.list[i].username;
@@ -610,7 +672,10 @@
 						//有登录信息
 						console.log("已登录用户：",value);	
 						if(!JIM.isLogin()){
-							_this.login(value.username,value.password)			
+							uni.showLoading({
+								title:"聊天系统初始化中..."
+							})
+							// _this.login(value.username,value.password)			
 						}
 					}else{
 						uni.reLaunch({
@@ -622,7 +687,7 @@
 				} 
 			},
 			
-			setPic(media_id,username,content,list,type,noDisturb){
+			setPic(media_id,username,content,list,type,noDisturb,latest_mgs,isOnline,onShow){
 				JIM.getResource({
 					'media_id' : media_id,
 				}).onSuccess(function(data) {
@@ -646,7 +711,7 @@
 												
 											}
 										}
-										if(!noDisturb){
+										if(!noDisturb&&isOnline){
 											//消息来了响铃
 											var music = null;
 											music = uni.createInnerAudioContext(); //创建播放器对象
@@ -658,7 +723,29 @@
 											        console.log('success');
 											    }
 											});
-										}
+											if(!onShow){
+												var title=type==3? username:'[群聊]:'+username;
+												
+												uni.request({
+													url:SERVER_API+'appWeb/pushMessage',
+													method:"POST",
+													header:{
+														token:uni.getStorageSync("setUserData").token
+													},
+													data:{
+														title:title,
+														content:latest_msg,
+														clientIds:clientIds
+													},
+													success(res) {
+														console.log(res)
+													},
+													fail(res) {
+														console.log(res)
+													}
+												})
+											}	
+										}							
 									}
 								});
 							}
@@ -679,11 +766,11 @@
 				// 拿到当前对象
 				let item = this.list[index]
 				if(item.type==3){
-					var isTop = uni.getStorageSync(item.username+"isTop")||false;
+					var isTop = uni.getStorageSync("isTop"+_this.myUsername+item.username)||false;
 					// 判断之前是否处于置顶状态
 					this.menus[0].name = isTop ? '取消置顶' : '设为置顶'
 				}else if(item.type==4){
-					var isTop = uni.getStorageSync(item.gid+"isTop")||false;
+					var isTop = uni.getStorageSync("isTop"+_this.myUsername+item.gid)||false;
 					// 判断之前是否处于置顶状态
 					this.menus[0].name = isTop ? '取消置顶' : '设为置顶'
 				}
@@ -724,8 +811,8 @@
 			setTop(){
 				let item = this.list[this.propIndex]
 				if(item.type==3){
-					var isTop = uni.getStorageSync(item.username+"isTop")||false;
-					uni.setStorageSync(item.username+"isTop",!isTop);
+					var isTop = uni.getStorageSync("isTop"+_this.myUsername+item.username)||false;
+					uni.setStorageSync("isTop"+_this.myUsername+item.username,!isTop);
 					//获取会话列表
 					JIM.getConversation().onSuccess(function(data) {
 						console.log('success:Conversation222222===========' + JSON.stringify(data));
@@ -770,8 +857,8 @@
 						console.log("====================hhhhhhhhhhhhhhh")
 					});
 				}else if(item.type==4){
-					var isTop = uni.getStorageSync(item.gid+"isTop")||false;
-					uni.setStorageSync(item.gid+"isTop",!isTop);
+					var isTop = uni.getStorageSync("isTop"+_this.myUsername+item.gid)||false;
+					uni.setStorageSync("isTop"+_this.myUsername+item.gid,!isTop);
 					//获取会话列表
 					JIM.getConversation().onSuccess(function(data) {
 						console.log('success:Conversation222222===========' + JSON.stringify(data));

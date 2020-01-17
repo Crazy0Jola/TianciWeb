@@ -16,37 +16,41 @@
 			uni.getStorage({
 				key: 'BM',
 				success: function (res) {
-					console.log(res.data);
+					
 				},
 				fail:function(res){
 					uni.setStorageSync("BM",true)
+					uni.setStorageSync("third",4)
 				}
 			});
 			uni.getStorage({
 				key: 'LS',
 				success: function (res) {
-					console.log(res.data);
+					
 				},
 				fail:function(res){
 					uni.setStorageSync("LS",true)
+					uni.setStorageSync("third",4)
 				}
 			});
 			uni.getStorage({
 				key: 'HY',
 				success: function (res) {
-					console.log(res.data);
+					
 				},
 				fail:function(res){
 					uni.setStorageSync("HY",true)
+					uni.setStorageSync("third",4)
 				}
 			});
 			uni.getStorage({
 				key: 'XZ',
 				success: function (res) {
-					console.log(res.data);
+					
 				},
 				fail:function(res){
 					uni.setStorageSync("XZ",true)
+					uni.setStorageSync("third",4)
 				}
 			});
 		
@@ -88,17 +92,17 @@
 			
 			JIM.onDisconnect(function(){
 				uni.showToast({
-					"title":"网络中断，请检查网络",
+					"title":"聊天系统离线，正在重新连接",
 					"position":"bottom"
 				})
 				uni.switchTab({
-					url:"pages/tabbar/index/index"
+					url:"/pages/tabbar/index/index"
 				})
 			});
 			
 		},
 		onShow: function() {
-			// console.log(plus.push.getClientInfo().clientid)
+			uni.setStorageSync("onShow",true)
 			
 			uni.getStorageInfo({
 				success: function (res) {
@@ -145,6 +149,7 @@
 		},
 		onHide: function() {
 			console.log('App Hide')
+			uni.setStorageSync("onShow",false)
 		}
 		
 	}

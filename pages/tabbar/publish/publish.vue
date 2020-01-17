@@ -129,16 +129,16 @@
 			
 			
 			async publish(){
-				if (!this.input_content&&_this.photo) {
+				if (!this.input_content) {
 					uni.showToast({
-						"title":"内容不能为空",
+						"title":"写点什么吧~",
 						"position":"bottom"
 					})
 					return;
 				}
 				if(!_this.photo&&_this.video==''){
 					uni.showToast({
-						"title":"未拍摄视频！",
+						"title":"您的视频呢~",
 						"position":"bottom"
 					})
 					return;

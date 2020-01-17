@@ -1,5 +1,5 @@
 <template>
-	<free-popup ref="confirm" center maskColor transformOrigin="center center">
+	<free-popup ref="confirm" center maskColor transformOrigin="center center" style="z-index: 9999;">
 		<view class="bg-white rounded" style="width: 600rpx;">
 			<view class="p-4 flex flex-column justify-center align-center">
 				<text class="font-md font-weight-bold mb-3">{{title}}</text>

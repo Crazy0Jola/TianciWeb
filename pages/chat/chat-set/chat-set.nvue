@@ -55,11 +55,11 @@
 		<!-- <free-divider></free-divider> -->
 		<free-list-item title="消息免打扰" showRight :showLeftIcon="false" 
 		:showRightIcon="false">
-			<switch slot="right" :checked="getNoDisturb"  @change="setNoDisturb" color="#08C060"/>
+			<switch slot="right" :checked="getNoDisturb"  @change="setNoDisturb" color="#3578E5"/>
 		</free-list-item>
 		<free-list-item title="置顶聊天" showRight :showLeftIcon="false" 
 		:showRightIcon="false">
-			<switch slot="right" :checked="getIsTop" @change="setTop" color="#08C060"/>
+			<switch slot="right" :checked="getIsTop" @change="setTop" color="#3578E5"/>
 		</free-list-item>
 		<free-divider></free-divider>
 	<!-- 	<free-list-item title="显示群成员昵称" showRight :showLeftIcon="false"
@@ -114,10 +114,10 @@
 		},
 		computed:{
 			getNoDisturb(){
-				return uni.getStorageSync("noDisturb"+_this.gid)||false
+				return uni.getStorageSync("noDisturb"+_this.myUsername+_this.gid)||false
 			},
 			getIsTop(){
-				return uni.getStorageSync(_this.gid+"isTop")||false
+				return uni.getStorageSync("isTop"+_this.myUsername+_this.gid)||false
 			},
 			getDesStyle(){
 				return _this.gdes?'':'height:0rpx;'
@@ -257,31 +257,10 @@
 				}
 			},
 			setNoDisturb(e){
-				if(e.detail.value){
-					JIM.addGroupNoDisturb({
-						'gid' : _this.gid
-					}).onSuccess(function(data) {
-						uni.setStorageSync("noDisturb"+_this.gid,true)
-					}).onFail(function(data) {
-						
-					});
-				}else{
-					JIM.delGroupNoDisturb({
-						'gid' : _this.gid
-					}).onSuccess(function(data) {
-						uni.setStorageSync("noDisturb"+_this.gid,false)
-					}).onFail(function(data) {
-					
-					});
-				}
-				
+				uni.setStorageSync("noDisturb"+_this.myUsername+_this.gid,e.detail.value)		
 			},
 			setTop(e){
-				if(e.detail.value){
-					uni.setStorageSync(_this.gid+"isTop",true)
-				}else{
-					uni.setStorageSync(_this.gid+"isTop",false)
-				}
+				uni.setStorageSync("isTop"+_this.myUsername+_this.gid,e.detail.value)
 			},
 			addMember(){
 				console.log(_this.gname)

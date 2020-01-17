@@ -36,7 +36,6 @@
 		methods: {
 			// 加载图片
 			loadImage(e){
-				console.log("======================="+this.src)
 				let w = e.detail.width
 				let h = e.detail.height
 				// // 最大宽度 px

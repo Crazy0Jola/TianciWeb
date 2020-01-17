@@ -31,12 +31,17 @@
 			freeAvater,
 			freeBadge
 		},
+		data() {
+			return {
+				myToken: uni.getStorageSync("setUserData").token
+			}
+		},
 		computed:{
 			istop(){
 				if(this.item.type==3){
-					return uni.getStorageSync(this.item.username+"isTop")||false					
+					return uni.getStorageSync("isTop"+this.myToken+this.item.username)||false					
 				}else if(this.item.type==4){
-					return uni.getStorageSync(this.item.gid+"isTop")||false
+					return uni.getStorageSync("isTop"+this.myToken+this.item.gid)||false
 				}
 			}
 		},
