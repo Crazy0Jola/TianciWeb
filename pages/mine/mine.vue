@@ -34,6 +34,13 @@
 		},
 		methods: {
 			save(){
+				if(_this.mCompany==""||_this.mPost==""||_this.mDesc==""){
+					uni.showToast({
+						"title":"写点什么吧~",
+						"position":"bottom"
+					})
+					return;
+				}
 				uni.request({
 					url:SERVER_API+'appUser/modifyUserInfo',
 					data:{

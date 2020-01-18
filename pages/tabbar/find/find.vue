@@ -346,7 +346,6 @@
 		},
 		methods: {
 			isVideo(list){
-				console.log(list.length)
 				if(list.length!=2){
 					console.log("222222222")
 					return false;

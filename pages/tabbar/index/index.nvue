@@ -339,19 +339,16 @@
 								username = data.messages[i].from_username;
 								console.log(_this.myUsername)
 								console.log(username)
-								list = uni.getStorageSync(_this.myUsername+username);	//获取该用户的聊天记录缓存
+								list = uni.getStorageSync(_this.myUsername+username)||[];	//获取该用户的聊天记录缓存
 								console.log("=========list==============")
 								console.log(JSON.stringify(list))
 								noDisturb=uni.getStorageSync("noDisturb"+_this.myUsername+username);
 								
 								//如果是文字 直接push
-								if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"||content.msg_body.extras.isVideo){
-									if(list){
-										console.log("zzzzzzzzzz")
-										list.push(content);
-										uni.setStorageSync(_this.myUsername+username,list);	
-									}
-									
+								if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"||content.msg_body.extras.isVideo){		
+									list.push(content);
+									uni.setStorageSync(_this.myUsername+username,list);	
+				
 									if(!noDisturb){
 										//消息来了响铃
 										var music = null;
@@ -401,16 +398,12 @@
 								noDisturb=uni.getStorageSync("noDisturb"+_this.myUsername+gid);
 								console.log("=============="+gid)
 								console.log("group"+gid)
-								list = uni.getStorageSync(_this.myUsername+gid); //获取该群聊的聊天记录缓存
+								list = uni.getStorageSync(_this.myUsername+gid)||[]; //获取该群聊的聊天记录缓存
 								console.log(list)
 								//如果是文字 直接push
-								if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"||content.msg_body.extras.isVideo){
-									if(list){
-										console.log("hhh")
-										list.push(content);
-										uni.setStorageSync(_this.myUsername+gid,list);	
-									}	
-									
+								if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"||content.msg_body.extras.isVideo){								
+									list.push(content);
+									uni.setStorageSync(_this.myUsername+gid,list);						
 									if(!noDisturb){
 										//消息来了响铃
 										var music = null;
@@ -506,16 +499,16 @@
 				        	
 				        	if(data[i].msg_type==3){//如果是单聊
 				        		var username = data[i].from_username
-				        		var list = uni.getStorageSync(_this.myUsername+username);//获取该对象的聊天记录
+				        		var list = uni.getStorageSync(_this.myUsername+username)||[];//获取该对象的聊天记录
 				        		
 				        		//遍历该用户的消息
 				        		for(var j=0;j<data[i].msgs.length;j++){
 				        			var content = data[i].msgs[j].content;
 				        			if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"||content.msg_body.extras.isVideo){//如果是文字或者位置直接push
-				        				if(list){
-				        					list.push(content);
-				        					uni.setStorageSync(_this.myUsername+username,list);	
-				        				}
+				        				
+										list.push(content);
+										uni.setStorageSync(_this.myUsername+username,list);	
+									
 				        			}else{//或者还要获取资源url进行替换
 				        				_this.setPic(content.msg_body.media_id,username,content,list,3,true,latest_msg,false,true)
 				        			}
@@ -527,16 +520,16 @@
 				        		});	 
 				        	}else if(data[i].msg_type==4){//如果是群聊
 				        		var gid = data[i].from_gid
-				        		var list = uni.getStorageSync(_this.myUsername+gid);//获取该对象的聊天记录
+				        		var list = uni.getStorageSync(_this.myUsername+gid)||[];//获取该对象的聊天记录
 				        		
 				        		//遍历该群的消息
 				        		for(var j=0;j<data[i].msgs.length;j++){
 				        			var content = data[i].msgs[j].content;
 				        			if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"||content.msg_body.extras.isVideo){//如果是文字直接push
-				        				if(list){
-				        					list.push(content);
-				        					uni.setStorageSync(_this.myUsername+gid,list);	
-				        				}
+									
+										list.push(content);
+										uni.setStorageSync(_this.myUsername+gid,list);	
+									
 				        			}else{//或者不是文字还要获取资源url进行替换
 				        				_this.setPic(content.msg_body.media_id,gid,content,list,4,true,latest_msg,false,true)
 				        			}
@@ -700,17 +693,17 @@
 									success: function (res) {
 										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
 										content.msg_body.media_id=savedFilePath;
-										if(list){
-											list.push(content);
-											console.log("===============资源push")
-											uni.setStorageSync(_this.myUsername+username,list);	
-											if(type==3){
-												uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
-											}else if(type==4){
-												uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据
-												
-											}
+										
+										list.push(content);
+										console.log("===============资源push")
+										uni.setStorageSync(_this.myUsername+username,list);	
+										if(type==3){
+											uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
+										}else if(type==4){
+											uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据
+											
 										}
+										
 										if(!noDisturb&&isOnline){
 											//消息来了响铃
 											var music = null;

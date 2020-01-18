@@ -1,14 +1,15 @@
 <template>
 	<view>
 		<view class="p-3 bg-light position-fixed left-0 right-0" >
-			<input type="text" v-model="keyword" placeholder="搜索" class="bg-white rounded pl-2" placeholder-class="text-center" style="height: 80rpx;"/>
+			<input type="text"  v-model="keyword" placeholder="搜索" @input="init" @confirm="search" confirm-type="search" class="bg-white rounded pl-2" placeholder-class="text-center" style="height: 80rpx;"/>
 		</view>
-		<view v-if="keyword !== '' && searchList.length === 0"
+		<view v-if="keyword !== '' && list.length === 0"
 		class="flex align-center justify-center" 
 		style="height: 100rpx;margin-top: 200rpx;">
 			<text class="font text-light-muted">暂无搜索结果</text>
 		</view>
-		<recycle-list for="(item, i) in allList">
+		
+		<recycle-list for="(item, i) in list" style="margin-top: 140rpx;">
 			<cell-slot>
 				<view class="bg-white flex align-stretch">
 					<view class="flex align-center justify-center py-2 pl-3">
@@ -36,27 +37,16 @@
 		data() {
 			return {
 				keyword:"",
-				list:[]
+				list:[],
+				searchList:[]
 			};
 		},
 		computed:{
-			// 最终列表
-			allList(){
-				return this.keyword==='' ? this.list : this.searchList
-			},
-			// 搜索结果列表
-			searchList(){
-				if(this.keyword === ''){
-					return []
-				}
-				return this.list.filter(item=>{
-					return item.name.indexOf(this.keyword) != -1
-				})
-			},
+
 		},
 		onLoad() {
 			_this=this;
-							
+
 			// var storagelist=uni.getStorageSync("allUser");
 			// console.log(JSON.stringify(_this.list))
 			// if(storagelist){
@@ -84,7 +74,8 @@
 						uni.hideLoading()
 						var data = res.data.result;
 						_this.list = data;
-						// uni.setStorageSync("allUser",_this.list);
+					
+						uni.setStorageSync("allUser",_this.list);
 						
 					}
 				})
@@ -96,7 +87,45 @@
 					
 			})
 		},
+		onReachBottom(){
+			console.log("hhh")
+		},
 		methods: {
+			init(){
+				if(_this.keyword==''){
+					var list = uni.getStorageSync("allUser");
+					_this.list = list;
+				}
+			},
+			// 搜索结果列表
+			search(){
+				if(_this.keyword==''){
+					var list = uni.getStorageSync("allUser");
+					_this.list = list;
+					return;
+				}
+				console.log("hhhhhhh")
+				uni.request({
+					url: SERVER_API+ 'appUser/search',
+					header: {
+						"token": uni.getStorageSync("setUserData").token,
+						"Content-Type":"application/x-www-form-urlencoded"
+					},
+					data:{
+						'name':_this.keyword
+					},
+					method:"POST",
+					success(res) {
+						
+						uni.hideLoading()
+						var data = res.data.result;
+						console.log(data.length)
+						_this.list = data;
+						// uni.setStorageSync("allUser",_this.list);
+						
+					}
+				})
+			},
 			follow(followId,isFollow,i){
 				console.log(followId+"=="+isFollow+"=="+i)
 				if(isFollow==0){
@@ -116,12 +145,35 @@
 									"title":"关注成功",
 									"position":"bottom"
 								})
-								if(_this.keyword==""){
-									_this.list[i].isFollow=1
-								}else{
-									_this.searchList[i].isFollow=1
-									_this.keyword=""
+								_this.list[i].isFollow=1
+								if(_this.keyword==''){
+									uni.setStorageSync("allUser",_this.list)
 								}
+								// if(pushId!=null){
+								// 	var clientIds = []
+								// 	clientIds.push(pushId)
+								// 	var name = uni.getStorageSync("setUserData").name;
+								// 	console.log(name)
+								// 	console.log(pushId)
+								// 	uni.request({
+								// 		url:SERVER_API+'appWeb/pushMessage',
+								// 		method:"POST",
+								// 		header:{
+								// 			token:uni.getStorageSync("setUserData").token
+								// 		},
+								// 		data:{
+								// 			title:"新消息",
+								// 			content:name+"关注了你",
+								// 			clientIds:clientIds
+								// 		},
+								// 		success(res) {
+								// 			console.log(res)
+								// 		},
+								// 		fail(res) {
+								// 			console.log(res)
+								// 		}
+								// 	})
+								// }
 							}else{
 								console.log(res.data)
 								uni.showToast({
@@ -148,11 +200,9 @@
 									"title":"取消关注",
 									"position":"bottom"
 								})
-								if(_this.keyword==""){
-									_this.list[i].isFollow=0
-								}else{
-									_this.searchList[i].isFollow=0
-									_this.keyword=""
+								_this.list[i].isFollow=0
+								if(_this.keyword==''){
+									uni.setStorageSync("allUser",_this.list)
 								}
 							}else{
 								uni.showToast({

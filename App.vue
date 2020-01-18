@@ -2,6 +2,7 @@
 	import Vue from 'vue'
 	import JMessage from 'js_sdk/jmessage-wxapplet-sdk-1.4.2.min.js'
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
+	import { checkUpdater } from '@/js_sdk/checkUpdater'
 	
 	var JIM = new JMessage({
 		debug:true
@@ -13,6 +14,58 @@
 			SERVER_API:SERVER_API
 		},
 		onLaunch: function() {	
+			
+			// app打开时先检查是否有更新记录（更新记录会被保存在storage中）
+			// 更新记录的内容为 { 更新标记, 安装包位置 }
+			
+			// 如果存在更新记录，且更新标记（complete=true）则删除上次使用过的安装包，达到存储释放空间的目的
+			
+			// 如果存在更新记录，且更新标记（complete=false）则进行安装更新 - 2019年3月27日 新增强制更新内容
+			
+			// #ifdef APP-PLUS
+			plus.screen.lockOrientation('portrait-primary') //竖屏正方向锁定
+			
+			const updated = uni.getStorageSync('updated') // 尝试读取storage
+			
+			if (updated.completed === true) { // 如果上次刚更新过
+				// 删除安装包及安装记录
+				console.log('安装记录被删除，更新成功')
+				uni.removeSavedFile({ 
+					filePath: updated.packgePath,
+					success: (res) => {
+						uni.removeStorageSync('updated')
+					}
+				})
+			} else if (updated.completed === false) {
+				uni.showModal({
+					title: '更新提示',
+					content: updated.content,
+					showCancel: false,
+					complete: () => {
+						plus.runtime.install(updated.packgePath, { force: true },function(){
+							uni.removeStorageSync('updated')
+							uni.setStorage({
+								key: 'updated',
+								data: {
+									completed: true,
+									packgePath: updated.packgePath
+								},
+								success: (res) => {
+									console.log('成功安装上次的更新，应用需要重启才能继续完成')
+								}
+							})  
+							plus.runtime.restart();  
+						},function(e){  
+						});
+					}
+				})  
+			} else {
+				plus.runtime.getProperty(plus.runtime.appid, (widgetInfo) => {
+					checkUpdater(widgetInfo.version) 
+				})
+			}
+			// #endif
+			
 			uni.getStorage({
 				key: 'BM',
 				success: function (res) {
