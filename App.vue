@@ -5,7 +5,7 @@
 	import { checkUpdater } from '@/js_sdk/checkUpdater'
 	
 	var JIM = new JMessage({
-		debug:true
+		debug:false
 	})
 	var SERVER_API="http://117.83.152.39:8081/interconnect/";
 	export default {
@@ -157,11 +157,11 @@
 		onShow: function() {
 			uni.setStorageSync("onShow",true)
 			
-			uni.getStorageInfo({
-				success: function (res) {
-					console.log(res.keys);
-				}
-			});
+			// uni.getStorageInfo({
+			// 	success: function (res) {
+			// 		console.log(res.keys);
+			// 	}
+			// });
 			if(!JIM.isInit()){
 				var appkey='09970876f33e884a3624335c';
 				var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";

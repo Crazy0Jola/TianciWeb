@@ -18,7 +18,6 @@
 			}
 		},
 		onLoad(e) {
-			console.log(e)
 			var _this=this;
 			if (e.url === '') {
 				this.back()
@@ -27,11 +26,9 @@
 					icon: 'none'
 				});
 			}
-			console.log(e.my)
 			if(e.my=="true"){
 				_this.url = e.url;
 			}else if(e.my=="false"){
-				console.log("hhh")
 				uni.getStorage({
 					key: e.url,
 					success:function(res){
@@ -51,8 +48,7 @@
 										uni.saveFile({
 											tempFilePath: res.tempFilePath,
 											success: function (res) {
-												var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-												console.log(savedFilePath)
+												var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);												
 												_this.url=savedFilePath;
 												uni.setStorageSync(e.url,"file://"+savedFilePath)
 												uni.hideLoading()
@@ -72,7 +68,6 @@
 			}
 			
 			if(e.id){
-				console.log("hhhhhh")
 				uni.getStorage({
 					key: e.id,
 					success:function(res){
@@ -82,17 +77,17 @@
 						uni.showLoading({
 						    title: '加载中'
 						});
-						console.log(e.url)
+						
 						uni.downloadFile({
 							url: e.url,
 							success: (res) => {
-								console.log(res)
+								
 								if (res.statusCode === 200) {	
 									uni.saveFile({
 										tempFilePath: res.tempFilePath,
 										success: function (res) {
 											var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-											console.log(savedFilePath)
+											
 											_this.url=savedFilePath;
 											uni.setStorageSync(e.id,"file://"+savedFilePath)
 											uni.hideLoading()
@@ -101,7 +96,7 @@
 								}
 							},
 							fail:(res)=>{
-								console.log(res)
+								
 							}
 						});	
 					}

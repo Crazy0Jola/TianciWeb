@@ -87,8 +87,8 @@
 			    success: function (res) {
 					_this.map.longitude=res.longitude
 					_this.map.latitude=res.latitude
-			        console.log('当前位置的经度：' + res.longitude);
-			        console.log('当前位置的纬度：' + res.latitude);
+			        // console.log('当前位置的经度：' + res.longitude);
+			        // console.log('当前位置的纬度：' + res.latitude);
 			    }
 			});
 		},
@@ -98,7 +98,7 @@
 			    uni.getLocation({
 			      type: 'gcj02',
 			      success: function(res) {
-			        console.log(res)
+			        
 			        let map = that.data.map
 			        map.longitude = res.longitude
 			        map.latitude = res.latitude
@@ -128,7 +128,7 @@
 			getAddressList(s = 0) {
 				let that = this
 				let position = that.position
-				console.log(position)
+				
 				qqmapsdk.reverseGeocoder({
 					location: {
 						latitude: position.latitude,
@@ -151,25 +151,25 @@
 						}
 						
 						setTimeout(() => {
-							console.log('************');
+							
 							that.scrollTop = 1
 						}, 1000)
 					},
 					fail: err => {
-						console.log(err)
+						
 					}
 				})
 			},
 			mapChange(e) {
 				let that = this
-				console.log(this.mapStatus);
+				
 				clearTimeout(this.timer)
 				this.timer = setTimeout(() => {
 					if (e.type == 'end') {
 						that.mapCtx = uni.createMapContext('map')
 						that.mapCtx.getCenterLocation({
 							success: res => {
-								console.log(res)
+								
 								that.setData({
 									position: {
 										latitude: res.latitude,
@@ -214,7 +214,7 @@
 					let pages = getCurrentPages()
 					let prePages = pages[pages.length - 2].$vm
 					
-					console.log(prePages);
+			
 					prePages.title=address.title
 					prePages.address=address.address
 					prePages.longitude=address.location.lng

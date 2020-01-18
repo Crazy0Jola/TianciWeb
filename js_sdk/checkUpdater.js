@@ -3,22 +3,20 @@ export function checkUpdater(currentId) {
         url: 'http://117.83.152.39:8081/interconnect/appWeb/getVersion',
         method: 'GET',
         success: res => {
-			console.log(res)
+			// console.log(res)
             if (res.statusCode === 200) {
                 const response = res.data
                 const latestVersion = response.version
                 const url = response.url
 				var currentVersion =  Number(currentId.substring(0,3)+currentId.substring(4))
-				console.log(currentVersion)
-				console.log(latestVersion)
                 if (currentVersion<latestVersion) {				
-					console.log('任务开始')
+					// console.log('任务开始')
 					let downloadTask = uni.downloadFile({
 						url: url,
 						success: (res) => {
 							if (res.statusCode === 200) {
 								// 保存下载的安装包
-								console.log('保存安装包')
+								// console.log('保存安装包')
 								uni.saveFile({
 									tempFilePath: res.tempFilePath,
 									success: (res) => {
@@ -32,11 +30,11 @@ export function checkUpdater(currentId) {
 												content:response.content
 											},
 											success: () => {
-												console.log('成功保存记录')
+												// console.log('成功保存记录')
 											}
 										}) 
 										// 任务完成，关闭下载任务
-										console.log('任务完成，关闭下载任务，下一次启动应用时将安装更新')
+										// console.log('任务完成，关闭下载任务，下一次启动应用时将安装更新')
 										downloadTask.abort()
 										downloadTask = null
 									}
@@ -45,7 +43,7 @@ export function checkUpdater(currentId) {
 						}
 					})         
                 }else{
-					console.log("已经是最新版本")
+					// console.log("已经是最新版本")
 				}
             }
         }

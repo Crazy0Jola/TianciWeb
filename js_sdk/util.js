@@ -52,10 +52,6 @@ function getImageInfo(path) {
 		plus.io.getImageInfo({
 			src: path,
 			success: function(image) {
-				// console.log(image.width);
-				// console.log(image.height);
-				// console.log('orientation=' + image.orientation);
-				// console.log('path=' + image.path);
 				resolve(image)
 			},
 			fail: function(err) {
@@ -68,10 +64,6 @@ function getImageInfo(path) {
 		uni.getImageInfo({
 			src: path,
 			success: function(image) {
-				// console.log(image.width);
-				// console.log(image.height);
-				// console.log('orientation=' + image.orientation);
-				// console.log('path=' + image.path);
 				resolve(image)
 			},
 			fail: function(err) {

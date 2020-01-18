@@ -46,49 +46,32 @@
 		},
 		onLoad() {
 			_this=this;
-
-			// var storagelist=uni.getStorageSync("allUser");
-			// console.log(JSON.stringify(_this.list))
-			// if(storagelist){
-			// 	uni.showLoading({
-			// 		"title":"加载中，请稍候..."
-			// 	})
-			// 	_this.list = storagelist;
-			// 	var loadTimer = setTimeout(function() {
-			// 		uni.hideLoading();
-			// 		clearTimeout(loadTimer);
-			// 	}, 1000);
+			uni.showLoading({
+				"title":"加载中，请稍候..."
+			})
+			uni.request({
+				url: SERVER_API+ 'appUser/search',
+				header: {
+					"token": uni.getStorageSync("setUserData").token,
+					"Content-Type":"application/json;charset=utf-8"
+				},
+				method:"POST",
+				success(res) {
+					uni.hideLoading()
+					var data = res.data.result;
+					_this.list = data;
 				
-			// }else{
-				uni.showLoading({
-					"title":"加载中，请稍候..."
-				})
-				uni.request({
-					url: SERVER_API+ 'appUser/search',
-					header: {
-						"token": uni.getStorageSync("setUserData").token,
-						"Content-Type":"application/json;charset=utf-8"
-					},
-					method:"POST",
-					success(res) {
-						uni.hideLoading()
-						var data = res.data.result;
-						_this.list = data;
+					uni.setStorageSync("allUser",_this.list);
 					
-						uni.setStorageSync("allUser",_this.list);
-						
-					}
-				})
-			// }
+				}
+			})
+			
 		},
 		mounted(){
 			// 监听键盘高度变化
 			uni.onKeyboardHeightChange(res => {
 					
 			})
-		},
-		onReachBottom(){
-			console.log("hhh")
 		},
 		methods: {
 			init(){
@@ -104,7 +87,7 @@
 					_this.list = list;
 					return;
 				}
-				console.log("hhhhhhh")
+				
 				uni.request({
 					url: SERVER_API+ 'appUser/search',
 					header: {
@@ -119,7 +102,6 @@
 						
 						uni.hideLoading()
 						var data = res.data.result;
-						console.log(data.length)
 						_this.list = data;
 						// uni.setStorageSync("allUser",_this.list);
 						
@@ -127,7 +109,6 @@
 				})
 			},
 			follow(followId,isFollow,i){
-				console.log(followId+"=="+isFollow+"=="+i)
 				if(isFollow==0){
 					uni.request({
 						url:SERVER_API+'appUser/follow',
@@ -175,7 +156,7 @@
 								// 	})
 								// }
 							}else{
-								console.log(res.data)
+								
 								uni.showToast({
 									"title":res.data.message,
 									"position":"bottom"
@@ -194,7 +175,7 @@
 						},
 						method:"POST",
 						success(res){
-							console.log(res)
+							
 							if(res.data.code==1){
 								uni.showToast({
 									"title":"取消关注",

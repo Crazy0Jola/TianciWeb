@@ -222,11 +222,9 @@
 			_this.myAvatar = userData.photo;
 			_this.myUsername = userData.username;
 			
-			console.log("gid++++"+_this.gid+"----gname+"+_this.gname)
 			
 			uni.$on("get_group_msg",function(){
-				console.log("hhhhhhhhhhhhhhhhhhhhhh")
-				console.log(_this.myUsername+_this.gid)
+		
 				var msg = uni.getStorageSync(_this.myUsername+_this.gid);
 				_this.list=msg;
 				var pageToBottomTimer = setTimeout(()=>{
@@ -240,14 +238,14 @@
 			uni.$off("get_group_msg")
 		},
 		onShow(){			
-			console.log("========================onshow")
+		
 			_this=this
 			var msg = uni.getStorageSync(_this.myUsername+_this.gid)||[];
-			console.log(JSON.stringify(msg))
+			
 			JIM.resetUnreadCount({
 				'gid' : _this.gid
 			});
-			console.log(msg.length)
+			
 			if(msg.length>0){
 				_this.list=msg;
 				// var pageToBottomTimer = setTimeout(()=>{
@@ -317,24 +315,12 @@
 						},
 						success(res) {
 							var msg = res.data.messages
-							// msg.forEach(function(item){
-							// 	if(item.msg_type=="image"){
-							// 		JIM.getResource({'media_id' :item.msg_body.media_id}).onSuccess(function(data){
-							// 			item.msg_body.media_id = data.url;
-							// 			console.log('success:' + JSON.stringify(data));
-							// 		}).onFail(function(data){
-							// 			console.log('error:' + JSON.stringify(data));
-							// 		});
-							// 	}	
-							// })
-							
-							
-							
+						
 							_this.$data.list=msg;
 							
 							
 							_this.$data.list.map(function(elem,index){
-							    if(elem.msg_type!="text"&&elem.msg_type!="location"&&elem.msg_body.msg_type!='card'&&!elem.msg_body.extras.isVideo){
+							    if(elem.msg_type=="image"||elem.msg_body.extras.isAudio){
 							    	_this.setPic(elem.msg_body.media_id,index);
 							    }
 							})
@@ -349,7 +335,7 @@
 				
 			}
 			if(this.title&&this.sendLocationFlag){
-				console.log(this.title+"="+this.address+"="+this.longitude+"="+this.latitude)
+				
 				JIM.sendGroupLocation({
 					'target_gid' : _this.gid,		
 					'latitude' : _this.latitude,
@@ -401,12 +387,11 @@
 						"title":getCodeMsg(data.code),
 						"position":"bottom"
 					})
-					console.log(data+"=======================")
+					
 				});
 			}
 			
 			if(this.cardName&&this.sendCardFlag){
-				console.log(this.cardName+"="+this.cardAvatar+"="+this.cardToken)
 				
 				JIM.sendGroupCustom({
 					'target_gid' : _this.gid,
@@ -420,7 +405,7 @@
 						}
 					}
 				}).onSuccess(function(res , msg) {
-					console.log(msg.content)
+					
 					var obj = {
 						"from_id": _this.myUsername,
 						"create_time": msg.content.create_time,				
@@ -438,10 +423,10 @@
 					}
 			
 					_this.sendCardFlag=false
-					console.log(JSON.stringify(obj))
+					
 					
 					_this.list.push(obj)
-					console.log(JSON.stringify(_this.list))
+					
 					// 置于底部
 					var pageToBottomTimer = setTimeout(()=>{
 						_this.pageToBottom()
@@ -459,7 +444,7 @@
 						"title":getCodeMsg(data.code),
 						"position":"bottom"
 					})
-					console.log(data+"=======================")
+					
 				});
 			}
 		},
@@ -614,7 +599,7 @@
 						"title":getCodeMsg(data.code),
 						"position":"bottom"
 					})
-					console.log(data+"=======================")
+					
 				});		
 			},
 			// 打开扩展菜单或者表情包
@@ -649,7 +634,7 @@
 										'isremove':false,
 									},
 								}).onSuccess(function(res,msg) {
-									console.log(JSON.stringify(msg)+"===================")
+									
 									var obj = {
 										"from_id": _this.myUsername,
 										"create_time": (new Date()).getTime(),				
@@ -677,7 +662,7 @@
 									
 									uni.setStorageSync(_this.myUsername+_this.gid,_this.list);
 								}).onFail(function(data) {
-									console.log(JSON.stringify(data))
+									
 									uni.hideLoading()
 									uni.showToast({
 										"title":"暂支持JPG格式",
@@ -704,7 +689,7 @@
 										'isAudio':true
 									}
 								}).onSuccess(function(res,msg) {
-									console.log(JSON.stringify(msg)+"===================")
+									
 									var obj = {
 										"from_id": _this.myUsername,
 										"create_time": (new Date()).getTime(),				
@@ -738,7 +723,7 @@
 										"title":getCodeMsg(data.code),
 										"position":"bottom",
 									})
-									console.log(data+"=======================")
+									
 								});
 									break;	
 																
@@ -758,7 +743,7 @@
 										"poster":_this.poster
 									},
 								}).onSuccess(function(res,msg) {
-									console.log(JSON.stringify(msg)+"===================")
+									
 									var obj = {
 										"from_id": _this.myUsername,
 										"create_time": msg.content.create_time,		
@@ -796,7 +781,7 @@
 										"title":getCodeMsg(data.code),
 										"position":"bottom",
 									})
-									console.log(data+"=======================")
+									
 								});
 									break;	
 							}
@@ -847,7 +832,7 @@
 								"title":getCodeMsg(data.code),
 								"position":"bottom",
 							})
-							console.log(data+"=======================")
+							
 						});
 							break;
 						case 'emoticon':
@@ -895,7 +880,7 @@
 								"title":getCodeMsg(data.code),
 								"position":"bottom",
 							})
-							console.log(data+"=======================")
+							
 						});
 										
 							break;
@@ -996,7 +981,7 @@
 						bottomHeight:500,
 						isBefore: false //默认前置
 					}, result => {
-						console.log(JSON.stringify(result))
+						
 						if (result.code == 200) {
 							var images = [];
 							var image_obj = {name:'file',uri:'file://'+result.data.thumbnail};
@@ -1015,7 +1000,7 @@
 									}
 								},
 								fail:(e) =>{
-									console.log(JSON.stringify(e))
+									
 									return;
 								}
 							})

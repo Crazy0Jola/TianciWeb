@@ -105,7 +105,6 @@
 			})
 		},
 		onShow(){
-			console.log(_this.isNull)
 			_this.list=[];
 			for(var i=0;i<26;i++){
 				var obj = {
@@ -199,7 +198,7 @@
 					}
 				})
 				if(_this.isAdd){
-					console.log(JSON.stringify(_this.selectList))
+
 					JIM.addGroupMembers({
 						'gid' : _this.gid,
 						'member_usernames' : _this.selectList

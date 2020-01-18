@@ -91,7 +91,7 @@
 			uni.$on("get_index_msg",function(){
 				//获取会话列表
 				JIM.getConversation().onSuccess(function(data) {
-					console.log('success:Conversation222222===========' + JSON.stringify(data));
+					// console.log('success:Conversation222222===========' + JSON.stringify(data));
 					_this.list=data.conversations.reverse();
 					var tokenList=[]
 					var len=_this.list.length;
@@ -113,7 +113,7 @@
 							},
 							method:"POST",
 							success(res){
-								console.log(res)
+								
 								for(var i=0;i<len;i++){
 									if(_this.list[i].type==3){//是单聊
 										var name= _this.list[i].username;
@@ -130,7 +130,7 @@
 						"position":"bottom",
 						
 					})
-					console.log("====================hhhhhhhhhhhhhhh")
+					
 				});
 			})
 		},
@@ -187,16 +187,16 @@
 						"position":"bottom",
 						
 					})
-					console.log("====================hhhhhhhhhhhhhhh")
+					
 				});
 			
 			}else{
 				const value = uni.getStorageSync('setUserData');
 				if (value) {
 					//有登录信息
-					console.log("已登录用户：",value);	
+					// console.log("已登录用户：",value);	
 					if(JIM.isInit()){
-						console.log("hhh")
+						
 						_this.login(value.username,value.password)			
 					}else{
 						var appkey='09970876f33e884a3624335c';
@@ -221,7 +221,7 @@
 										  "timestamp" : timestamp,
 										  "flag":1
 								}).onSuccess(function(data) {
-									console.log('Init-success:444444444444444444' + JSON.stringify(data));	
+									// console.log('Init-success:444444444444444444' + JSON.stringify(data));	
 									_this.login(value.username,value.password)	
 								}).onFail(function(data) {
 									uni.showToast({
@@ -229,7 +229,7 @@
 										"position":"bottom",
 										
 									})	
-										console.log("====================hhhhhhhhhhhhhhh")
+										
 								});
 							}
 						})
@@ -259,7 +259,7 @@
 		},
 		methods: {
 			getPic(media_id,index){
-				console.log(media_id+"=="+index)
+				
 				JIM.getResource({
 					'media_id' : media_id,
 				}).onSuccess(function(res) {
@@ -270,7 +270,7 @@
 						"position":"bottom",
 						
 					})
-					console.log("====================hhhhhhhhhhhhhhh")
+					
 				});
 			},
 			async requestAndroidPermission(permisionId) {
@@ -298,7 +298,7 @@
 				}).onSuccess(function(data) {		
 					
 				    JIM.onMsgReceive( async function(data) {
-						console.log("在线========"+JSON.stringify(data)+"===================================")
+						// console.log("在线========"+JSON.stringify(data)+"===================================")
 					    var onShow = uni.getStorageSync("onShow")
 						for(var i=0;i<data.messages.length;i++){
 							var noDisturb = false;
@@ -328,20 +328,15 @@
 								latest_msg = "[个人名片]"+content.msg_body.cardName
 							}
 							
-							console.log("============"+latest_msg+"+=============")
+							
 							
 							var clientIds = []
 							clientIds.push(plus.push.getClientInfo().clientid)
-							console.log(JSON.stringify(clientIds))
 							
-							if(type==3){//如果是单聊消息
-								console.log(JSON.stringify(data.messages[i]))
-								username = data.messages[i].from_username;
-								console.log(_this.myUsername)
-								console.log(username)
-								list = uni.getStorageSync(_this.myUsername+username)||[];	//获取该用户的聊天记录缓存
-								console.log("=========list==============")
-								console.log(JSON.stringify(list))
+							
+							if(type==3){//如果是单聊消息	
+								username = data.messages[i].from_username;	
+								list = uni.getStorageSync(_this.myUsername+username)||[];	//获取该用户的聊天记录缓存	
 								noDisturb=uni.getStorageSync("noDisturb"+_this.myUsername+username);
 								
 								//如果是文字 直接push
@@ -386,7 +381,7 @@
 									_this.setPic(content.msg_body.media_id,username,content,list,3,noDisturb,latest_msg,true,onShow)
 								}
 
-								console.log("==========latest_mgs"+latest_msg)
+								
 							    JIM.updateConversation({
 								   'username' : username,
 								   'extras' : {'latest_msg':latest_msg}
@@ -396,10 +391,10 @@
 							
 								gid = data.messages[i].from_gid;
 								noDisturb=uni.getStorageSync("noDisturb"+_this.myUsername+gid);
-								console.log("=============="+gid)
-								console.log("group"+gid)
+								
+								
 								list = uni.getStorageSync(_this.myUsername+gid)||[]; //获取该群聊的聊天记录缓存
-								console.log(list)
+								
 								//如果是文字 直接push
 								if(content.msg_type=="text"||content.msg_type=="location"||content.msg_body.msg_type=="card"||content.msg_body.extras.isVideo){								
 									list.push(content);
@@ -413,7 +408,7 @@
 										//消息来了震动
 										uni.vibrateLong({
 											success: function () {
-												console.log('success');
+												
 											}
 										});
 										if(!onShow){
@@ -451,17 +446,17 @@
 					
 						}
 								
-						console.log("主页通知。。。。。。。。。。。。。。。。")
+						
 						
 						
 						
 						uni.$emit('get_index_msg',{})				
 						
 						if(type==3){
-							console.log("通知333333333333333333")
+							
 							uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
 						}else if(type==4){
-							console.log("通知444444444444444444444444")
+							
 							uni.$emit('get_group_msg',{})//通知群聊页面属性获取数据
 							
 						}
@@ -471,7 +466,7 @@
 					
 					
 					JIM.onSyncConversation(async function(data) { //离线消息同步监听
-						console.log("SSSSSSSSSSSSSSSSSS"+JSON.stringify(data))
+						
 				        for(var i=0;i<data.length;i++){
 				        	var latest_msg;
 				        	var last_content= data[i].msgs[data[i].msgs.length-1].content;
@@ -546,7 +541,7 @@
 						var conversationTimer = setTimeout(()=>{
 							//获取会话列表
 							JIM.getConversation().onSuccess(function(data) {
-								console.log('success:Conversation222222===========' + JSON.stringify(data));
+								// console.log('success:Conversation222222===========' + JSON.stringify(data));
 								_this.list=data.conversations.reverse();
 								var tokenList=[]
 								var len=_this.list.length;
@@ -569,7 +564,7 @@
 										},
 										method:"POST",
 										success(res){
-											console.log(res)
+											
 											for(var i=0;i<len-1;i++){
 												if(_this.list[i].type==3){//是单聊
 													var name= _this.list[i].username;
@@ -588,7 +583,7 @@
 									"position":"bottom",
 									
 								})
-								console.log("====================hhhhhhhhhhhhhhh")
+								
 							});
 							clearTimeout(conversationTimer)
 						},500)
@@ -597,7 +592,7 @@
 					
 					//获取会话列表
 					JIM.getConversation().onSuccess(function(data) {
-						console.log('success:Conversation222222===========' + JSON.stringify(data));
+						// console.log('success:Conversation222222===========' + JSON.stringify(data));
 						_this.list=data.conversations.reverse();
 						var tokenList=[]
 						var len=_this.list.length;
@@ -638,18 +633,18 @@
 							"position":"bottom",
 							
 						})
-						console.log("====================hhhhhhhhhhhhhhh")
+						
 					});
 					
 				}).onFail(function(data) {
-				     console.log('error:' + JSON.stringify(data));
+				     // console.log('error:' + JSON.stringify(data));
 					 uni.showToast({
 					 	icon: 'none',
 					 	position: 'bottom',
 					 	title: getCodeMsg(data.code)
 					 });					 
 				}).onTimeout(function(data) {
-				    console.log('timeout:' + JSON.stringify(data));
+				    
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
@@ -663,7 +658,7 @@
 					const value = uni.getStorageSync('setUserData');
 					if (value) {
 						//有登录信息
-						console.log("已登录用户：",value);	
+						// console.log("已登录用户：",value);	
 						if(!JIM.isLogin()){
 							uni.showLoading({
 								title:"聊天系统初始化中..."
@@ -695,7 +690,7 @@
 										content.msg_body.media_id=savedFilePath;
 										
 										list.push(content);
-										console.log("===============资源push")
+										
 										uni.setStorageSync(_this.myUsername+username,list);	
 										if(type==3){
 											uni.$emit('get_chat_msg',{})//通知单聊页面刷新获取数据
@@ -750,7 +745,7 @@
 						"position":"bottom",
 						
 					})
-					console.log("====================hhhhhhhhhhhhhhh")
+					
 				});	
 			},
 			long({x,y,index}){
@@ -808,7 +803,7 @@
 					uni.setStorageSync("isTop"+_this.myUsername+item.username,!isTop);
 					//获取会话列表
 					JIM.getConversation().onSuccess(function(data) {
-						console.log('success:Conversation222222===========' + JSON.stringify(data));
+						// console.log('success:Conversation222222===========' + JSON.stringify(data));
 						_this.list=data.conversations.reverse();
 						var tokenList=[]
 						var len=_this.list.length;
@@ -830,7 +825,7 @@
 								},
 								method:"POST",
 								success(res){
-									console.log(res)
+									
 									for(var i=0;i<len;i++){
 										if(_this.list[i].type==3){//是单聊
 											var name= _this.list[i].username;
@@ -847,14 +842,14 @@
 							"position":"bottom",
 							
 						})
-						console.log("====================hhhhhhhhhhhhhhh")
+						
 					});
 				}else if(item.type==4){
 					var isTop = uni.getStorageSync("isTop"+_this.myUsername+item.gid)||false;
 					uni.setStorageSync("isTop"+_this.myUsername+item.gid,!isTop);
 					//获取会话列表
 					JIM.getConversation().onSuccess(function(data) {
-						console.log('success:Conversation222222===========' + JSON.stringify(data));
+						// console.log('success:Conversation222222===========' + JSON.stringify(data));
 						_this.list=data.conversations.reverse();
 						var tokenList=[]
 						var len=_this.list.length;
@@ -876,7 +871,7 @@
 								},
 								method:"POST",
 								success(res){
-									console.log(res)
+									
 									for(var i=0;i<len;i++){
 										if(_this.list[i].type==3){//是单聊
 											var name= _this.list[i].username;
@@ -893,7 +888,7 @@
 							"position":"bottom",
 							
 						})
-						console.log("====================hhhhhhhhhhhhhhh")
+						
 					});
 				}
 				

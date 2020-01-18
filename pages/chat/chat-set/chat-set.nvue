@@ -127,8 +127,7 @@
 			JIM.getGroupInfo({
 				'gid' : _this.gid
 			}).onSuccess(function(data) {
-				console.log(data)
-				console.log(JSON.stringify(data))
+
 				_this.gdes=data.group_info.desc
 				_this.gname=data.group_info.name
 				if(data.group_info.avatar){
@@ -163,7 +162,6 @@
 					tokenList.push(data.member_list[i].username)
 				}			
 				
-				console.log(tokenList)
 				uni.request({
 					url:SERVER_API+'appUser/getUserPhotoByToken',
 					data:tokenList,
@@ -172,12 +170,10 @@
 					},
 					method:"POST",
 					success(res){
-						console.log(res)
 						for(var i=0;i<len;i++){
 							var name= _this.memberList[i].username;
 							_this.memberList[i].avatar=res.data.result[name]
-						}
-						console.log(JSON.stringify(_this.memberList))
+						}					
 					}
 				})
 				
@@ -263,7 +259,6 @@
 				uni.setStorageSync("isTop"+_this.myUsername+_this.gid,e.detail.value)
 			},
 			addMember(){
-				console.log(_this.gname)
 				uni.navigateTo({
 					url:`../../group/addGroup/addGroup?gid=${_this.gid}&gname=${_this.gname}`
 				})

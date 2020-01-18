@@ -257,7 +257,7 @@
 			    },
 			    success: (res) => {
 				   _this.posts=res.data.result;
-				   console.log(JSON.stringify(_this.posts))
+				   // console.log(JSON.stringify(_this.posts))
 				   var len = _this.posts.length;
 				   if(len<10){
 					   _this.loadMoreText="暂无更多";
@@ -347,18 +347,18 @@
 		methods: {
 			isVideo(list){
 				if(list.length!=2){
-					console.log("222222222")
+					
 					return false;
 					
 				}else{
 					if(list[0].url.lastIndexOf('.mp4')!=-1){
-						console.log("1111111111")
+						
 						return true;
 					}else if(list[1].url.lastIndexOf('.mp4')!=-1){
-						console.log("1111111111")
+						
 						return true;
 					}else{
-						console.log("222222222")
+						
 						return false;
 					}
 				}
@@ -523,12 +523,12 @@
 					var scrollTop = res.scrollTop;
 					let view = uni.createSelectorQuery().select("#post-" + this.index);
 					view.boundingClientRect(data => {
-						console.log("data:" + JSON.stringify(data));
-						console.log("手机屏幕高度:" + this.screenHeight);
-						console.log("竖直滚动位置" + scrollTop);
-						console.log("节点离页面顶部的距离为" + data.top);
-						console.log("节点高度为" + data.height);
-						console.log("窗口高度为" + this.windowHeight);
+						// console.log("data:" + JSON.stringify(data));
+						// console.log("手机屏幕高度:" + this.screenHeight);
+						// console.log("竖直滚动位置" + scrollTop);
+						// console.log("节点离页面顶部的距离为" + data.top);
+						// console.log("节点高度为" + data.height);
+						// console.log("窗口高度为" + this.windowHeight);
 
 						uni.pageScrollTo({
 							scrollTop: scrollTop - (this.windowHeight - (data.height + data.top + 45)), //一顿乱算

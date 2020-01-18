@@ -97,7 +97,7 @@
 			_this=this;
 			_this.gid=e.gid;
 			_this.gname=e.gname;
-			console.log(e.gid)
+			
 			_this.list=[];
 			for(var i=0;i<26;i++){
 				var obj = {
@@ -121,7 +121,7 @@
 					}
 				}			
 				
-				console.log(tokenList)
+				
 				uni.request({
 					url:SERVER_API+'appUser/getUserPhotoByToken',
 					data:tokenList,
@@ -130,7 +130,7 @@
 					},
 					method:"POST",
 					success(res){
-						console.log(res)
+						
 						
 						for(var i=0;i<len-1;i++){
 							var name= _this.memberList[i].username;
@@ -141,8 +141,7 @@
 							_this.list[index].data.push(_this.memberList[i])
 						}
 						
-						
-						console.log(JSON.stringify(_this.memberList))
+		
 					}
 				})
 				
@@ -189,7 +188,6 @@
 							username:res.username,
 						}
 					})
-					console.log(JSON.stringify(_this.selectList))
 					
 					JIM.delGroupMembers({
 						'gid' : _this.gid,

@@ -163,14 +163,11 @@
 						},
 						method:"POST",
 						success(res){
-							console.log(res)
-							console.log(token)
 							var resAvatar = res.data.result[token]
 							if(resAvatar==""){
-								console.log("hhh")
 								uni.setStorageSync("avatar"+token,"/static/images/userpic.jpg")
 							}else{
-								console.log("ggggg")
+								
 								uni.setStorageSync("avatar"+token,resAvatar)
 							}
 							return resAvatar||"/static/images/userpic.jpg"
@@ -239,7 +236,7 @@
 						    duration: 100, //ms
 						    timingFunction: 'ease',
 						    }, function () {
-						       console.log('动画执行结束');
+						       // console.log('动画执行结束');
 						    })
 					})
 				}
@@ -332,7 +329,6 @@
 			},
 			// 打开视频
 			openVideo(){
-				console.log(this.item.msg_body.extras.poster)
 				var my='false';
 				if(this.item.my){
 					my='true';
@@ -350,7 +346,7 @@
 					'name':_this.item.msg_body.extras.title,
 					'address':_this.item.msg_body.label,
 					success: function () {
-						console.log('success');
+						// console.log('success');
 					}
 				})
 			},
