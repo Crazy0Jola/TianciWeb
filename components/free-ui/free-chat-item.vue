@@ -49,7 +49,7 @@
 						
 			<div v-else class=" rounded" :class="labelClass" style="max-width:500rpx;" :style="labelStyle">
 				<!-- 表情包  -->
-				<free-image  v-if="item.msg_body.extras.isEmotion" :src="item.msg_body.extras.emotion" @click="preview(item.msg_body.extras.emotion)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
+				<free-image v-if="item.msg_body.extras.isEmotion" :src="item.msg_body.extras.emotion" @click="preview(item.msg_body.extras.emotion)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
 
 				<!-- 文字 -->
 				
