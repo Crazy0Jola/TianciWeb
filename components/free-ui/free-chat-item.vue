@@ -151,7 +151,7 @@
 				var token = this.item.from_id
 				tokenList.push(token);
 				var avatar = uni.getStorageSync("avatar"+token)
-				
+			
 				if(avatar){
 					return avatar
 				}else{
@@ -166,15 +166,27 @@
 							var resAvatar = res.data.result[token]
 							if(resAvatar==""){
 								uni.setStorageSync("avatar"+token,"/static/images/userpic.jpg")
+								return "/static/images/userpic.jpg"
 							}else{
-								
-								uni.setStorageSync("avatar"+token,resAvatar)
-							}
-							return resAvatar||"/static/images/userpic.jpg"
+								uni.downloadFile({
+									url: resAvatar,
+									success: (res) => {
+										if (res.statusCode === 200) {	
+											uni.saveFile({
+												tempFilePath: res.tempFilePath,
+												success: function (res) {
+													var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+													uni.setStorageSync("avatar"+token,savedFilePath)			
+													return savedFilePath
+												}
+											});
+										}
+									}
+								}); 
+							}						
 						}
 					})
 				}
-				return "/static/images/userpic.jpg"
 			},
 			// 是否是他人
 			isother() {

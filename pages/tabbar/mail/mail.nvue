@@ -28,7 +28,7 @@
 				</view>
 				<free-list-item  v-for="(item2,index2) in item.data" 
 				:key="index2" :title="item2.name" 
-				:cover="item2.photo?item2.photo:'/static/images/userpic.jpg'" @click="goChat(item2)"></free-list-item>
+				:cover="getPhoto(item2.token,item2.photo)" @click="goChat(item2)"></free-list-item>
 			</view>
 		</scroll-view>
 		
@@ -96,7 +96,6 @@
 			this.scrollHeight = res.windowHeight - this.top - 50
 		},
 		onShow(){	
-			console.log(_this.isNull)
 			_this.list=[];
 			for(var i=0;i<26;i++){
 				var obj = {
@@ -112,14 +111,9 @@
 				},
 				method:"POST",
 				success(res){
-					console.log(res)
+					
 					var result = res.data.result;
 					var len = result.length
-					if(len==0){
-						_this.isNull=true
-					}else{
-						_this.isNull=false
-					}
 					for(var i=0;i<len;i++){
 						let letter = initial(result[i].name)
 						let index = letter.charCodeAt()-65;
@@ -130,6 +124,35 @@
 			})
 		},
 		computed: {
+			getPhoto(){
+				return function (token,photo) {
+					var avatar = uni.getStorageSync("avatar"+token);
+					if(avatar){
+						return avatar;
+					}else{
+						if(photo){
+							uni.downloadFile({
+								url: photo,
+								success: (res) => {
+									if (res.statusCode === 200) {	
+										uni.saveFile({
+											tempFilePath: res.tempFilePath,
+											success: function (res) {
+												var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+												uni.setStorageSync("avatar"+token,savedFilePath)	
+												return savedFilePath;
+											}
+										});
+									}
+								}
+							}); 
+						}else{
+							uni.setStorageSync("avatar"+token,'/static/images/userpic.jpg')
+							return '/static/images/userpic.jpg';
+						}
+					}
+				}
+			},
 			modalTop(){
 				return (this.scrollHeight - uni.upx2px(150)) / 2
 			},

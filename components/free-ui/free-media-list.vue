@@ -10,7 +10,7 @@
 		<view class="flex flex-column border-bottom flex-1 py-3 pr-3 border-light-secondary">
 			<view class="flex align-center justify-between mb-1">
 				<text class="font-md flex-4 text-ellipsis">{{item.nickName?item.nickName:item.name}}</text>
-				<text v-if="isConver" class="flex-1 font-sm text-light-muted text-right">{{item.mtime|formatTime}}</text>
+				<text v-if="isConver" class="flex-2 font-sm text-light-muted text-right">{{item.mtime|formatTime}}</text>
 			</view>
 			<text class="font text-ellipsis text-light-muted" v-if="isConver">{{item.extras.latest_msg}}</text>
 		</view>

@@ -7,7 +7,7 @@
 			@click="like"></free-icon-button>
 		</free-nav-bar>
 		<view class="px-3 py-4 flex align-center bg-white border-bottom">
-			<free-avater :src="userInfo.baseInfo.photo?userInfo.baseInfo.photo:'/static/images/userpic.jpg'" size="120"></free-avater>
+			<free-avater :src="getPhoto" size="120"></free-avater>
 			<view class="flex flex-column ml-3 flex-1">
 				<view class="flex align-center justify-between">
 					<text class="font-lg font-weight-bold mb-1">{{userInfo.baseInfo.name}}</text>
@@ -65,6 +65,15 @@
 	var _this;
 	var SERVER_API = getApp().globalData.SERVER_API
 	export default {
+		data() {
+			return {
+				token:"",
+				myToken:"",
+				isBlack:false,
+				userInfo:{},
+				isFollow:false
+			}
+		},
 		components: {
 			freeNavBar,
 			freeAvater,
@@ -73,8 +82,44 @@
 			freeIconButton
 		},
 		computed:{
+			getPhoto(){
+				uni.request({
+					url:SERVER_API+'appUser/getUserDetailInfo',
+					data:{
+						token:_this.token
+					},
+					method:"POST",
+					header:{
+						token:_this.myToken
+					},
+					success(res) {
+						_this.userInfo = res.data.result;
+						_this.isFollow = _this.userInfo.baseInfo.isFollow; 
+						//更新头像
+						if(_this.userInfo.baseInfo.photo){
+							uni.downloadFile({
+								url: _this.userInfo.baseInfo.photo,
+								success: (res) => {
+									if (res.statusCode === 200) {	
+										uni.saveFile({
+											tempFilePath: res.tempFilePath,
+											success: function (res) {
+												var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+												uni.setStorageSync("avatar"+_this.token,savedFilePath)	
+											}
+										});
+									}
+								}
+							}); 
+							
+						}else{
+							uni.setStorageSync("avatar"+_this.token,'/static/images/userpic.jpg');
+						}
+					}
+				})
+				return uni.getStorageSync("avatar"+_this.token)
+			},
 			iconClass(){
-				console.log("hhhhhhhh")
 				return _this.isFollow? 'text-red':'text-gray';
 			},
 			getNoDisturb(){
@@ -87,38 +132,11 @@
 				return _this.myToken!=_this.token
 			}
 		},
-		data() {
-			return {
-				token:"",
-				myToken:"",
-				isBlack:false,
-				userInfo:{},
-				isFollow:false
-			}
-		},
 		onLoad:function (option) {
 			_this=this;
 			_this.token = option.token;
 			_this.myToken = uni.getStorageSync("setUserData").token;
-			uni.request({
-				url:SERVER_API+'appUser/getUserDetailInfo',
-				data:{
-					token:_this.token
-				},
-				method:"POST",
-				header:{
-					token:_this.myToken
-				},
-				success(res) {
-					_this.userInfo = res.data.result;
-					//更新头像
-					if(_this.userInfo.baseInfo.photo){
-						uni.setStorageSync("avatar"+_this.token,_this.userInfo.baseInfo.photo)
-					}
-					_this.isFollow = _this.userInfo.baseInfo.isFollow; 
-					console.log(_this.userInfo)
-				}
-			})
+			
 		},
 		beforeDestroy() {
 			

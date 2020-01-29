@@ -30,7 +30,7 @@
 		<!-- 底部输入框 -->
 		<view class="position-fixed left-0 right-0 border-top flex align-center" style="background-color: #F7F7F6;height: 105rpx;" 
 		:style="'bottom:'+KeyboardHeight+'px;'">
-			<free-icon-button :icon="(mode === 'audio') ? '\ue618':'\ue656'" @click="changeVoiceOrText"></free-icon-button>
+			<free-icon-button iconClass="font-vg" :icon="(mode === 'audio') ? '\ue618':'\ue656'" @click="changeVoiceOrText"></free-icon-button>
 			<view class="flex-1">
 				<view v-if="mode === 'audio'" class="rounded flex align-center justify-center" style="height: 80rpx;" :class="isRecording?'bg-hover-light':'bg-white'" @touchstart="voiceTouchStart" @touchend="voiceTouchEnd" @touchcancel="voiceTouchCancel" @touchmove="voiceTouchMove">
 					<text class="font">{{isRecording ? '松开 结束':'按住 说话'}}</text>
@@ -39,11 +39,11 @@
 				<textarea v-else fixed class="bg-white rounded p-2 font-md" style="height: 80rpx;" :adjust-position="false" v-model="text" @focus="mode = 'text'"/>
 			</view>
 			<!-- 表情 -->
-			<free-icon-button :icon="'\ue60d'"
+			<free-icon-button iconClass="font-vg" :icon="'\ue60d'"
 			@click="openActionOrEmoticon('emoticon')"></free-icon-button>
 			<template v-if="text.length === 0">
 				<!-- 扩展菜单 -->
-				<free-icon-button :icon="'\ue636'" 
+				<free-icon-button iconClass="font-vg" :icon="'\ue636'" 
 				@click="openActionOrEmoticon('action')"></free-icon-button>
 			</template>
 			<template v-else>
@@ -178,10 +178,12 @@
 				navBarHeight:0,
 				//聊天记录
 				list:[],
+				totalList:[],
 				// 当前操作的气泡索引
 				propIndex:-1,
 				// 输入文字
 				text:"",
+				last_text:"",
 				
 				// 音频录制状态
 				isRecording:false,
@@ -224,7 +226,6 @@
 			
 			
 			uni.$on("get_group_msg",function(){
-		
 				var msg = uni.getStorageSync(_this.myUsername+_this.gid);
 				_this.list=msg;
 				var pageToBottomTimer = setTimeout(()=>{
@@ -238,7 +239,19 @@
 			uni.$off("get_group_msg")
 		},
 		onShow(){			
-		
+			if(!JIM.isLogin()){
+				uni.showToast({
+					"title":"当前已离线,即将返回主页重新登录",
+					"position":"bottom"
+				})
+				var Timer = setTimeout(function(){
+					uni.switchTab({
+						url:"../../tabbar/index/index"
+					})
+					clearTimeout(Timer)
+				},1000)
+				return;
+			}
 			_this=this
 			var msg = uni.getStorageSync(_this.myUsername+_this.gid)||[];
 			
@@ -314,15 +327,13 @@
 							"Authorization": 'Basic MDk5NzA4NzZmMzNlODg0YTM2MjQzMzVjOmU4ZTg3M2U2MDI0NTMxNWE3MGVkZTRiMg=='
 						},
 						success(res) {
-							var msg = res.data.messages
-						
+							var msg = res.data.messages	
 							_this.$data.list=msg;
-							
-							
+				
 							_this.$data.list.map(function(elem,index){
-							    if(elem.msg_type=="image"||elem.msg_body.extras.isAudio){
-							    	_this.setPic(elem.msg_body.media_id,index);
-							    }
+								if(elem.msg_type=="image"||elem.msg_body.extras.isAudio){
+									_this.setPic(elem.msg_body.media_id,index);
+								}
 							})
 							uni.setStorageSync(_this.myUsername+_this.gid,_this.$data.list);	
 							uni.hideLoading()
@@ -427,6 +438,7 @@
 					
 					_this.list.push(obj)
 					
+					
 					// 置于底部
 					var pageToBottomTimer = setTimeout(()=>{
 						_this.pageToBottom()
@@ -474,6 +486,13 @@
 				}
 			})
 		},
+		onPullDownRefresh(){
+			// var list =  _this.list.splice(_this.list.length-20,20);
+			// for(var i =list.length-1;i>=0;i--){
+			// 	_this.list.unshift(list[i])
+			// }
+			// uni.stopPullDownRefresh()
+		},
 		computed: {
 			...mapState({
 				RECORD:state=>state.audio.RECORD,
@@ -514,16 +533,6 @@
 			// 获取操作或者表情列表
 			emoticonOrActionList(){
 				return (this.mode === 'emoticon' || this.mode === 'action') ? this[this.mode+'List'] : []
-			},
-			// 所有信息的图片地址
-			imageList(){
-				let arr = []
-				this.list.forEach((item)=>{
-					if (item.type === 'emoticon' || item.type === 'image') {
-						arr.push(item.data)
-					}
-				})
-				return arr
 			}
 		},
 		watch: {
@@ -648,6 +657,7 @@
 										}
 									}
 									_this.list.push(obj)
+									
 									uni.hideLoading()
 									// 置于底部
 									var pageToBottomTimer = setTimeout(()=>{
@@ -705,6 +715,7 @@
 										}
 									}
 									_this.list.push(obj)
+									
 									
 									// 置于底部
 									var pageToBottomTimer = setTimeout(()=>{
@@ -791,6 +802,12 @@
 					switch(type){
 						case 'text':
 						latest_msg = text;
+						if(_this.last_text == text){
+							_that.text = ''
+							return;
+						}
+						_that.last_text = text;
+						
 						JIM.sendGroupMsg({
 							'target_gid' : _this.gid,
 							'content' : text,
@@ -810,10 +827,10 @@
 							}
 							_this.list.push(obj)
 							
+					
 							// 发送文字成功，清空输入框
-							if (type === 'text') {
-								_that.text = ''
-							}
+							_that.text = ''
+							_that.last_text=''
 							// 置于底部
 							var pageToBottomTimer = setTimeout(()=>{
 								_this.pageToBottom()
@@ -861,7 +878,6 @@
 							}		
 							
 							_this.list.push(obj)				
-							
 							// 置于底部
 							var pageToBottomTimer = setTimeout(()=>{
 								_this.pageToBottom()

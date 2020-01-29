@@ -139,8 +139,23 @@
 				_this.name = item.name;
 				var token = item.token
 				if(item.photo){
-					_this.avatar = item.photo
-					uni.setStorageSync("avatar"+token,item.photo)
+					
+					uni.downloadFile({
+						url: item.photo,
+						success: (res) => {
+							if (res.statusCode === 200) {	
+								uni.saveFile({
+									tempFilePath: res.tempFilePath,
+									success: function (res) {
+										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+										_this.avatar = savedFilePath
+										uni.setStorageSync("avatar"+token,savedFilePath)
+									}
+								});
+							}
+						}
+					});
+					
 				}else{
 					uni.setStorageSync("avatar"+token,"/static/images/userpic.jpg")
 					_this.avatar = "/static/images/userpic.jpg"

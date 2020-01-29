@@ -11,7 +11,7 @@
         ,{
             "path" : "pages/tabbar/find/find",
             "style" : {
-            	"navigationBarTitleText" : "朋友圈",
+            	"navigationBarTitleText" : "国信云",
             	"enablePullDownRefresh" : true,
             	"app-plus" : {
             		"bounce" : "none",
@@ -36,7 +36,9 @@
         }
         ,{
             "path" : "pages/chat/chat/chat",
-            "style" : {}
+            "style" : {
+				// "enablePullDownRefresh" : true
+			}
         }
         ,{
             "path" : "pages/chat/video/video",
@@ -99,7 +101,9 @@
         }
         ,{
             "path" : "pages/group/groupChat/groupChat",
-            "style" : {}
+            "style" : {
+				// "enablePullDownRefresh" : true
+			}
         }
         ,{
             "path" : "pages/group/deleteMember/deleteMember",
@@ -216,7 +220,7 @@
 				"iconPath":"static/tabbar/find.png",
 				"selectedIconPath":"static/tabbar/find-select.png",
 				"pagePath":"pages/tabbar/find/find",
-				"text":"朋友圈"
+				"text":"国信云"
 			},
 			{
 				"iconPath":"static/tabbar/my.png",

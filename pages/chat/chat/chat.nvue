@@ -30,7 +30,7 @@
 		<!-- 底部输入框 -->
 		<view class="position-fixed left-0 right-0 border-top flex align-center" style="background-color: #F7F7F6;height: 105rpx;" 
 		:style="'bottom:'+KeyboardHeight+'px;'">
-			<free-icon-button :icon="(mode === 'audio') ? '\ue618':'\ue656'" @click="changeVoiceOrText"></free-icon-button>
+			<free-icon-button iconClass="font-vg" :icon="(mode === 'audio') ? '\ue618':'\ue656'" @click="changeVoiceOrText"></free-icon-button>
 			<view class="flex-1">
 				<view v-if="mode === 'audio'" class="rounded flex align-center justify-center" style="height: 80rpx;" :class="isRecording?'bg-hover-light':'bg-white'" @touchstart="voiceTouchStart" @touchend="voiceTouchEnd" @touchcancel="voiceTouchCancel" @touchmove="voiceTouchMove">
 					<text class="font">{{isRecording ? '松开 结束':'按住 说话'}}</text>
@@ -39,11 +39,11 @@
 				<textarea v-else fixed class="bg-white rounded p-2 font-md" style="height: 80rpx;" :adjust-position="false" v-model="text" @focus="mode = 'text'"/>
 			</view>
 			<!-- 表情 -->
-			<free-icon-button :icon="'\ue60d'"
+			<free-icon-button iconClass="font-vg" :icon="'\ue60d'"
 			@click="openActionOrEmoticon('emoticon')"></free-icon-button>
 			<template v-if="text.length === 0">
 				<!-- 扩展菜单 -->
-				<free-icon-button :icon="'\ue636'" 
+				<free-icon-button iconClass="font-vg" :icon="'\ue636'" 
 				@click="openActionOrEmoticon('action')"></free-icon-button>
 			</template>
 			<template v-else>
@@ -176,6 +176,7 @@
 				propIndex:-1,
 				// 输入文字
 				text:"",
+				last_text:"",
 				
 				// 音频录制状态
 				isRecording:false,
@@ -236,13 +237,23 @@
 			uni.$off("get_chat_msg")
 		},
 		onShow(){			
+			if(!JIM.isLogin()){
+				uni.showToast({
+					"title":"当前已离线,即将返回主页重新登录",
+					"position":"bottom"
+				})
+				var Timer = setTimeout(function(){
+					uni.switchTab({
+						url:"../../tabbar/index/index"
+					})
+					clearTimeout(Timer)
+				},1000)
+				return;
+			}
 			
 			_this=this
 
 			var msg = uni.getStorageSync(_this.myUsername+_this.username)||[];
-			JIM.resetUnreadCount({
-				'username' : _this.username
-			});
 			if(msg.length>0){
 				_this.list=msg;		
 				// var pageToBottomTimer = setTimeout(()=>{
@@ -283,6 +294,7 @@
 					_this.sendLocationFlag=false
 					
 					_this.list.push(obj)
+					
 					
 					// 置于底部
 					var pageToBottomTimer = setTimeout(()=>{
@@ -342,6 +354,7 @@
 					
 					_this.list.push(obj)
 					
+					
 					// 置于底部
 					var pageToBottomTimer = setTimeout(()=>{
 						_this.pageToBottom()
@@ -361,6 +374,10 @@
 					})
 				});
 			}
+			
+			JIM.resetUnreadCount({
+				'username' : _this.username
+			});
 		},
 		mounted() {
 			// #ifdef APP-PLUS-NVUE
@@ -387,6 +404,11 @@
 					})
 				}
 			})
+		},
+		
+		onPullDownRefresh(){
+			
+			uni.stopPullDownRefresh()
 		},
 		computed: {
 			...mapState({
@@ -601,6 +623,7 @@
 										}
 									}
 									_this.list.push(obj)
+									
 									uni.hideLoading()
 									// 置于底部
 									var pageToBottomTimer = setTimeout(()=>{
@@ -659,6 +682,7 @@
 										}
 									}
 									_this.list.push(obj)
+									
 									
 									// 置于底部
 									var pageToBottomTimer = setTimeout(()=>{
@@ -742,6 +766,13 @@
 					switch(type){
 						case 'text':
 						latest_msg = text;
+						console.log(text)
+						
+						if(_this.last_text == text){
+							_that.text = ''
+							return;
+						}
+						_this.last_text = text;
 						JIM.sendSingleMsg({
 							'target_username' : _this.username,
 							'content' : text,
@@ -761,11 +792,12 @@
 								}
 							}
 							_this.list.push(obj)
+							console.log("push==============")
 							
 							// 发送文字成功，清空输入框
-							if (type === 'text') {
-								_that.text = ''
-							}
+							
+							_that.text = ''
+							_that.last_text = ''
 							// 置于底部
 							var pageToBottomTimer = setTimeout(()=>{
 								_this.pageToBottom()
@@ -834,8 +866,7 @@
 								"title":getCodeMsg(data.code),
 								"position":"bottom"
 							})
-						});
-										
+						});				
 							break;
 					}
 				}

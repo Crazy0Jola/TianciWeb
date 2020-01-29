@@ -4,7 +4,7 @@
 		<view class="home-pic">
 			<view class="home-pic-base">
 				<view class="top-pic">
-					<image class="header" mode="aspectFill" :src="myAvatar||'/static/images/userpic.jpg'" @tap="goView"></image>
+					<image class="header" mode="aspectFill" :src="myAvatar||'/static/images/userpic.jpg'"></image>
 				</view>
 				<text class="top-name font-lg">{{username}}</text>
 			</view>
@@ -28,10 +28,16 @@
 							<image mode="aspectFill" src="/static/video/play.png" @tap="openVideo(post.urlList,post.id)" style="width: 80upx;height: 80upx; position: absolute;top:160upx;left:85upx"></image>
 						</view>
 					</view>
-					
+
+					<!-- 图片 -->
+					<view class="thumbnails" v-else-if="post.urlList.length==1">
+						<view class="my-gallery" v-for="(image, index_images) in post.urlList" :key="index_images">
+							<image class="gallery_img" lazy-load mode="aspectFill" :src="image.url" :data-src="image.url" @tap="previewImage(post.urlList,index_images)"></image>
+						</view>
+					</view>	
 					<!-- 图片 -->
 					<view class="thumbnails" v-else>
-						<view :class="post.urlList.length === 1?'my-gallery':'thumbnail'" v-for="(image, index_images) in post.urlList" :key="index_images">
+						<view class="thumbnail" v-for="(image, index_images) in post.urlList" :key="index_images">
 							<image class="gallery_img" lazy-load mode="aspectFill" :src="image.url" :data-src="image.url" @tap="previewImage(post.urlList,index_images)"></image>
 						</view>
 					</view>	
@@ -39,7 +45,7 @@
 				
 				<!-- 资料条 -->
 				<view class="toolbar">
-					<text class="timestamp font-small">{{getCreateTime(index)}}</text>
+					<text class="timestamp font-small">{{post.createTime.substring(0,19)}}——{{getCreateTime(index)}}</text>
 					<text class="post-username font-small ml-2" v-if="isMine(post.publisherId)"  @click="deletePost(post.id,index)">删除</text>
 					<view class="like" @tap="changeLike(post.id,index)">
 						<image :src="post.like ?'../../../static/moments/like.png': '../../../static/moments/islike.png'"></image>
@@ -152,7 +158,7 @@
 			_this=this;
 			var userData = uni.getStorageSync("setUserData")
 			console.log(userData)
-			_this.myAvatar = userData.photo;
+			_this.myAvatar = "file://"+ userData.photo;
 			_this.username = userData.name;
 			_this.myToken = userData.token;
 			_this.myId = userData.id;
@@ -167,7 +173,6 @@
 			uni.startPullDownRefresh();
 		},
 		onShow() {
-			
 			uni.onWindowResize((res) => { //监听窗口尺寸变化,窗口尺寸不包括底部导航栏
 				if(this.platform === 'ios'){
 					this.windowHeight = res.size.windowHeight;

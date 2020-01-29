@@ -8,6 +8,7 @@
 		debug:false
 	})
 	var SERVER_API="http://117.83.152.39:8081/interconnect/";
+	
 	export default {
 		globalData:{
 			JIM:JIM,
@@ -111,7 +112,7 @@
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
 			    'fontFamily': "iconfont",
-			    'src': "url('https://at.alicdn.com/t/font_1587665_dmuoexg582.ttf')"
+			    'src': "url('https://at.alicdn.com/t/font_1587665_1mh1vquff72.ttf')"
 			});
 			// 初始化录音管理器
 			this.$store.commit('initRECORD')
@@ -155,49 +156,65 @@
 			
 		},
 		onShow: function() {
+			
+			var times = 0;
+			var Interval = setInterval(function(){
+				times +=1;
+				if(!JIM.isInit()){
+					uni.showLoading({
+						title:"聊天系统初始化中..."
+					})
+					var appkey='09970876f33e884a3624335c';
+					var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
+					var timestamp=(new Date()).getTime();
+					var signature;
+					uni.request({
+						url: SERVER_API+'appUser/getJMKey',
+						header: {
+							"token": '1ab5f25e6e44485fb69646158126b6f6',
+							"Content-Type":"application/json"
+						},
+						data:{
+							timestamp:timestamp
+						},
+						success(res) {
+							signature = res.data.result;
+							JIM.init({
+									  "appkey"    : appkey,
+									  "random_str": random_str,
+									  "signature" : signature,
+									  "timestamp" : timestamp,
+									  "flag":1
+							}).onSuccess(function(data) {
+								console.log('Init-success:22222222222222222' + JSON.stringify(data));	
+								uni.$emit("reInit",{})
+								uni.hideLoading()
+							}).onFail(function(data) {
+								uni.hideLoading()
+							    uni.showToast({
+							    	"title":getCodeMsg(data.code),
+							    	"position":"bottom"
+							    })	    
+							});
+						}
+					})
+				}else{
+					console.log("ggggggggggggggggg")
+					clearInterval(Interval);
+				}
+				if(times == 5){
+					plus.runtime.restart();
+					clearInterval(Interval);
+				}
+			},2000)
+			
 			uni.setStorageSync("onShow",true)
 			
-			// uni.getStorageInfo({
-			// 	success: function (res) {
-			// 		console.log(res.keys);
-			// 	}
-			// });
-			if(!JIM.isInit()){
-				var appkey='09970876f33e884a3624335c';
-				var random_str="NkSYvAH3yAw93dqdlto47G9A35xHv4Oa";
-				var timestamp=(new Date()).getTime();
-				var signature;
-				uni.request({
-					url: SERVER_API+'appUser/getJMKey',
-					header: {
-						"token": '1ab5f25e6e44485fb69646158126b6f6',
-						"Content-Type":"application/json"
-					},
-					data:{
-						timestamp:timestamp
-					},
-					success(res) {
-						signature = res.data.result;
-						JIM.init({
-								  "appkey"    : appkey,
-								  "random_str": random_str,
-								  "signature" : signature,
-								  "timestamp" : timestamp,
-								  "flag":1
-						}).onSuccess(function(data) {
-							console.log('Init-success:22222222222222222' + JSON.stringify(data));	
-							uni.$emit("reInit",{})
-							uni.hideLoading()
-						}).onFail(function(data) {
-						    uni.showToast({
-						    	"title":getCodeMsg(data.code),
-						    	"position":"bottom"
-						    })	    
-						});
-					}
-				})
-			}	
-				
+			uni.getStorageInfo({
+				success: function (res) {
+					console.log(res.keys);
+				}
+			});	
 			console.log('App Show')
 		},
 		onHide: function() {

@@ -37,8 +37,7 @@
 		data() {
 			return {
 				keyword:"",
-				list:[],
-				searchList:[]
+				list:[]
 			};
 		},
 		computed:{
@@ -87,6 +86,10 @@
 					_this.list = list;
 					return;
 				}
+				
+				uni.showLoading({
+					"title":"搜索中，请稍候..."
+				})
 				
 				uni.request({
 					url: SERVER_API+ 'appUser/search',

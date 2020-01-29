@@ -94,8 +94,29 @@
 							userdata.password=password;
 									
 							_this.$store.dispatch("setUserData",userdata); //存入状态
+							uni.setStorageSync('setUserData', userdata);
 							try {
-								uni.setStorageSync('setUserData', userdata); //存入缓存
+								if(userdata.photo){
+									uni.downloadFile({
+										url: userdata.photo,
+										success: (res) => {
+											if (res.statusCode === 200) {	
+												uni.saveFile({
+													tempFilePath: res.tempFilePath,
+													success: function (res) {
+														var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+														userdata.photo=savedFilePath;
+														console.log(JSON.stringify(userdata))
+														uni.setStorageSync('setUserData', userdata); //存入缓存
+													}
+												});
+											}
+										}
+									}); 
+								}else{
+									userdata.photo='/static/images/userpic.jpg'
+									uni.setStorageSync('setUserData',userdata)
+								}
 							} catch (e) {
 								// error
 							}
@@ -181,7 +202,6 @@
 									"title":getCodeMsg(data.code),
 									"position":"bottom"
 								})
-								console.log("=======hhh============")
 							});
 						}
 					})

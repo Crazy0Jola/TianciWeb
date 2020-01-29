@@ -2,7 +2,7 @@
 	<view class="flex align-center justify-center" 
  @click="$emit('click')"
 	style="height: 90rpx;width: 90rpx;">
-		<text class="iconfont font-vg" :class="iconClass">{{icon}}</text>
+		<text class="iconfont font-lg" :class="iconClass">{{icon}}</text>
 	</view>
 </template>
 

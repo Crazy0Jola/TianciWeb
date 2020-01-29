@@ -44,11 +44,18 @@
 			_this=this;
 			JIM.getGroups().onSuccess(function(data) {
 				_this.list = data.group_list;
+				console.log(JSON.stringify(_this.list))
 				var len = _this.list.length;
 				for(var i =0;i<len;i++){
-					if(_this.list[i].avatar){
-						_this.getPic(_this.list[i].avatar,i);
+					var avatar = uni.getStorageSync("avatar"+_this.list[i].gid);
+					if(avatar){
+						_this.list[i].avatar = avatar;
+					}else{
+						if(_this.list[i].avatar){
+							_this.getPic(_this.list[i].avatar,i,_this.list[i].gid);
+						}
 					}
+				
 				}
 			//data.code 返回码
 			//data.message 描述
@@ -67,11 +74,25 @@
 			});
 		},
 		methods: {
-			getPic(media_id,index){
+			getPic(media_id,index,gid){
 				JIM.getResource({
 					'media_id' : media_id,
 				}).onSuccess(function(res) {
-					_this.list[index].avatar=res.url;
+					uni.downloadFile({
+						url: res.url,
+						success: (res) => {
+							if (res.statusCode === 200) {	
+								uni.saveFile({
+									tempFilePath: res.tempFilePath,
+									success: function (res) {
+										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+										_this.list[index].avatar=savedFilePath;
+										uni.setStorageSync("avatar"+gid,savedFilePath)	
+									}
+								});
+							}
+						}
+					}); 	
 				}).onFail(function(res) {
 					uni.showToast({
 						"title":getCodeMsg(res.code),

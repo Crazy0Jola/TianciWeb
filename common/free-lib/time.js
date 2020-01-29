@@ -10,20 +10,8 @@ export default{
 		  var valueTime = Date.parse(dateStr.replace(/-/gi,"/"))
 	      let diffTime = Math.abs(new Date().getTime() - new Date(valueTime).getTime())
 	      if (diffTime > 7 * 24 * 3600 * 1000) {
-	        let date = new Date(valueTime)
-	        // let y = date.getFullYear()
-	        let m = date.getMonth() + 1
-	        m = m < 10 ? ('0' + m) : m
-	        let d = date.getDate()
-	        d = d < 10 ? ('0' + d) : d
-	        let h = date.getHours()
-	        h = h < 10 ? ('0' + h) : h
-	        let minute = date.getMinutes()
-	        let second = date.getSeconds()
-	        console.log(second)
-	        minute = minute < 10 ? ('1' + minute) : minute
-	        second = second < 10 ? ('0' + second) : second
-	        return m + '-' + d + ' ' + h + ':' + minute
+	        let dayNum = Math.floor(diffTime / (24 * 60 * 60 * 1000))
+	        return dayNum + '天前'
 	      } else if (diffTime < 7 * 24 * 3600 * 1000 && diffTime > 24 * 3600 * 1000) {
 	        // //注释("一周之内");
 	        // var time = newData - diffTime;
@@ -72,7 +60,7 @@ export default{
 		v1=v1.toString().length<13 ? v1*1000 : v1;
 		v2=v2.toString().length<13 ? v2*1000 : v2;
 		if(((parseInt(v1)-parseInt(v2))/1000) > 300){
-			return this.gettime(v1);
+			return this.getchattime(v1);
 		}
 	},
 	// 人性化时间格式
@@ -81,15 +69,49 @@ export default{
 		let now = (new Date()).getTime();
 		let cha = (now-parseInt(shorttime))/1000;
 		
-		if (cha < 43200) {
+		if (cha < 60*60*12) {
 			// 当天
 			return this.dateFormat(new Date(shorttime),"{hh}:{ii}");
-		} else if(cha < 518400){
+		} else if(cha < 60 * 60 * 24 * 365){
 			// 隔天 显示日期+时间
 			return this.dateFormat(new Date(shorttime),"{Mon}月{DD}日");
 		} else {
 			// 隔年 显示完整日期+时间
 			return this.dateFormat(new Date(shorttime),"{Y}-{MM}-{DD}");
+		}
+	},
+	
+	isYesterday(time) {
+		 const date = new Date();
+		 const year = date.getFullYear();
+		const month = date.getMonth() + 1;
+		const day = date.getDate();
+		const today = `${year}/${month}/${day}`; 
+		const todayTime = new Date(today).getTime(); // 当天凌晨的时间
+		const yesterdayTime = new Date(todayTime - 24 * 60 * 60 * 1000).getTime(); // 昨天凌晨的时间
+		return time < todayTime && yesterdayTime <= time;
+	},
+	
+	// 人性化时间格式
+	getchattime(shorttime){
+		shorttime=shorttime.toString().length<13 ? shorttime*1000 : shorttime;
+		let now = (new Date()).getTime();
+		let cha = (now-parseInt(shorttime))/1000;
+		
+		if (cha < 60*60*12) {
+			// 当天
+			return this.dateFormat(new Date(shorttime),"{A} {h}:{ii}");
+		} else if(cha < 60 * 60 * 24 * 365){
+			//昨天
+			if(this.isYesterday(shorttime)){
+				return '昨天 '+this.dateFormat(new Date(shorttime),"{h}:{ii}");
+			}else{
+				// 隔天 显示日期+时间
+				return this.dateFormat(new Date(shorttime),"{Mon}月{DD}日 {A} {h}:{ii}");
+			}
+		} else {
+			// 隔年 显示完整日期+时间
+			return this.dateFormat(new Date(shorttime),"{Y}-{MM}-{DD} {A} {h}:{ii}");
 		}
 	},
 	
@@ -112,7 +134,15 @@ export default{
 		dateObj["hh"] = this.parseNumber(dateObj["h"]);
 		dateObj["t"] = dateObj["h"] > 12 ? dateObj["h"] - 12 : dateObj["h"];
 		dateObj["tt"] = this.parseNumber(dateObj["t"]);
-		dateObj["A"] = dateObj["h"] > 12 ? '下午' : '上午';
+		var str;
+		if(dateObj["h"] < 12){
+			str = "上午"
+		}else if(dateObj["h"] < 18){
+			str = "下午"
+		}else{
+			str = "晚上"
+		}
+		dateObj["A"] = str;
 		dateObj["i"] = date.getMinutes();
 		dateObj["ii"] = this.parseNumber(dateObj["i"]);
 		dateObj["s"] = date.getSeconds();

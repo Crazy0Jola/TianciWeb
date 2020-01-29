@@ -130,17 +130,38 @@
 
 				_this.gdes=data.group_info.desc
 				_this.gname=data.group_info.name
-				if(data.group_info.avatar){
-					JIM.getResource({
-						'media_id' : data.group_info.avatar,
-					}).onSuccess(function(data) {
-						_this.gavatar=data.url;
-					}).onFail(function(data) {
-						uni.showToast({
-							"title":getCodeMsg(data.code),
-							"position":"bottom"
-						})
-					});
+				
+				var avatar = uni.getStorageSync("avatar"+_this.gid);
+				if(avatar){
+					_this.gavatar=avatar;
+				}else{
+					if(data.group_info.avatar){
+						JIM.getResource({
+							'media_id' : data.group_info.avatar,
+						}).onSuccess(function(data) {
+							
+							uni.downloadFile({
+								url: data.url,
+								success: (res) => {
+									if (res.statusCode === 200) {	
+										uni.saveFile({
+											tempFilePath: res.tempFilePath,
+											success: function (res) {
+												var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+												_this.gavatar=savedFilePath;
+												uni.setStorageSync("avatar"+_this.gid,savedFilePath)	
+											}
+										});
+									}
+								}
+							}); 
+						}).onFail(function(data) {
+							uni.showToast({
+								"title":getCodeMsg(data.code),
+								"position":"bottom"
+							})
+						});
+					}
 				}
 			}).onFail(function(data) {
 				uni.showToast({
@@ -159,23 +180,33 @@
 					if(data.member_list[i].username==_this.myUsername&&data.member_list[i].flag==1){
 						_this.isAdmin=true
 					}
-					tokenList.push(data.member_list[i].username)
-				}			
-				
-				uni.request({
-					url:SERVER_API+'appUser/getUserPhotoByToken',
-					data:tokenList,
-					header:{
-						token:uni.getStorageSync("setUserData").token
-					},
-					method:"POST",
-					success(res){
-						for(var i=0;i<len;i++){
-							var name= _this.memberList[i].username;
-							_this.memberList[i].avatar=res.data.result[name]
-						}					
+					var avatar = uni.getStorageSync("avatar"+data.member_list[i].username)
+					console.log(avatar)
+					if(avatar){
+						_this.memberList[i].avatar=avatar;
+					}else{
+						tokenList.push(data.member_list[i].username)
 					}
-				})
+				}		
+				if(tokenList.length>0){
+					uni.request({
+						url:SERVER_API+'appUser/getUserPhotoByToken',
+						data:tokenList,
+						header:{
+							token:uni.getStorageSync("setUserData").token
+						},
+						method:"POST",
+						success(res){
+							for(var i=0;i<len;i++){
+								var name= _this.memberList[i].username;
+								var avatar = uni.getStorageSync("avatar"+name);
+								if(!avatar){
+									_this.setPic(res.data.result[name],i,name)
+								}
+							}					
+						}
+					})
+				}
 				
 				//data.code 返回码
 				//data.message 描述
@@ -197,6 +228,23 @@
 			_this.myUsername=uni.getStorageSync("setUserData").username;
 		},
 		methods: {
+			setPic(url,index,name){
+				uni.downloadFile({
+					url: url,
+					success: (res) => {
+						if (res.statusCode === 200) {	
+							uni.saveFile({
+								tempFilePath: res.tempFilePath,
+								success: function (res) {
+									var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+									_this.memberList[index].avatar=savedFilePath;
+									uni.setStorageSync("avatar"+name,savedFilePath)	
+								}
+							});
+						}
+					}
+				});
+			},
 			changeGavatar(){
 				if(_this.isAdmin){
 					uni.chooseImage({
