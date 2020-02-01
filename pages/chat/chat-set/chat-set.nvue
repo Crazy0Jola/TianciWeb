@@ -27,9 +27,9 @@
 			</view>
 		</view>
 		<free-divider></free-divider>
-		<free-list-item title="群头像" showRight :showRightIcon="false" :showLeftIcon="false" @click="changeGavatar">
+		<free-list-item title="群头像" showRight :showRightIcon="false" :showLeftIcon="false" >
 			<view slot="right" class="position-relative p-1">
-				<free-avater :src="gavatar?gavatar:'/static/images/grouppic.jpg'" size="80"
+				<free-avater @click="changeGavatar" :src="gavatar?gavatar:'/static/images/grouppic.jpg'" size="80"
 				></free-avater>
 			</view>
 		</free-list-item>
@@ -181,7 +181,6 @@
 						_this.isAdmin=true
 					}
 					var avatar = uni.getStorageSync("avatar"+data.member_list[i].username)
-					console.log(avatar)
 					if(avatar){
 						_this.memberList[i].avatar=avatar;
 					}else{
@@ -270,9 +269,10 @@
 						}
 					})
 				}else{
+					
 					uni.previewImage({
-						current:_this.gavatar,
-						urls:[_this.gavatar],
+						current:"file://"+_this.gavatar,
+						urls:["file://"+_this.gavatar],
 					})
 				}
 			},

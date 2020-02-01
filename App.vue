@@ -199,22 +199,17 @@
 						}
 					})
 				}else{
-					console.log("ggggggggggggggggg")
 					clearInterval(Interval);
 				}
-				if(times == 5){
-					plus.runtime.restart();
-					clearInterval(Interval);
-				}
-			},2000)
+			},3000)
 			
 			uni.setStorageSync("onShow",true)
 			
-			uni.getStorageInfo({
-				success: function (res) {
-					console.log(res.keys);
-				}
-			});	
+			// uni.getStorageInfo({
+			// 	success: function (res) {
+			// 		console.log(res.keys);
+			// 	}
+			// });	
 			console.log('App Show')
 		},
 		onHide: function() {

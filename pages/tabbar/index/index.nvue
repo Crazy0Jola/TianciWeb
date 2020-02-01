@@ -141,6 +141,7 @@
 			_this= this;
 			_this.isLogin()
 			if(JIM.isLogin()){
+				console.log("JIM已登录")
 				//获取会话列表
 				JIM.getConversation().onSuccess(function(data) {
 					// console.log('success:Conversation222222===========' + JSON.stringify(data));
@@ -184,6 +185,7 @@
 				});
 			
 			}else{
+				console.log("JIM未登录")
 				const value = uni.getStorageSync('setUserData');
 				if (value) {
 					//有登录信息
@@ -669,14 +671,8 @@
 				try {
 					const value = uni.getStorageSync('setUserData');
 					if (value) {
-						//有登录信息
-						// console.log("已登录用户：",value);	
-						// if(!JIM.isLogin()){
-						// 	uni.showLoading({
-						// 		title:"聊天系统初始化中..."
-						// 	})
-						// 	// _this.login(value.username,value.password)			
-						// }
+						console.log("已登录")
+						console.log(value)
 					}else{
 						uni.reLaunch({
 							url: '../../login/login',

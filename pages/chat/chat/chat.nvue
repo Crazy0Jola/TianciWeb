@@ -13,11 +13,14 @@
 		@click="clickPage">
 			
 			<!-- 聊天信息列表组件 -->
-			<block v-for="(item,index) in list" :key="index">
-				<free-chat-item :item="item" :avatar="avatar" :myUsername="myUsername" :myAvatar="myAvatar" :index="index" ref="chatItem"
-				:pretime=" index > 0 ? list[index-1].create_time : 0"
-				@long="long" @preview="previewImage"></free-chat-item>
-			</block>
+			<list>
+				<yy-refresh :refresh-text="refreshText" @refresh="onRefresh" ref="yyRefresh"></yy-refresh>
+				<cell v-for="(item,index) in list" :key="index">
+					<free-chat-item :item="item" :avatar="item.avatar" :myUsername="myUsername" :myAvatar="myAvatar" :index="index" ref="chatItem"
+					:pretime=" index > 0 ? list[index-1].create_time : 0"
+					@long="long" @preview="previewImage"></free-chat-item>
+				</cell>
+			</list>
 		</scroll-view>
 		
 		<!-- #ifdef APP-PLUS-NVUE -->
@@ -112,7 +115,7 @@
 	import freeMainButton from '@/components/free-ui/free-main-button.vue';
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
 	import permision from "@/js_sdk/wa-permission/permission.js"
-	
+	import yyRefresh from '@/components/yy-refresh/yy-refresh.nvue';
 	import { mapState,mapMutations } from 'vuex'
 	var _this;
 	var JIM = getApp().globalData.JIM;
@@ -123,7 +126,8 @@
 			freeIconButton,
 			freeChatItem,
 			freePopup,
-			freeMainButton
+			freeMainButton,
+			yyRefresh
 		},
 		data() {
 			return {
@@ -171,7 +175,9 @@
 				// }
 				],
 				navBarHeight:0,
-				list:[],
+				list:[],//聊天页面list
+				tmpList:[],//临时总的list 用于分页splice
+				totalList:[], //总的list
 				// 当前操作的气泡索引
 				propIndex:-1,
 				// 输入文字
@@ -219,11 +225,34 @@
 			_this.myAvatar = userData.photo;
 			_this.myUsername = userData.username;
 			
+			
+			var msg = uni.getStorageSync(_this.myUsername+_this.username)||[];
+			if(msg.length>0){
+				_this.tmpList=msg.concat();
+				_this.totalList=msg.concat();
+				if(msg.length>20){
+					_this.list = _this.tmpList.splice(_this.tmpList.length-20,20);	
+				}else{
+					_this.list = msg;
+				}
+				
+				// var pageToBottomTimer = setTimeout(()=>{
+				// 	_this.pageToBottom()
+				// 	clearTimeout(pageToBottomTimer)
+				// },500)
+			}
+			
 			uni.$on("get_chat_msg",function(){
 				// console.log("===================有新消息来啦=====================")
 				var msg = uni.getStorageSync(_this.myUsername+_this.username);
-				
-				_this.list=msg;
+				console.log(msg.length)
+				_this.totalList=msg.concat();
+				_this.tmpList=msg.concat();
+				if(msg.length>20){
+					_this.list = _this.tmpList.splice(_this.tmpList.length-20,20);	
+				}else{
+					_this.list = _this.tmpList.splice(0,msg.length);
+				}
 				var pageToBottomTimer = setTimeout(()=>{
 					_this.pageToBottom()
 					clearTimeout(pageToBottomTimer)
@@ -253,14 +282,7 @@
 			
 			_this=this
 
-			var msg = uni.getStorageSync(_this.myUsername+_this.username)||[];
-			if(msg.length>0){
-				_this.list=msg;		
-				// var pageToBottomTimer = setTimeout(()=>{
-				// 	_this.pageToBottom()
-				// 	clearTimeout(pageToBottomTimer)
-				// },500)
-			}
+			
 			if(this.title&&this.sendLocationFlag){
 				
 				JIM.sendSingleLocation({
@@ -294,7 +316,7 @@
 					_this.sendLocationFlag=false
 					
 					_this.list.push(obj)
-					
+					_this.totalList.push(obj)
 					
 					// 置于底部
 					var pageToBottomTimer = setTimeout(()=>{
@@ -307,7 +329,7 @@
 					   'extras' : {'latest_msg':"[位置]"+_this.title}
 					});
 					
-					uni.setStorageSync(_this.myUsername+_this.username,_this.list);
+					uni.setStorageSync(_this.myUsername+_this.username,_this.totalList);
 					
 				}).onFail(function(data) {
 					uni.showToast({
@@ -353,7 +375,7 @@
 					_this.sendCardFlag=false
 					
 					_this.list.push(obj)
-					
+					_this.totalList.push(obj)
 					
 					// 置于底部
 					var pageToBottomTimer = setTimeout(()=>{
@@ -366,7 +388,7 @@
 					   'extras' : {'latest_msg':"[个人名片]"+_this.cardName}
 					});
 					
-					uni.setStorageSync(_this.myUsername+_this.username,_this.list);
+					uni.setStorageSync(_this.myUsername+_this.username,_this.totalList);
 				}).onFail(function(data) {
 					uni.showToast({
 						"title":getCodeMsg(data.code),
@@ -406,10 +428,6 @@
 			})
 		},
 		
-		onPullDownRefresh(){
-			
-			uni.stopPullDownRefresh()
-		},
 		computed: {
 			...mapState({
 				RECORD:state=>state.audio.RECORD,
@@ -542,8 +560,8 @@
 									tempFilePath: res.tempFilePath,
 									success: function (res) {
 										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-										_this.$data.list[index].msg_body.media_id=savedFilePath;
-										uni.setStorageSync(_this.myUsername+_this.username,_this.$data.list);									
+										_this.$data.totalList[index].msg_body.media_id=savedFilePath;
+										uni.setStorageSync(_this.myUsername+_this.username,_this.$data.totalList);									
 									}
 								});
 							}
@@ -623,7 +641,7 @@
 										}
 									}
 									_this.list.push(obj)
-									
+									_this.totalList.push(obj)
 									uni.hideLoading()
 									// 置于底部
 									var pageToBottomTimer = setTimeout(()=>{
@@ -636,7 +654,7 @@
 									   'extras' : {'latest_msg':latest_msg}
 									});
 									
-									uni.setStorageSync(_this.myUsername+_this.username,_this.list);
+									uni.setStorageSync(_this.myUsername+_this.username,_this.totalList);
 								}).onFail(function(data) {
 									
 									uni.hideLoading()
@@ -682,7 +700,7 @@
 										}
 									}
 									_this.list.push(obj)
-									
+									_this.totalList.push(obj)
 									
 									// 置于底部
 									var pageToBottomTimer = setTimeout(()=>{
@@ -695,7 +713,7 @@
 									   'extras' : {'latest_msg':latest_msg}
 									});
 									
-									uni.setStorageSync(_this.myUsername+_this.username,_this.list);
+									uni.setStorageSync(_this.myUsername+_this.username,_this.totalList);
 								}).onFail(function(data) {
 									uni.showToast({
 										"title":getCodeMsg(data.code),
@@ -737,7 +755,8 @@
 										"my":true
 									}
 									_this.list.push(obj)
-									uni.setStorageSync(_this.myUsername+_this.username,_this.list);
+									_this.totalList.push(obj)
+									uni.setStorageSync(_this.myUsername+_this.username,_this.totalList);
 									
 									// 置于底部
 									var pageToBottomTimer = setTimeout(()=>{
@@ -792,6 +811,7 @@
 								}
 							}
 							_this.list.push(obj)
+							_this.totalList.push(obj)
 							console.log("push==============")
 							
 							// 发送文字成功，清空输入框
@@ -809,7 +829,7 @@
 							   'extras' : {'latest_msg':latest_msg}
 							});
 							
-							uni.setStorageSync(_this.myUsername+_this.username,_this.list);
+							uni.setStorageSync(_this.myUsername+_this.username,_this.totalList);
 						
 						}).onFail(function(data) {
 							uni.showToast({
@@ -847,7 +867,7 @@
 							}		
 							
 							_this.list.push(obj)				
-							
+							_this.totalList.push(obj)
 							// 置于底部
 							var pageToBottomTimer = setTimeout(()=>{
 								_this.pageToBottom()
@@ -859,7 +879,7 @@
 							   'extras' : {'latest_msg':latest_msg}
 							});
 							
-							uni.setStorageSync(_this.myUsername+_this.username,_this.list);
+							uni.setStorageSync(_this.myUsername+_this.username,_this.totalList);
 						
 						}).onFail(function(data) {
 							uni.showToast({
@@ -1061,6 +1081,21 @@
 				uni.navigateTo({
 					url: `/pages/mail/user-base/user-base?token=${_this.username}`
 				});
+			},
+			
+			onRefresh() {
+				if(_this.tmpList.length==0){
+					this.$refs.yyRefresh.stop();
+				}
+				setTimeout(() => {
+					if(_this.tmpList.length>=20){
+						_this.list  = _this.tmpList.splice(_this.tmpList.length-20,20).concat(_this.list)
+						
+					}else{
+						_this.list = _this.tmpList.splice(0,20).concat(_this.list)
+					}
+					this.$refs.yyRefresh.finish();
+				}, 300);
 			}
 		}
 	}

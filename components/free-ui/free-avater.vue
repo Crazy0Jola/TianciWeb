@@ -1,5 +1,5 @@
 <template>
-	<image :src="src" mode="aspectFill" :style="getStyle" :class="type" @click="clickEvent"></image>
+	<image :src="getSrc" mode="aspectFill" :style="getStyle" :class="type" @click="clickEvent"></image>
 </template>
 
 <script>
@@ -27,6 +27,13 @@
 			}
 		},
 		computed: {
+			getSrc(){
+				if(this.src.indexOf("Android")!=-1){
+					return "file://"+this.src;
+				}else{
+					return this.src
+				}
+			},
 			getStyle() {
 				return `width: ${this.size}rpx;height: ${this.size}rpx;`
 			}
