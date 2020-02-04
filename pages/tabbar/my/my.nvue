@@ -16,62 +16,12 @@
 		</free-list-item>
 		<free-divider></free-divider>
 		
-		<free-list-item title="社圈" showRight @click="openSQ">
-			<text slot="icon" class="iconfont font-lg py-1 text-sq">&#xe631;</text>
-		</free-list-item>
-		<free-list-item  title="企业名录" showRight @click="openQY">
-			<text slot="icon" class="iconfont font-lg py-1 text-qy">&#xe702;</text>
-		</free-list-item>
-		<free-list-item  title="疫情地图" showRight @click="openYQDT">
-			<text slot="icon" class="iconfont font-lg py-1 text-red">&#xe6a9;</text>
-		</free-list-item>
-		<free-list-item v-if="getTCB()" title="天赐币" showRight @click="openTCB">
-			<text slot="icon" class="iconfont font-lg py-1 text-tcb">&#xe629;</text>
-		</free-list-item>
-		<free-list-item v-if="getWS()" title="微视" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-ws">&#xe65d;</text>
-		</free-list-item>
-		<free-list-item v-if="getZB()" title="直播" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-zb">&#xe61e;</text>
-		</free-list-item>
-		<free-list-item v-if="getYS()" title="影视" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-ys">&#xe610;</text>
-		</free-list-item>
-		<free-list-item v-if="getWY()" title="网游" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-wy">&#xe6cf;</text>
-		</free-list-item>
-		<free-list-item v-if="getSY()" title="手游" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-sy">&#xe69e;</text>
-		</free-list-item>
-		<free-divider></free-divider>
-		<free-list-item v-if="getJJ()" title="国际接机" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-jj">&#xe6aa;</text>
-		</free-list-item>
-		<free-list-item v-if="getQYFW()" title="企业服务" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-qyfw">&#xe6e2;</text>
-		</free-list-item>
-		<free-list-item v-if="getZWFW()" title="政务服务" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-zwfw">&#xe668;</text>
-		</free-list-item>
-		<free-list-item v-if="getSHFW()" title="生活服务" showRight @click="openNone">
-			<text slot="icon" class="iconfont font-lg py-1 text-shfw">&#xe60e;</text>
-		</free-list-item>
-		<free-divider v-if="getSecond()"></free-divider>
-		<free-list-item v-if="getBM()" title="部门组织" showRight @click="openBM">
-			<text slot="icon" class="iconfont font-lg py-1 text-bm">&#xecd2;</text>
-		</free-list-item>
-		<free-list-item v-if="getLS()" title="历史朝代" showRight @click="openLS">
-			<text slot="icon" class="iconfont font-lg py-1 text-ls">&#xe60c;</text>
-		</free-list-item>
-		<free-list-item v-if="getHY()" title="行业划分" showRight @click="openHY">
-			<text slot="icon" class="iconfont font-lg py-1 text-hy">&#xe60f;</text>
-		</free-list-item>
-		<free-list-item v-if="getXZ()" title="行政划分" showRight @click="openXZ">
-			<text slot="icon" class="iconfont font-lg py-1 text-xz">&#xe603;</text>
-		</free-list-item>
-		<free-divider v-if="getThird()"></free-divider>
-		<free-list-item title="我要邀请" showRight @click="openYQ">
-			<text slot="icon" class="iconfont font-lg py-1 text-yq">&#xe652;</text>
+		<block v-for="(item,index) in appList" :key="index">
+			<free-list-item v-for="(item2,index2) in filterList(item.data,item.groupId)" :key="index2" :title="item2.title" showRight @click="openUrl(item2.url)" coverSize="40" :cover="item2.icon">
+			</free-list-item>
+			<free-divider v-if="showDivider(item.groupId)"></free-divider>
+		</block>
+		<free-list-item cover="http://oos-cn.ctyunapi.cn/interconnect-container/application/YQ.png" coverSize="40" title="我要邀请" showRight @click="openUrl('http://117.83.152.39:8081/download/download.html')">
 		</free-list-item>
 		<free-divider></free-divider>
 		
@@ -116,11 +66,19 @@
 			return {
 				avatar:"",
 				name:"",
-				phone:""
+				phone:"",
+				appList:[]
 			}
 		},
 		onLoad(){
 			_this = this;
+			uni.request({
+				url:SERVER_API+ "appWeb/getApplications",
+				method:"POST",
+				success(res) {
+					_this.appList=res.data;
+				}
+			})
 		},
 		onShow(){
 			this.$forceUpdate();
@@ -167,6 +125,39 @@
 			
 		},
 		methods: {
+			filterList:function(list,groupId){
+				var num=list.length;
+				return list.filter(function(item){
+					if(item.fixed){
+						uni.setStorageSync("num"+groupId,num)
+						return true;
+					}else if(item.showDefault){
+						var flag = uni.getStorageSync("application"+item.id);
+						if(flag){
+							uni.setStorageSync("num"+groupId,num)
+							return true;
+						}else if(!flag){
+							num--;
+							uni.setStorageSync("num"+groupId,num)
+							return false;
+						}else{
+							uni.setStorageSync("application"+item.id,true);
+							uni.setStorageSync("num"+groupId,num)
+							return true;
+						}
+					}else{
+						var flag = uni.getStorageSync("application"+item.id)||false;
+						if(!flag){
+							num--;
+						}
+						uni.setStorageSync("num"+groupId,num)
+						return flag;
+					}
+				})
+			},
+			showDivider(id){
+				return uni.getStorageSync("num"+id)>0;
+			},
 			changeAvatar(){
 				uni.chooseImage({
 					count:1,
@@ -221,119 +212,16 @@
 					url:"../../mine/mine"
 				})
 			},
-			getSQ(){
-				return uni.getStorageSync("QY")||false;;
-			},
-			getQY(){
-				return uni.getStorageSync("QY")||false;
-			},
-			getTCB(){
-				return uni.getStorageSync("TCB")||false;
-			},
-			getWS(){
-				return uni.getStorageSync("WS")||false;
-			},
-			getZB(){
-				return uni.getStorageSync("ZB")||false;
-			},
-			getYS(){
-				return uni.getStorageSync("YS")||false;
-			},
-			getWY(){
-				return uni.getStorageSync("WY")||false;
-			},
-			getSY(){
-				return uni.getStorageSync("SY")||false;
-			},
-			getJJ(){
-				return uni.getStorageSync("JJ")||false;
-			},
-			getQYFW(){
-				return uni.getStorageSync("QYFW")||false;
-			},
-			getZWFW(){
-				return uni.getStorageSync("ZWFW")||false;
-			},
-			getSHFW(){
-				return uni.getStorageSync("SHFW")||false;
-			},
-			getBM(){
-				return uni.getStorageSync("BM")||false;
-			},
-			getLS(){
-				return uni.getStorageSync("LS")||false;
-			},
-			getHY(){
-				return uni.getStorageSync("HY")||false;
-			},
-			getXZ(){
-				return uni.getStorageSync("XZ")||false;
-			},
-			getSecond(){
-				var num = uni.getStorageSync("second")|| 0;
-				if( num>0){
-					return true;
+			openUrl(url){
+				if(url=="none"){
+					_this.$refs.none.show((close)=>{
+						close()
+					})
 				}else{
-					return false;
-				}			
-			},
-			getThird(){
-				var num = uni.getStorageSync("third")|| 0;
-				if( num>0){
-					return true;
-				}else{
-					return false;
-				}			
-			},
-			openSQ(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=http://117.83.152.39:8085/',
-				});
-			},
-			openQY(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=http://117.83.152.39:8082/',
-				});
-			},
-			openYQDT(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=https://ncportal.esrichina.com.cn/2019-nCoV/mobile.html',
-				});
-			},
-			openTCB(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=http://117.83.152.39:8081/home/tcb.html',
-				});
-			},
-			openBM(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=http://117.83.152.39:8083/&type=1',
-				});
-			},
-			openLS(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=http://117.83.152.39:8083/&type=2',
-				});
-			},
-			openHY(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=http://117.83.152.39:8083/&type=4',
-				});
-			},
-			openXZ(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=http://117.83.152.39:8083/&type=3',
-				});
-			},
-			openYQ(){
-				uni.navigateTo({
-					url: '../../webview/webview?url=http://117.83.152.39:8081/download/download.html',
-				});
-			},
-			openNone(){
-				this.$refs.none.show((close)=>{
-					close()
-				})
+					uni.navigateTo({
+						url: '../../webview/webview?url='+url.replace("?","&"),
+					});
+				}
 			},
 			goSetting(){
 				uni.navigateTo({

@@ -13,9 +13,9 @@
 		@click="clickPage">
 			
 			<!-- 聊天信息列表组件 -->
-			<list>
+			<list :show-scrollbar="false">
 				<yy-refresh :refresh-text="refreshText" @refresh="onRefresh" ref="yyRefresh"></yy-refresh>
-				<cell v-for="(item,index) in list" :key="index">
+				<cell v-for="(item,index) in list" :key="item.msg_id">
 					<free-chat-item :item="item" :avatar="item.avatar" :myUsername="myUsername" :myAvatar="myAvatar" :index="index" ref="chatItem"
 					:pretime=" index > 0 ? list[index-1].create_time : 0"
 					@long="long" @preview="previewImage"></free-chat-item>
@@ -142,6 +142,8 @@
 				gid:"",
 				//我的用户名
 				myUsername:"",
+				//我的昵称
+				myName:'',
 				//我的头像
 				myAvatar:"/static/images/userpic.jpg",
 				// 扩展菜单列表
@@ -171,13 +173,7 @@
 				//长按菜单
 				menus:[{ 
 					name:"复制",
-					event:'',
-				},{ 
-					name:"删除",
-					event:''
-				},{ 
-					name:"撤回",
-					event:'removeChatItem'
+					event:'copy',
 				}],
 				//导航栏高度
 				navBarHeight:0,
@@ -214,6 +210,7 @@
 				
 				//视频相关
 				poster:'',//视频封面
+				
 			}
 		},
 		onBackPress(){
@@ -223,26 +220,33 @@
 			return true;
 		},
 		onLoad: async function(e){
+			
 			_this=this;
 			this.requestAndroidPermission('android.permission.RECORD_AUDIO')
 			_this.gid = e.gid;
 			_this.gname = e.gname;
 			var userData = uni.getStorageSync("setUserData");
 			_this.myAvatar = userData.photo;
+			_this.myName = userData.name;
 			_this.myUsername = userData.username;
 			
 			var msg = uni.getStorageSync(_this.myUsername+_this.gid)||[];
 			
+			
 			if(msg.length>0){
 				_this.tmpList=msg.concat();
 				_this.totalList=msg.concat();
-				console.log(_this.tmpList.length)
-				if(msg.length>20){
-					_this.list = _this.tmpList.splice(_this.tmpList.length-20,20);	
-				}else{
-					_this.list = _this.tmpList.splice(0,msg.length);
-				}
+				console.log(_this.tmpList[0])
 				
+				if(e.index){
+					_this.list = _this.tmpList.splice(e.index);	
+				}else{
+					if(msg.length>20){
+						_this.list = _this.tmpList.splice(_this.tmpList.length-20,20);	
+					}else{
+						_this.list = _this.tmpList.splice(0,msg.length);
+					}
+				}
 				// var pageToBottomTimer = setTimeout(()=>{
 				// 	_this.pageToBottom()
 				// 	clearTimeout(pageToBottomTimer)
@@ -312,6 +316,7 @@
 					},
 					success:async function(res) {
 						var msg = res.data.messages	
+						console.log(JSON.stringify(msg[0]))
 						var len = msg.length
 						if(msg.length>100){
 							_this.$data.tmpList=msg.splice(len-100,100);
@@ -348,7 +353,9 @@
 					clearTimeout(pageToBottomTimer)
 				},200)
 			})
-			_this.pageToBottom()
+			if(!e.index){
+				_this.pageToBottom();
+			}		
 		},
 		onUnload(){
 			uni.$off("get_group_msg")
@@ -841,6 +848,10 @@
 							},
 						}).onSuccess(function(data) {
 							var obj = {
+								"target_type":"group",
+								"target_name":_this.gname,
+								"target_id":_this.gid,
+								"from_name":_this.myName,
 								"from_id": _this.myUsername,
 								"create_time": (new Date()).getTime(),				
 								"msg_type": type,
@@ -969,19 +980,36 @@
 				return date;
 			},
 			// 长按消息气泡
-			// long({x,y,index}){
-			// 	// 初始化 索引
-			// 	this.propIndex = index
-			// 	// 显示扩展菜单
-			// 	this.$refs.extend.show(x,y)
-			// },
+			long({x,y,index}){
+				// 初始化 索引
+				this.propIndex = index
+				if(_this.list[index].msg_type=="text"&&!_this.list[index].msg_body.extras.isEmotion){
+					// 显示扩展菜单
+					this.$refs.extend.show(x,y)
+				}
+			},
 			// 操作菜单方法分发
 			clickEvent(event){
 				switch (event){
+					case 'copy'://复制
+					if (this.propIndex > -1) {
+						uni.setClipboardData({
+						    data: this.list[this.propIndex].msg_body.text,
+						    success: function () {
+						        console.log('success');
+						    }
+						});
+					}
+						break;
 					case 'removeChatItem': // 撤回消息
 					// 拿到当前被操作的信息
 					if (this.propIndex > -1) {
 						this.list[this.propIndex].msg_body.extras.isremove = true
+					}
+						break;
+					case 'delete'://删除
+					if (this.propIndex > -1) {
+						this.list.splice(this.propIndex,1)
 					}
 						break;
 					default:
@@ -1120,22 +1148,37 @@
 			},
 			// 打开聊天信息设置
 			openChatSet(){
+				uni.hideKeyboard()
 				uni.navigateTo({
 					url: `../../chat/chat-set/chat-set?gid=${_this.gid}&gname=${_this.gname}`,
 				});
 			},
 			
 			onRefresh() {
+				
 				if(_this.tmpList.length==0){
 					this.$refs.yyRefresh.stop();
 				}
 				setTimeout(() => {
+					var len;
 					if(_this.tmpList.length>=20){
+						len=20;
 						_this.list  = _this.tmpList.splice(_this.tmpList.length-20,20).concat(_this.list)
 						
 					}else{
+						len=_this.tmpList.length;
 						_this.list = _this.tmpList.splice(0,20).concat(_this.list)
 					}
+					console.log(len)
+					_this.$nextTick(()=>{
+						let chatItem = _this.$refs.chatItem			
+						
+						dom.scrollToElement(chatItem[len],{
+							offset:0,
+							animated:false
+						})
+					})
+					
 					this.$refs.yyRefresh.finish();
 				}, 300);
 			}

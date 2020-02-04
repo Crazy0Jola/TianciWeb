@@ -65,16 +65,16 @@
 						});
 					}else if(this.item.type==4){//群聊
 						var gid = this.item.gid;
-						var ganme = this.item.name;
+						var gname = this.item.name;
 						uni.navigateTo({
-							url: '/pages/group/groupChat/groupChat?gid='+gid+'&gname='+ganme,
+							url: '/pages/group/groupChat/groupChat?gid='+gid+'&gname='+gname,
 						});
 					}
 				}else{
 					var gid = this.item.gid;
-					var ganme = this.item.name;
+					var gname = this.item.name;
 					uni.navigateTo({
-						url: '/pages/group/groupChat/groupChat?gid='+gid+'&gname='+ganme,
+						url: '/pages/group/groupChat/groupChat?gid='+gid+'&gname='+gname,
 					});
 				}	
 			},

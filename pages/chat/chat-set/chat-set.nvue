@@ -51,8 +51,8 @@
 		</view>
 			
 		<free-divider></free-divider>
-		<!-- <free-list-item title="查找聊天记录" showRight :showLeftIcon="false"></free-list-item> -->
-		<!-- <free-divider></free-divider> -->
+		<free-list-item title="查找聊天记录"  @click="goChatHistory" showRight :showLeftIcon="false"></free-list-item>
+		<free-divider></free-divider>
 		<free-list-item title="消息免打扰" showRight :showLeftIcon="false" 
 		:showRightIcon="false">
 			<switch slot="right" :checked="getNoDisturb"  @change="setNoDisturb" color="#3578E5"/>
@@ -130,39 +130,35 @@
 
 				_this.gdes=data.group_info.desc
 				_this.gname=data.group_info.name
-				
-				var avatar = uni.getStorageSync("avatar"+_this.gid);
-				if(avatar){
-					_this.gavatar=avatar;
-				}else{
-					if(data.group_info.avatar){
-						JIM.getResource({
-							'media_id' : data.group_info.avatar,
-						}).onSuccess(function(data) {
-							
-							uni.downloadFile({
-								url: data.url,
-								success: (res) => {
-									if (res.statusCode === 200) {	
-										uni.saveFile({
-											tempFilePath: res.tempFilePath,
-											success: function (res) {
-												var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-												_this.gavatar=savedFilePath;
-												uni.setStorageSync("avatar"+_this.gid,savedFilePath)	
-											}
-										});
-									}
+
+				if(data.group_info.avatar){
+					JIM.getResource({
+						'media_id' : data.group_info.avatar,
+					}).onSuccess(function(data) {
+						
+						uni.downloadFile({
+							url: data.url,
+							success: (res) => {
+								if (res.statusCode === 200) {	
+									uni.saveFile({
+										tempFilePath: res.tempFilePath,
+										success: function (res) {
+											var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+											_this.gavatar=savedFilePath;
+											uni.setStorageSync("avatar"+_this.gid,savedFilePath)	
+										}
+									});
 								}
-							}); 
-						}).onFail(function(data) {
-							uni.showToast({
-								"title":getCodeMsg(data.code),
-								"position":"bottom"
-							})
-						});
-					}
+							}
+						}); 
+					}).onFail(function(data) {
+						uni.showToast({
+							"title":getCodeMsg(data.code),
+							"position":"bottom"
+						})
+					});
 				}
+				
 			}).onFail(function(data) {
 				uni.showToast({
 					"title":getCodeMsg(data.code),
@@ -255,9 +251,18 @@
 								'gid' : _this.gid,
 								'avatar': res.tempFilePaths[0]
 							}).onSuccess(function(data) {
-								uni.showToast({
-									"title":"群头像更换成功",
-									"position":"bottom"
+								uni.saveFile({
+									tempFilePath: res.tempFilePaths[0],
+									success: function (res) {
+										var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+										_this.gavatar=savedFilePath;
+										uni.setStorageSync("avatar"+_this.gid,savedFilePath)
+										uni.showToast({
+											"title":"群头像更换成功",
+											"position":"bottom"
+										})
+									}
+									
 								})
 							}).onFail(function(data) {
 								uni.showToast({
@@ -355,6 +360,11 @@
 					}
 					close()
 				})	
+			},
+			goChatHistory(){
+				uni.navigateTo({
+					url:"../chatHistory/chatHistory?username="+_this.gid
+				})
 			}
 		}
 	}

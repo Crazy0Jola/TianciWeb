@@ -1,14 +1,13 @@
 <template>
 	<view id="moments">
 
-		<view class="home-pic" :style="getCover" @click="changeCover">
-			
+		<view class="home-pic" :style="getCover">
 		</view>
 		<view class="home-pic-base">
-			<view class="top-pic" @click="goUserInfo(myToken)">
-				<image class="header"  mode="aspectFill" :src="myAvatar||'/static/images/userpic.jpg'"></image>
+			<view class="top-pic" @click="goUserInfo(targetToken)">
+				<image class="header"  mode="aspectFill" :src="targetAvatar||'/static/images/userpic.jpg'"></image>
 			</view>
-			<text class="top-name font-lg">{{username}}</text>
+			<text class="top-name font-lg">{{targetUsername}}</text>
 		</view>
 		<view class="moments__post" v-for="(post,index) in posts" :key="post.id" :id="post.id">
 			<view class="post-left" @click="goUserInfo(post.token)">
@@ -112,7 +111,7 @@
 			return {	
 				userData:{},
 				propIndex:-1,
-				posts: [],//模拟数据
+				posts: [],
 				username: 'Liuxy',
 				myAvatar:"",
 				myToken:"",
@@ -150,13 +149,25 @@
 				showLoadMore: true,
 				pageNo:1,
 				cover:'',
+				publisher:'',
+				targetUsername:"",
+				targetAvatar:"",
+				targetToken:""
 			}
 		},
 		mounted() {
 
 		},
-		onLoad() {
+		onLoad:function(e) {
+			console.log(e)
 			_this=this;
+			_this.publisher = e.publisher;
+			_this.cover = e.cover;
+			_this.targetUsername=e.name;
+			if(e.photo!="undefined"){
+				_this.targetAvatar = e.photo;
+			}
+			_this.targetToken = e.token;
 			_this.userData = uni.getStorageSync("setUserData")
 			_this.myAvatar = "file://"+ _this.userData.photo;
 			_this.username = _this.userData.name;
@@ -197,7 +208,8 @@
 				    url: SERVER_API+"appFriends/list", //仅为示例，并非真实接口地址。
 				    data: {
 				        "type":"2",
-				        "pageNo":_this.pageNo.toString()
+				        "pageNo":_this.pageNo.toString(),
+						"publisher":_this.publisher
 				    },
 					method:"POST",
 				    header: {
@@ -240,6 +252,7 @@
 			}	
 		},
 		onPullDownRefresh() { //监听下拉刷新动作
+			console.log('onPullDownRefresh');  	
 			this.loadMoreText = "加载中...",
 			this.showLoadMore = true;
 			this.pageNo = 1;
@@ -247,7 +260,8 @@
 			    url: SERVER_API+"appFriends/list", //仅为示例，并非真实接口地址。
 			    data: {
 			        "type":"1",
-			        "pageNo":"0"
+			        "pageNo":"0",
+					"publisher":_this.publisher
 			    },
 				method:"POST",
 			    header: {
@@ -255,6 +269,7 @@
 			    },
 			    success: (res) => {
 				   _this.posts=res.data.result;
+				   _this.targetToken=res.data.result[0].token;
 				   var len = res.data.result.length;
 				   if(len<10){
 					   _this.loadMoreText="暂无更多";
@@ -298,32 +313,11 @@
 		},
 		computed:{
 			getCover(){
-				var cover = _this.userData.cover
-				if(cover){
-					if(cover.indexOf("Android")==-1){
-						uni.downloadFile({
-							url: cover,
-							success: (res) => {
-								if (res.statusCode === 200) {	
-									uni.saveFile({
-										tempFilePath: res.tempFilePath,
-										success: function (res) {
-											var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-											_this.cover = "file://"+savedFilePath;
-											_this.userData.cover =savedFilePath;
-											uni.setStorageSync("setUserData",_this.userData)
-										}
-									});
-								}
-							}
-						}); 
-					}else{
-						_this.cover = "file://"+cover;
-					}
-				}else{
-					_this.cover = "/static/moments/cover.jpg";
+				var cover = _this.cover
+				if(_this.cover.indexOf("Android")!=-1){
+					cover ='file://'+cover
 				}
-				return 'background:url('+_this.cover+') no-repeat center center';
+				return 'background:url('+cover+') no-repeat center center';
 			},
 			getPhoto(){
 				return function(publisherId,photo){
@@ -710,7 +704,6 @@
 								"token":_this.userData.token
 							},
 							success: (uploadFileRes) => {
-								
 								var res = JSON.parse(uploadFileRes.data)
 								if(res.code==1){
 									uni.showToast({

@@ -28,7 +28,7 @@
 		},
 		computed: {
 			getSrc(){
-				if(this.src.indexOf("Android")!=-1){
+				if(this.src.indexOf("Android")!=-1&&this.src.indexOf("file://")==-1){
 					return "file://"+this.src;
 				}else{
 					return this.src
@@ -42,20 +42,19 @@
 			clickEvent() {
 				switch (this.clickType){
 					case 'navigate':
-					if(this.token==uni.getStorageSync("setUserData").token){
-						uni.showToast({
-							"title":"您戳到了自己",
-							"position":"bottom"
-						})
-						return;
-					}
 					uni.navigateTo({
 						url: `/pages/mail/user-base/user-base?token=${this.token}`
 					});
 						break;
+					case 'preview':
+						uni.previewImage({
+							urls:[this.getSrc]
+						})
+						break;
 					default:
 					this.$emit('click')
 						break;
+					
 				}
 			}
 		},

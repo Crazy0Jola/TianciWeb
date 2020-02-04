@@ -16,16 +16,20 @@
 		</view>
 		
 		<!-- 置顶列表 -->
-		<block v-for="(item,index) in list" :key="index">
-			<free-media-list v-if="isTop(item.gid||item.username)&&!item.extras.del" :item="item" :index="index"
-			@long="long"></free-media-list>
-		</block>
+		<list>
+			<cell v-for="(item,index) in list" :key="index">
+				<free-media-list v-if="isTop(item.gid||item.username)&&!item.extras.del" :item="item" :index="index"
+				@long="long"></free-media-list>
+			</cell>
+		</list>
 		
 		<!-- 非置顶列表 -->
-		<block v-for="(item,index) in list" :key="index">
-			<free-media-list v-if="!isTop(item.gid||item.username)&&!item.extras.del" :item="item" :index="index"
-			@long="long"></free-media-list>
-		</block>
+		<list>
+			<cell v-for="(item,index) in list" :key="index">
+				<free-media-list v-if="!isTop(item.gid||item.username)&&!item.extras.del" :item="item" :index="index"
+				@long="long"></free-media-list>
+			</cell>
+		</list>
 		
 		
 		<!-- 弹出层 -->
@@ -141,7 +145,6 @@
 			_this= this;
 			_this.isLogin()
 			if(JIM.isLogin()){
-				console.log("JIM已登录")
 				//获取会话列表
 				JIM.getConversation().onSuccess(function(data) {
 					// console.log('success:Conversation222222===========' + JSON.stringify(data));

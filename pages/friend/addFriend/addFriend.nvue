@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="p-3 bg-light position-fixed left-0 right-0" >
-			<input type="text"  v-model="keyword" placeholder="搜索" @input="init" @confirm="search" confirm-type="search" class="bg-white rounded pl-2" placeholder-class="text-center" style="height: 80rpx;"/>
+			<input type="text"  v-model="keyword" placeholder="输入人名/公司/手机号" @input="init" @confirm="search" confirm-type="search" class="bg-white rounded pl-2" placeholder-class="text-center" style="height: 80rpx;"/>
 		</view>
 		<view v-if="keyword !== '' && list.length === 0"
 		class="flex align-center justify-center" 

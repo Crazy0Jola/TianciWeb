@@ -112,7 +112,7 @@
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
 			    'fontFamily': "iconfont",
-			    'src': "url('https://at.alicdn.com/t/font_1587665_1mh1vquff72.ttf')"
+			    'src': "url('https://at.alicdn.com/t/font_1587665_2dfl5ybptuq.ttf')"
 			});
 			// 初始化录音管理器
 			this.$store.commit('initRECORD')
@@ -156,10 +156,9 @@
 			
 		},
 		onShow: function() {
-			
-			var times = 0;
-			var Interval = setInterval(function(){
-				times +=1;
+			// var times = 0;
+			// var Interval = setInterval(function(){
+			// 	times +=1;
 				if(!JIM.isInit()){
 					uni.showLoading({
 						title:"聊天系统初始化中..."
@@ -198,10 +197,11 @@
 							});
 						}
 					})
-				}else{
-					clearInterval(Interval);
 				}
-			},3000)
+			// 	else{
+			// 		clearInterval(Interval);
+			// 	}
+			// },3000)
 			
 			uni.setStorageSync("onShow",true)
 			

@@ -13,9 +13,9 @@
 		@click="clickPage">
 			
 			<!-- 聊天信息列表组件 -->
-			<list>
+			<list :show-scrollbar="false">
 				<yy-refresh :refresh-text="refreshText" @refresh="onRefresh" ref="yyRefresh"></yy-refresh>
-				<cell v-for="(item,index) in list" :key="index">
+				<cell v-for="(item,index) in list" :key="item.msg_id">
 					<free-chat-item :item="item" :avatar="item.avatar" :myUsername="myUsername" :myAvatar="myAvatar" :index="index" ref="chatItem"
 					:pretime=" index > 0 ? list[index-1].create_time : 0"
 					@long="long" @preview="previewImage"></free-chat-item>
@@ -138,6 +138,7 @@
 				nickname:"",
 				avatar:"/static/images/userpic.jpg",
 				myUsername:"",
+				myName:"",
 				myAvatar:"/static/images/userpic.jpg",
 				// 扩展菜单列表
 				actionList:[
@@ -165,10 +166,11 @@
 				menus:[{ 
 					name:"复制",
 					event:'copy',
-				},{ 
-					name:"删除",
-					event:'delete'
 				}
+				// ,{ 
+				// 	name:"删除",
+				// 	event:'delete'
+				// }
 				// ,{ 
 				// 	name:"撤回",
 				// 	event:'removeChatItem'
@@ -207,6 +209,7 @@
 				
 				//视频相关
 				poster:'',//视频封面
+				
 			}
 		},
 		onBackPress(){
@@ -223,6 +226,7 @@
 			_this.avatar = e.avatar;
 			var userData = uni.getStorageSync("setUserData");
 			_this.myAvatar = userData.photo;
+			_this.myName=userData.name;
 			_this.myUsername = userData.username;
 			
 			
@@ -230,10 +234,15 @@
 			if(msg.length>0){
 				_this.tmpList=msg.concat();
 				_this.totalList=msg.concat();
-				if(msg.length>20){
-					_this.list = _this.tmpList.splice(_this.tmpList.length-20,20);	
+				
+				if(e.index){
+					_this.list = _this.tmpList.splice(e.index);	
 				}else{
-					_this.list = msg;
+					if(msg.length>20){
+						_this.list = _this.tmpList.splice(_this.tmpList.length-20,20);	
+					}else{
+						_this.list =  _this.tmpList.splice(0,msg.length);
+					}
 				}
 				
 				// var pageToBottomTimer = setTimeout(()=>{
@@ -258,8 +267,9 @@
 					clearTimeout(pageToBottomTimer)
 				},200)
 			})
-					
-			_this.pageToBottom();
+			if(!e.index){
+				_this.pageToBottom();
+			}
 		},
 		onUnload(){
 			// console.log("=================onUnload==================")
@@ -656,7 +666,7 @@
 									
 									uni.setStorageSync(_this.myUsername+_this.username,_this.totalList);
 								}).onFail(function(data) {
-									
+									console.log(data)
 									uni.hideLoading()
 									uni.showToast({
 										"title":"暂支持JPG格式",
@@ -784,14 +794,14 @@
 				}else{
 					switch(type){
 						case 'text':
-						latest_msg = text;
 						console.log(text)
-						
+						latest_msg = text;
 						if(_this.last_text == text){
 							_that.text = ''
 							return;
 						}
 						_this.last_text = text;
+						console.log(_this.username)
 						JIM.sendSingleMsg({
 							'target_username' : _this.username,
 							'content' : text,
@@ -800,10 +810,13 @@
 							},
 						}).onSuccess(function(data) {
 							var obj = {
+								"target_type":"single",
+								"from_name":_this.myName,
 								"from_id": _this.myUsername,
 								"create_time": (new Date()).getTime(),				
 								"msg_type": type,
 								"target_id": _this.username,
+								"target_name":_this.nickname,
 								"msg_id":data.msg_id,
 								"msg_body":{
 									"extras": {'isremove':false},
@@ -911,13 +924,14 @@
 				// #endif
 			},
 			// 长按消息气泡
-			// long({x,y,index}){
-			// 	// 初始化 索引
-			// 	this.propIndex = index
-			// 	console.log(_this.list[_this.propIndex])
-			// 	// 显示扩展菜单
-			// 	this.$refs.extend.show(x,y)
-			// },
+			long({x,y,index}){
+				// 初始化 索引
+				this.propIndex = index
+				if(_this.list[index].msg_type=="text"&&!_this.list[index].msg_body.extras.isEmotion){
+					// 显示扩展菜单
+					this.$refs.extend.show(x,y)
+				}
+			},
 			// 操作菜单方法分发
 			clickEvent(event,e){
 				switch (event){
@@ -1078,6 +1092,7 @@
 			},
 			// 打开聊天信息设置
 			openChatSet(){
+				uni.hideKeyboard()
 				uni.navigateTo({
 					url: `/pages/mail/user-base/user-base?token=${_this.username}`
 				});
@@ -1088,12 +1103,23 @@
 					this.$refs.yyRefresh.stop();
 				}
 				setTimeout(() => {
+					var len;
 					if(_this.tmpList.length>=20){
+						len=20;
 						_this.list  = _this.tmpList.splice(_this.tmpList.length-20,20).concat(_this.list)
 						
 					}else{
+						len=_this.tmpList.length;
 						_this.list = _this.tmpList.splice(0,20).concat(_this.list)
 					}
+					_this.$nextTick(()=>{
+						let chatItem = _this.$refs.chatItem			
+						
+						dom.scrollToElement(chatItem[len],{
+							offset:0,
+							animated:false
+						})
+					})
 					this.$refs.yyRefresh.finish();
 				}, 300);
 			}

@@ -77,7 +77,15 @@
             	"app-plus" : {
             		"bounce" : "none",
             		"titleNView" : {
-            			"type" : "default"
+            			"type" : "default",
+						"buttons" : [
+							{
+								"color" : "#696969",
+								"type" : "none",
+								"fontSrc" : "/static/fonts/iconfont.ttf",
+								"text" : "\ue745" //小相机
+							}
+						]
             		}
             	}
             }
@@ -186,6 +194,16 @@
             		}
             	}
             }
+        }
+        ,{
+            "path" : "pages/chat/chatHistory/chatHistory",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/friend/friendCircle/friendCircle",
+            "style" : {
+				"enablePullDownRefresh" : true
+			}
         }
     ],
 	"globalStyle": {

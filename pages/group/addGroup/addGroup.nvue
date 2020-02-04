@@ -7,7 +7,7 @@
 		</free-nav-bar>
 		
 		
-		<view class="flex" style="height: 100rpx;" v-if="!isAdd">
+		<view class="flex" style="height: 100rpx;width: 700rpx;" v-if="!isAdd">
 			<view  class="flex-1 pl-2 text-center justify-center">
 				<text class="font-md ">群聊名称</text>
 			</view>
@@ -28,13 +28,13 @@
 		<!-- 通讯录列表 -->
 		<scroll-view scroll-y="true" :style="'height:'+scrollHeight+'px;'"
 		:scroll-into-view="scrollInto">
-			<view v-for="(item,index) in list" :key="index"
+			<view style="width: 700rpx;" v-for="(item,index) in list" :key="index"
 			:id="'item-'+item.letter">
 				<view v-if="item.data.length" 
 				class="py-2 px-3 border-bottom bg-light">
 					<text class="font-md text-dark">{{item.letter}}</text>
 				</view>
-				<free-list-item v-for="(item2,index2) in item.data" 
+				<free-list-item style="width: 700rpx;"  v-for="(item2,index2) in item.data" 
 				:key="index2" :title="item2.name" 
 				:cover="item2.photo?item2.photo:'/static/images/userpic.jpg'"
 				:showRightIcon="false" showRight

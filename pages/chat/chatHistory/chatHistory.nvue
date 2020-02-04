@@ -1,0 +1,93 @@
+<template>
+	<view class="page">
+		<view :style="'height:'+statusBarHeight+'px'" class="bg-nav" ></view>
+		<view class="m-2 position-fixed flex search-box" :style="'top:'+statusBarHeight+'px'">
+			<view class="col-1 search-btn bg-white flex align-center">
+				<text class="iconfont text-light-muted font-md">&#xe607;</text>
+			</view>
+			<view class="col-11 flex align-center search-input bg-white">
+				<input type="text" class="font-md" style="width: 580rpx;" @input="search" v-model="keyword" @confirm="search" placeholder="输入搜索的关键词" confirm-type="search"></input>
+				<text v-if="keyword!=''" @click="clean" class="iconfont text-light-muted font-md" style="width: 70rpx;">&#xe67e;</text>
+			</view>
+		</view>
+		<list class="bg-white" :style="getStyle">
+			<cell v-for="(item,index) in list" :key="index">
+				<free-chat-history :item="item" ></free-chat-history>
+			</cell>
+		</list>
+		<text v-if="keyword!=''&&list.length==0" class="font-md text-gray text-center" :style="'margin-top:'+(statusBarHeight+50)+'px'">暂无搜索结果</text>
+	</view>
+	
+</template>
+
+<script>
+	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
+	import freeChatHistory from "@/components/free-ui/free-chat-history.vue"
+	var _this;
+	export default {
+		data() {
+			return {
+				statusBarHeight:0,
+				keyword:'',
+				list:[],
+				myUsername:'',
+				username:''
+			}
+		},
+		components: {
+			freeNavBar,
+			freeChatHistory
+		},
+		onLoad:function(e){
+			_this=this;
+			_this.username=e.username
+			var userData = uni.getStorageSync("setUserData");
+			_this.myUsername = userData.username;
+			try {
+			    const res = uni.getSystemInfoSync();
+			    _this.statusBarHeight=res.statusBarHeight;
+			} catch (e) {
+			    // error
+			}
+		},
+		computed:{
+			getStyle(){
+				var height = uni.upx2px(70);
+				if(_this.keyword==""){
+					_this.list=[]
+					return 'height:0';
+				}else{
+					return 'margin-top:'+(_this.statusBarHeight+height)+'px'
+				}
+			}
+		},
+		methods: {
+			clean(){
+				_this.keyword=''
+			},
+			search(){
+				_this.list=[]
+				var list= uni.getStorageSync(_this.myUsername+_this.username)
+				var len = list.length;
+				for(var i=len-1;i>=0;i--){
+					var text = list[i].msg_body.text
+					if(text==undefined){
+						continue;
+					}else{
+						if(text.indexOf(_this.keyword)!=-1){
+							list[i].index=i;
+							_this.list.push(list[i])
+						}
+					}
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+	.search-box{
+		width: 710rpx;
+		height: 80rpx;
+	}
+</style>

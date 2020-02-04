@@ -5,74 +5,11 @@
 		</free-nav-bar>
 		
 		
-		<!-- <free-list-item title="社圈" showRight  :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-sq">&#xe631;</text>
-			<switch slot="right" :checked="getSQ"  @change="setSQ" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="企业名录" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-qy">&#xe702;</text>
-			<switch slot="right" :checked="getQY"  @change="setQY" color="#3578E5"/>
-		</free-list-item> -->
-		<free-list-item title="天赐币" showRight :showRightIcon="false" >
-			<text slot="icon" class="iconfont font-lg py-1 text-tcb">&#xe629;</text>
-			<switch slot="right" :checked="getTCB"  @change="setTCB" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="微视" showRight  :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-ws">&#xe65d;</text>
-			<switch slot="right" :checked="getWS"  @change="setWS" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="直播" showRight :showRightIcon="false" >
-			<text slot="icon" class="iconfont font-lg py-1 text-zb">&#xe61e;</text>
-			<switch slot="right" :checked="getZB"  @change="setZB" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="影视" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-ys">&#xe610;</text>
-			<switch slot="right" :checked="getYS"  @change="setYS" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="网游" showRight  :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-wy">&#xe6cf;</text>
-			<switch slot="right" :checked="getWY"  @change="setWY" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="手游" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-sy">&#xe69e;</text>
-			<switch slot="right" :checked="getSY"  @change="setSY" color="#3578E5"/>
-		</free-list-item>
-		<free-divider></free-divider>
-		<free-list-item title="国际接机" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-jj">&#xe6aa;</text>
-			<switch slot="right" :checked="getJJ"  @change="setJJ" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="企业服务" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-qyfw">&#xe6e2;</text>
-			<switch slot="right" :checked="getQYFW"  @change="setQYFW" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="政务服务" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-zwfw">&#xe668;</text>
-			<switch slot="right" :checked="getZWFW"  @change="setZWFW" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="生活服务" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-shfw">&#xe60e;</text>
-			<switch slot="right" :checked="getSHFW"  @change="setSHFW" color="#3578E5"/>
-		</free-list-item>
-		<free-divider></free-divider>
-		<free-list-item title="部门组织" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-bm">&#xecd2;</text>
-			<switch slot="right" :checked="getBM"  @change="setBM" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="历史朝代" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-ls">&#xe60c;</text>
-			<switch slot="right" :checked="getLS"  @change="setLS" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="行业划分" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-hy">&#xe60f;</text>
-			<switch slot="right" :checked="getHY"  @change="setHY" color="#3578E5"/>
-		</free-list-item>
-		<free-list-item title="行政划分" showRight :showRightIcon="false">
-			<text slot="icon" class="iconfont font-lg py-1 text-xz">&#xe603;</text>
-			<switch slot="right" :checked="getXZ"  @change="setXZ" color="#3578E5"/>
-		</free-list-item>
-		
-		
+		<block v-for="(item,index) in appList" :key="index">
+			<free-list-item  v-for="(item2,index2) in filterList(item.data)" :key="index2" :title="item2.title" showRight :cover="item2.icon" coverSize="40" :showRightIcon="false" >
+				<switch slot="right" :checked="getCheck(item2.id)"  @change="setCheck($event,item2.id)" color="#3578E5"/>
+			</free-list-item>
+		</block>
 		
 	</view>
 </template>
@@ -80,7 +17,7 @@
 <script>
 	import freeNavBar from "@/components/free-ui/free-nav-bar.vue"
 	import freeListItem from "@/components/free-ui/free-list-item.vue"
-	
+	var SERVER_API = getApp().globalData.SERVER_API;
 	export default {
 		components:{
 			freeNavBar,
@@ -88,58 +25,18 @@
 		},
 		data() {
 			return {
-				
+				appList:[]
 			}
 		},
-		computed:{
-			getSQ(){
-				return uni.getStorageSync("SQ")||false;
-			},
-			getQY(){
-				return uni.getStorageSync("QY")||false;
-			},
-			getTCB(){
-				return uni.getStorageSync("TCB")||false;
-			},
-			getWS(){
-				return uni.getStorageSync("WS")||false;
-			},
-			getZB(){
-				return uni.getStorageSync("ZB")||false;
-			},
-			getYS(){
-				return uni.getStorageSync("YS")||false;
-			},
-			getWY(){
-				return uni.getStorageSync("WY")||false;
-			},
-			getSY(){
-				return uni.getStorageSync("SY")||false;
-			},
-			getJJ(){
-				return uni.getStorageSync("JJ")||false;
-			},
-			getQYFW(){
-				return uni.getStorageSync("QYFW")||false;
-			},
-			getZWFW(){
-				return uni.getStorageSync("ZWFW")||false;
-			},
-			getSHFW(){
-				return uni.getStorageSync("SHFW")||false;
-			},
-			getBM(){
-				return uni.getStorageSync("BM")||false;
-			},
-			getLS(){
-				return uni.getStorageSync("LS")||false;
-			},
-			getHY(){
-				return uni.getStorageSync("HY")||false;
-			},
-			getXZ(){
-				return uni.getStorageSync("XZ")||false;
-			}
+		onLoad() {
+			var _this = this;
+			uni.request({
+				url:SERVER_API+ "appWeb/getApplications",
+				method:"POST",
+				success(res) {
+					_this.appList=res.data;
+				}
+			})
 		},
 		onBackPress(){
 			uni.switchTab({
@@ -148,69 +45,23 @@
 			return true;
 		},
 		methods: {
-			setSQ(e){
-				uni.setStorageSync("SQ",e.detail.value)	
+			filterList:function(list){
+				return list.filter(function(item){
+					if(item.fixed){
+						return false;
+					}else{
+						return true;
+					}
+				})
 			},
-			setQY(e){
-				uni.setStorageSync("QY",e.detail.value)
+			getCheck(id){
+				return uni.getStorageSync("application"+id)||false;
 			},
-			setTCB(e){
-				uni.setStorageSync("TCB",e.detail.value)
-			},
-			setWS(e){
-				uni.setStorageSync("WS",e.detail.value)
-			},
-			setZB(e){
-				uni.setStorageSync("ZB",e.detail.value)
-			},
-			setYS(e){
-				uni.setStorageSync("YS",e.detail.value)
-			},
-			setWY(e){
-				uni.setStorageSync("WY",e.detail.value)
-			},
-			setSY(e){
-				uni.setStorageSync("SY",e.detail.value)
-			},
-			setJJ(e){
-				uni.setStorageSync("JJ",e.detail.value)
-				var num = uni.getStorageSync("second")||0
-				uni.setStorageSync("second",e.detail.value? ++num:--num)
-			},
-			setQYFW(e){
-				uni.setStorageSync("QYFW",e.detail.value)
-				var num = uni.getStorageSync("second")||0
-				uni.setStorageSync("second",e.detail.value? ++num:--num)
-			},
-			setZWFW(e){
-				uni.setStorageSync("ZWFW",e.detail.value)
-				var num = uni.getStorageSync("second")||0
-				uni.setStorageSync("second",e.detail.value? ++num:--num)
-			},
-			setSHFW(e){
-				uni.setStorageSync("SHFW",e.detail.value)
-				var num = uni.getStorageSync("second")||0
-				uni.setStorageSync("second",e.detail.value? ++num:--num)
-			},
-			setBM(e){
-				uni.setStorageSync("BM",e.detail.value)
-				var num = uni.getStorageSync("third")||0
-				uni.setStorageSync("third",e.detail.value? ++num:--num)
-			},
-			setLS(e){
-				uni.setStorageSync("LS",e.detail.value)
-				var num = uni.getStorageSync("third")||0
-				uni.setStorageSync("third",e.detail.value? ++num:--num)
-			},
-			setHY(e){
-				uni.setStorageSync("HY",e.detail.value)
-				var num = uni.getStorageSync("third")||0
-				uni.setStorageSync("third",e.detail.value? ++num:--num)
-			},
-			setXZ(e){
-				uni.setStorageSync("XZ",e.detail.value)
-				var num = uni.getStorageSync("third")||0
-				uni.setStorageSync("third",e.detail.value? ++num:--num)
+			
+			setCheck(e,id){
+				console.log(e)
+				console.log(id)
+				uni.setStorageSync("application"+id,e.detail.value)	
 			}
 		}
 	}

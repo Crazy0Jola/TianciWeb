@@ -9,7 +9,7 @@
 		</view>
 		<view class="flex-1 flex align-center  justify-between pr-3 py-3 pl-3" :class="border ? 'border-bottom' : ''">
 			<slot>
-				<text class="font-md text-dark">{{title}}</text>
+				<text class="font-md text-dark text-ellipsis" style="width: 530rpx;">{{title}}</text>
 			</slot>
 			<view class="flex align-center" v-if="showRight">
 				<slot name="right"></slot>

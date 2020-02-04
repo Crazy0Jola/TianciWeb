@@ -4,7 +4,7 @@
 		<div v-if="mask" class="position-fixed top-0 left-0 right-0 bottom-0"
 		:style="getMaskColor" @click="hide"></div>
 		<!-- 弹出框内容 -->
-		<div ref="popup" class="position-fixed free-animated" :class="getBodyClass" :style="getBodyStyle">
+		<div ref="popup" class="position-fixed" :class="getBodyClass" :style="getBodyStyle">
 			<slot></slot>
 		</div>
 	</div>

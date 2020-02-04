@@ -13,7 +13,7 @@
 						</view>
 					</view>
 				</view>
-				<view class='padding-l' @click='addressSearch'>
+				<view v-if="!isPublish" class='padding-l' @click='addressSearch'>
 					<icon class='icon_search' type='search' size='22' color='#666' />
 				</view>
 			</view>
@@ -25,10 +25,11 @@
 		<map id='map' :scale='map.scale' :show-location='map.showLocation' :longitude='map.longitude' :latitude='map.latitude'
 		 :width='map.width' :height='map.height' :controls='map.controls' :markers='map.markers' @regionchange='mapChange'>
 			<!-- <cover-view class='icon-position' style="margin-top: 100px;"> -->
+				<cover-view v-if="isPublish" style="width:750rpx;height: 100%;background: rgba(0,0,0,0);"></cover-view>
 				<cover-image src="/static/images/icon_position.png" class="icon-img"></cover-image>
+				
 			<!-- </cover-view> -->
 		</map>
-		
 		<view class='footer bg-ff font-26'>
 			<scroll-view scroll-y class='scroll' :scroll-top='scrollTop'>
 				<view class="">
@@ -77,11 +78,16 @@
 				},
 				checked: 0,
 				scrollTop: 0,
-				mapStatus: 1 // 控制选择地址时 地图不加载附近列表
+				mapStatus: 1 ,// 控制选择地址时 地图不加载附近列表
+				isPublish:false
 			}
 		},
-		onLoad() {
+		onLoad:function(e) {
 			_this= this;
+			console.log(e)
+			if(e.from=='publish'){
+				_this.isPublish=true;
+			}
 			uni.getLocation({
 			    type: 'wgs84',
 			    success: function (res) {
@@ -211,11 +217,15 @@
 				if (e.index == 0) {
 					let that = this
 					let address = that.address
+					console.log(JSON.stringify(address))
 					let pages = getCurrentPages()
 					let prePages = pages[pages.length - 2].$vm
 					
-			
-					prePages.title=address.title
+					if(_this.isPublish){
+						prePages.title=address.ad_info.city+'·'+address.title
+					}else{
+						prePages.title=address.title
+					}
 					prePages.address=address.address
 					prePages.longitude=address.location.lng
 					prePages.latitude = address.location.lat

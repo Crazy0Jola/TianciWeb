@@ -27,9 +27,12 @@
 						</view>				
 					</view>
 				</view>
+				<free-list-item @click="sendLocation" :title="title" showRight :showRightIcon="false" cover="/static/images/address.png" :coverSize="50">
+					<image slot="right" src="/static/images/rightArrow.png" mode="aspectFill" style="width: 50rpx;height: 50rpx;"></image>
+				</free-list-item>
 			</view>
-			
-			<view class="footer">
+
+			<view class="footer bg-white">
 				<button type="default" class="feedback-submit" @click="publish">发表</button>
 			</view>
 			
@@ -46,6 +49,7 @@
 	import freeConfirm from "@/components/free-ui/free-confirm.vue"
 	import compressImage from '@/js_sdk/util.js';
 	import permision from "@/js_sdk/wa-permission/permission.js"
+	import freeListItem from "@/components/free-ui/free-list-item.vue"
 	
 	var SERVER_API = getApp().globalData.SERVER_API;
 	const device = uni.getSystemInfoSync();
@@ -63,14 +67,15 @@
 	export default {
 		components: {
 			freeNavBar,
-			freeConfirm
+			freeConfirm,
+			freeListItem
 		},
 		data() {
 			return {
 				// title: 'choose/previewImage',
 				input_content:'',
 				imageList: [],
-				
+				title:'所在位置',
 				
 				
 				sourceTypeIndex: 2,
@@ -143,7 +148,6 @@
 					})
 					return;
 				}
-				uni.showLoading({title:'发布中'});
 				// var location = await this.getLocation();//位置信息,可删除,主要想记录一下异步转同步处理
 				
 				var images = [];
@@ -152,10 +156,12 @@
 					images.push(image_obj);
 				}
 				if(images.length==0){
+					uni.showLoading({title:'发布中...'});
 					uni.request({
 						url: SERVER_API+'appFriends/publish',
 						data: {
 							'content': this.input_content,//moment文字部分
+							'location':_this.title
 						},
 						method:"POST",
 						header:{
@@ -189,11 +195,13 @@
 					})
 				}else{
 					if(_this.photo){//如果是拍照
+						uni.showLoading({title:'发布中...'});
 						uni.uploadFile({//该上传仅为示例,可根据自己业务修改或封装,注意:统一上传可能会导致服务器压力过大
 							url: SERVER_API+'appFriends/publish', 
 							files:images,//有files时,会忽略filePath和name
 							formData: {//后台以post方式接收
 								'content': this.input_content,//moment文字部分
+								'location':_this.title
 								// 'longitude':location.longitude,//经度
 								// 'latitude':location.latitude//纬度
 							},
@@ -226,7 +234,9 @@
 							}
 						});
 					}else{//如果是视频
-						var image_obj = {name:'image1',uri:'file://'+_this.video};
+						uni.showLoading({title:'视频资源上传中...'});
+						var video = _this.video.indexOf("file://")==-1? 'file://'+_this.video: _this.video;
+						var image_obj = {name:'image1',uri:video};
 						var image_obj2 = {name:'image2',uri:_this.imageList[0]}
 						var images = []
 						images.push(image_obj)
@@ -236,6 +246,7 @@
 							files:images,//有files时,会忽略filePath和name
 							formData: {//后台以post方式接收
 								'content': this.input_content,//moment文字部分
+								'location':_this.title
 								// 'longitude':location.longitude,//经度
 								// 'latitude':location.latitude//纬度
 							},
@@ -317,28 +328,57 @@
 						}
 					})
 				}else{
-					const PPVideo = uni.requireNativePlugin('PP-Video');
-					PPVideo.show({
-						minTime: 1,
-						maxTime: 10,
-						bit: 1024*800,
-						vWidth: 720,
-						vHeight:1280,
-						isBeautiful: false,
-						isBeautifulBtn: true,
-						isFlashBtn: true,
-						isShowTime: true,
-						beautifulValue: 10,
-						bottomHeight:500,
-						isBefore: false //默认前置
-					}, result => {
-						console.log(JSON.stringify(result))
-						if (result.code == 200) {		
-							_this.imageList.push('file://'+result.data.thumbnail)
-							_this.video=result.data.videoPath
-						}
-						
+					uni.showActionSheet({
+					    itemList: ['拍摄', '相册'],
+					    success: function (res) {
+					        if(res.tapIndex==1){
+								uni.chooseVideo({
+									count: 1,
+									sourceType: ['album'],
+									success: function (res) {
+										console.log(res)
+										if(res.size/1000000>5){
+											uni.showToast({
+												"title":"请选择小于5M的短视频",
+												"position":"bottom"
+											})
+											return;
+										}
+										_this.imageList.push('file://'+plus.io.convertLocalFileSystemURL('/static/video/poster.jpg'))
+										_this.video=res.tempFilePath
+									}
+								});
+							}else if(res.tapIndex==0){
+								const PPVideo = uni.requireNativePlugin('PP-Video');
+								PPVideo.show({
+									minTime: 1,
+									maxTime: 10,
+									bit: 1024*800,
+									vWidth: 720,
+									vHeight:1280,
+									isBeautiful: false,
+									isBeautifulBtn: true,
+									isFlashBtn: true,
+									isShowTime: true,
+									beautifulValue: 10,
+									bottomHeight:500,
+									isBefore: false //默认前置
+								}, result => {
+									console.log(JSON.stringify(result))
+									if (result.code == 200) {		
+										_this.imageList.push('file://'+result.data.thumbnail)
+										console.log(result.data.videoPath)
+										_this.video=result.data.videoPath
+									}
+									
+								});
+							}
+					    },
+					    fail: function (res) {
+					        
+					    }
 					});
+
 				}
 				
 			},
@@ -373,6 +413,17 @@
 					})
 				}
 				
+			},
+			sendLocation(){
+				if(!permision.checkSystemEnableLocation()){
+					uni.showToast({
+						"title":'未开启GPS位置服务，将会影响精确度',
+						"position":"bottom"
+					})
+				}
+				uni.navigateTo({
+					url:"../../location/send-location/send-location?from=publish"
+				})
 			}
 		}
 	}
@@ -381,13 +432,16 @@
 <style scoped>
 	@import url("../../../common/uni.css");
 	.footer {
-		margin-top: 80upx;
+		padding: 10px;
+		paddding-top: 80upx;
 	}
 	
 	.cell-pd {
 		padding: 20upx 30upx;
 	}
-
+	.feedback-submit{
+		margin: 0!important;
+	}
 	.uni-textarea {
 		width: auto;
 		padding: 20upx 25upx;
