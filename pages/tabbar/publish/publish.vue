@@ -155,6 +155,9 @@
 					var image_obj = {name:'image'+(i+1),uri:this.imageList[i]};
 					images.push(image_obj);
 				}
+				if(_this.title=="所在位置"){
+					_this.title="";
+				}
 				if(images.length==0){
 					uni.showLoading({title:'发布中...'});
 					uni.request({

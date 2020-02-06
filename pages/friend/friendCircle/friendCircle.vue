@@ -11,12 +11,22 @@
 		</view>
 		<view class="moments__post" v-for="(post,index) in posts" :key="post.id" :id="post.id">
 			<view class="post-left" @click="goUserInfo(post.token)">
-				<image mode="aspectFill" class="post_header" :src="getPhoto(post.publisherId,post.photo)"></image>
+				<image mode="aspectFill" class="post_header" :src="getPhoto(post.token,post.photo)"></image>
 			</view>
 
 			<view class="post_right">
 				<text class="post-username font-md">{{post.publisherName}}</text>
-				<view id="paragraph" class="paragraph" @longpress="long" :data-content="post.content">{{post.content}}</view>
+				<view id="paragraph" class="paragraph" @longpress="long" :data-content="post.content">
+					<view v-show="showText[index]">
+						{{post.content}}
+					<view v-if="post.content.length >100" class="full_text" @click="toggleContent(index)">收起</view>
+					</view>
+					<view v-show="!showText[index]">
+						{{post.content.substr(0, 100)}}
+						<text class="font" v-if="post.content.length > 100">...</text>
+					<view v-if="post.content.length > 100" class="full_text" @click="toggleContent(index)">全文</view>
+					</view>
+				</view>
 				
 				
 				<view v-if="post.urlList.length!=0">
@@ -152,7 +162,9 @@
 				publisher:'',
 				targetUsername:"",
 				targetAvatar:"",
-				targetToken:""
+				targetToken:"",
+				
+				showText:[],
 			}
 		},
 		mounted() {
@@ -179,6 +191,10 @@
 					this.screenHeight = res.screenHeight;
 					this.platform = res.platform;
 				}
+			});
+			
+			uni.setNavigationBarTitle({
+				title:e.name
 			});
 	
 			uni.startPullDownRefresh();
@@ -269,7 +285,6 @@
 			    },
 			    success: (res) => {
 				   _this.posts=res.data.result;
-				   _this.targetToken=res.data.result[0].token;
 				   var len = res.data.result.length;
 				   if(len<10){
 					   _this.loadMoreText="暂无更多";
@@ -317,7 +332,7 @@
 				if(_this.cover.indexOf("Android")!=-1){
 					cover ='file://'+cover
 				}
-				return 'background:url('+cover+') no-repeat center center';
+				return 'background:url('+cover+') no-repeat center center;background-size: cover';
 			},
 			getPhoto(){
 				return function(publisherId,photo){
@@ -736,6 +751,16 @@
 						})					
 					}
 				})
+			},
+			toggleContent(index){
+			
+				console.log(index)
+				if(_this.showText[index]==undefined){
+					_this.showText[index]=false;
+				}
+				
+				var newArrItem=!_this.showText[index];
+				this.$set(this.showText,index,newArrItem)
 			}
 		}
 	}
@@ -744,4 +769,11 @@
 <style scoped>
 	@import url("../../../common/uni.css");
 	@import url("../../../common/moments/moments.css");
+	
+	.full_text{
+		color: #36648B;
+	}
+	.paragraph{
+		word-wrap:break-word;
+	}
 </style>

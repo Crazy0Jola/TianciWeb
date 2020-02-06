@@ -41,7 +41,7 @@
 					</view>
 				</picker>
 			</view>
-			<view class="cu-form-group" v-if="districtList.length>0">
+			<!-- <view class="cu-form-group" v-if="districtList.length>0">
 				<view class="title">县区</view>
 				<picker @change="districtListChange" :value="districtListIndex" :range="districtList" range-key="name">
 					<view class="picker">
@@ -64,7 +64,7 @@
 						{{communityListIndex>-1?communityList[communityListIndex].name:'请选择社区'}}
 					</view>
 				</picker>
-			</view>
+			</view> -->
 			<view class="cu-form-group margin-top">
 				<view class="title">生日</view>
 				<dyDatePicker @getData="getBirthday" :childValue="birthday" placeholder="请选择生日"></dyDatePicker>
@@ -86,6 +86,27 @@
 				</picker>
 			</view>
 			
+			<view class="cu-form-group margin-top">
+				<view class="title">联系方式</view>
+				<button class='cu-btn bg-blue shadow' @click="addPhone">添加</button>
+			</view>
+			
+			<view class="cu-card case"  v-for="(item,index) in phoneList" :key="index">
+				<view class="cu-item shadow">
+					<view class="cu-form-group">
+						<view class="title">类型</view>
+						<input v-model="type[index]"  placeholder="请输入类型(如QQ/微信/抖音号/微博等)" name="input"></input>
+					</view>
+					<view class="cu-form-group">
+						<view class="title">号码</view>
+						<input v-model="phone_number[index]"  placeholder="请输入号码" name="input"></input>
+					</view>
+					<view class="cu-form-group flex justify-end">
+						<button class='cu-btn bg-blue shadow' @click="delPhone(index)">删除</button>
+					</view>
+				</view>
+			</view>
+			
 			
 			<view class="cu-form-group margin-top">
 				<view class="title">教育经历</view>
@@ -95,11 +116,11 @@
 			<view class="cu-card case"  v-for="(item,index) in educationList" :key="index">
 				<view class="cu-item shadow">
 					<view class="cu-form-group">
-						<view class="title">教育名称</view>
+						<view class="title">学校名称</view>
 						<input v-model="education_name[index]"  placeholder="请输入教育名称" name="input"></input>
 					</view>
 					<view class="cu-form-group">
-						<view class="title">学校专业</view>
+						<view class="title">院校专业</view>
 						<input v-model="administrative_unit[index]"  placeholder="请输入学校专业" name="input"></input>
 					</view>
 					<view class="cu-form-group">
@@ -220,7 +241,12 @@
 				company:[],
 				post:[],
 				start_time:[],
-				end_time:[]
+				end_time:[],
+				
+				//联系方式
+				phoneList:[],
+				type:[],
+				phone_number:[],
 				
 			}
 		},
@@ -262,6 +288,13 @@
 				}
 				_this.workList.push(obj)
 			},
+			addPhone(){
+				var obj={
+					"type": "",
+					"phone_number": "",
+				}
+				_this.phoneList.push(obj)
+			},
 			delEdu(index){
 				_this.educationList.splice(index,1)
 				_this.education_name.splice(index,1)
@@ -269,6 +302,8 @@
 				_this.degree.splice(index,1)
 				_this.admission_date.splice(index,1)
 				_this.graduate_date.splice(index,1)
+				
+				console.log(_this.educationList)
 			},
 			delWork(index){
 				_this.workList.splice(index,1)
@@ -277,6 +312,11 @@
 				_this.post.splice(index,1)
 				_this.start_time.splice(index,1)
 				_this.end_time.splice(index,1)
+			},
+			delPhone(index){
+				_this.phoneList.splice(index,1)
+				_this.phone_number.splice(index,1)
+				_this.type.splice(index,1)
 			},
 			constellationListChange(e) {
 				if(e.detail.value==-1){
@@ -492,7 +532,9 @@
 						administrativeUnit:_this.administrative_unit[i],
 						degree:_this.degree[i]
 					}
-					educationList.push(obj)
+					if(JSON.stringify(obj) != "{}"){
+						educationList.push(obj)
+					}
 				}
 				var workList=[]
 				for(var i=0;i<_this.workList.length;i++){
@@ -503,11 +545,23 @@
 						post:_this.post[i],
 						company:_this.company[i]
 					}
-					workList.push(obj)
+					if(JSON.stringify(obj) != "{}"){
+						workList.push(obj)
+					}
+				}
+				var phoneList=[]
+				for(var i=0;i<_this.phoneList.length;i++){
+					var obj={
+						phoneType:_this.type[i],
+						phoneName:_this.phone_number[i],
+					}
+					if(JSON.stringify(obj) != "{}"){
+						phoneList.push(obj)
+					}
 				}
 				var data={
 					addressList:[],
-					phoneList:[],
+					phoneList:phoneList,
 					educationList:educationList,
 					workList:workList
 				}
@@ -535,7 +589,7 @@
 						"Content-Type":"application/x-www-form-urlencoded"
 					},
 					success(res) {
-						console.log(res)
+						// console.log(res)
 						if(res.data.code==1){
 							uni.request({
 								url:SERVER_API+'appUser/modifyUserAttachedInfo',
@@ -545,7 +599,7 @@
 									token:_this.myToken
 								},
 								success(res) {
-									console.log(res)
+									// console.log(res)
 									if(res.data.code==1){
 										uni.showToast({
 											"title":"保存成功"
@@ -573,6 +627,8 @@
 		onLoad(){
 			_this=this;
 			_this.myToken=uni.getStorageSync("setUserData").token;
+		},
+		onShow() {
 			uni.request({
 				url:SERVER_API+'appWeb/getCountry',
 				success(res) {
@@ -596,6 +652,7 @@
 							_this.constellation = _this.userInfo.baseInfo.constellation;
 							_this.educationList = _this.userInfo.educationList;
 							_this.workList = _this.userInfo.workList;
+							_this.phoneList=_this.userInfo.phoneList;
 							_this.nation = _this.userInfo.baseInfo.nation;
 							var country = _this.userInfo.baseInfo.country;
 							var province = _this.userInfo.baseInfo.province;
@@ -621,6 +678,12 @@
 									_this.post[i]=_this.workList[i].post
 									_this.start_time[i]=_this.workList[i].start_time
 									_this.end_time[i]=_this.workList[i].end_time
+								}
+							}
+							if(_this.phoneList.length>0){
+								for(var i=0,len=_this.phoneList.length;i<len;i++){
+									_this.phone_number[i]=_this.phoneList[i].phone_number
+									_this.type[i]=_this.phoneList[i].type
 								}
 							}
 							
@@ -765,8 +828,6 @@
 					})
 				}
 			})
-			
-
 		}
 	}
 </script>

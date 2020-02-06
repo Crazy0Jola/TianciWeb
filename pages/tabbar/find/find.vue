@@ -12,12 +12,22 @@
 		</view>
 		<view class="moments__post" v-for="(post,index) in posts" :key="post.id" :id="post.id">
 			<view class="post-left" @click="goUserInfo(post.token)">
-				<image mode="aspectFill" class="post_header" :src="getPhoto(post.publisherId,post.photo)"></image>
+				<image mode="aspectFill" class="post_header" :src="getPhoto(post.token,post.photo)"></image>
 			</view>
 
 			<view class="post_right">
 				<text class="post-username font-md">{{post.publisherName}}</text>
-				<view id="paragraph" class="paragraph" @longpress="long" :data-content="post.content">{{post.content}}</view>
+				<view id="paragraph" class="paragraph" @longpress="long" :data-content="post.content">
+					<view v-show="showText[index]">
+						{{post.content}}
+					<view v-if="post.content.length >100" class="full_text" @click="toggleContent(index)">收起</view>
+					</view>
+					<view v-show="!showText[index]">
+						{{post.content.substr(0, 100)}}
+						<text class="font" v-if="post.content.length > 100">...</text>
+					<view v-if="post.content.length > 100" class="full_text" @click="toggleContent(index)">全文</view>
+					</view>
+				</view>
 				
 				
 				<view v-if="post.urlList.length!=0">
@@ -150,6 +160,8 @@
 				showLoadMore: true,
 				pageNo:1,
 				cover:'',
+				
+				showText:[],
 			}
 		},
 		mounted() {
@@ -158,7 +170,6 @@
 		onLoad() {
 			_this=this;
 			_this.userData = uni.getStorageSync("setUserData")
-			_this.myAvatar = "file://"+ _this.userData.photo;
 			_this.username = _this.userData.name;
 			_this.myToken = _this.userData.token;
 			_this.myId = _this.userData.id;
@@ -169,8 +180,6 @@
 					this.platform = res.platform;
 				}
 			});
-	
-			uni.startPullDownRefresh();
 		},
 		onShow() {
 			uni.onWindowResize((res) => { //监听窗口尺寸变化,窗口尺寸不包括底部导航栏
@@ -184,6 +193,13 @@
 					}
 				}
 			});
+			_this.userData = uni.getStorageSync("setUserData")
+			if(_this.userData.photo.indexOf("Android")==-1){
+				_this.myAvatar =  _this.userData.photo;
+			}else{
+				_this.myAvatar = "file://"+ _this.userData.photo;
+			}
+			uni.startPullDownRefresh();
 		},
 		onHide() {
 			uni.offWindowResize(); //取消监听窗口尺寸变化
@@ -227,6 +243,7 @@
 							
 							for(var i =10*_this.pageNo ;i<len;i++){
 								_this.posts[i].like=_this.islike(i);
+								_this.posts[i].showText=false;
 							}
 						}
 				    },
@@ -262,6 +279,8 @@
 				   }
 				   for(var i =0 ;i<len;i++){
 					   _this.posts[i].like=_this.islike(i);
+					   _this.posts[i].showText=false;
+					   
 				   }
 			       uni.stopPullDownRefresh(); //停止下拉刷新
 			    },
@@ -323,13 +342,17 @@
 				}else{
 					_this.cover = "/static/moments/cover.jpg";
 				}
-				return 'background:url('+_this.cover+') no-repeat center center';
+				return 'background:url('+_this.cover+') no-repeat center center;background-size: cover';
 			},
 			getPhoto(){
 				return function(publisherId,photo){
 					var avatar = uni.getStorageSync("avatar"+publisherId);
 					if(avatar){
-						return 'file://'+avatar;
+						if(avatar.indexOf("Android")==-1){
+							return avatar;
+						}else{
+							return 'file://'+avatar;
+						}
 					}else{
 						if(photo){
 							uni.downloadFile({
@@ -699,10 +722,14 @@
 			changeCover(){
 				uni.chooseImage({
 					count:1,
+					sizeType:['compressed '],
 					success: (res) => {			
 						var images = [];
 						var image_obj = {name:'cover',uri:res.tempFilePaths[0]};
 						images.push(image_obj);
+						uni.showLoading({
+							"title":"封面上传中..."
+						})
 						uni.uploadFile({
 							url: SERVER_API+'appFriends/changeCover',
 							files:images,
@@ -711,27 +738,21 @@
 							},
 							success: (uploadFileRes) => {
 								
-								var res = JSON.parse(uploadFileRes.data)
-								if(res.code==1){
+								var data = JSON.parse(uploadFileRes.data)
+								if(data.code==1){
+									uni.hideLoading()
 									uni.showToast({
 										"title":"更换封面成功",
 									})
-		
-									uni.downloadFile({
-										url: res.result,
-										success: (res) => {
-											if (res.statusCode === 200) {	
-												uni.saveFile({
-													tempFilePath: res.tempFilePath,
-													success: function (res) {
-														var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-														_this.userData.cover =savedFilePath;
-														uni.setStorageSync("setUserData",_this.userData)
-													}
-												});
-											}
+									uni.saveFile({
+										tempFilePath: res.tempFilePaths[0],
+										success: function (res) {
+											var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+											_this.userData.cover =savedFilePath;
+											uni.setStorageSync("setUserData",_this.userData)
 										}
-									}); 
+									});
+									
 								}
 							},
 							fail:(res) =>{
@@ -743,6 +764,16 @@
 						})					
 					}
 				})
+			},
+			toggleContent(index){
+			
+				console.log(index)
+				if(_this.showText[index]==undefined){
+					_this.showText[index]=false;
+				}
+				
+				var newArrItem=!_this.showText[index];
+				this.$set(this.showText,index,newArrItem)
 			}
 		}
 	}
@@ -751,4 +782,11 @@
 <style scoped>
 	@import url("../../../common/uni.css");
 	@import url("../../../common/moments/moments.css");
+	
+	.full_text{
+		color: #36648B;
+	}
+	.paragraph{
+		word-wrap:break-word;
+	}
 </style>

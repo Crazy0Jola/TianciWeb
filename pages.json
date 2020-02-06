@@ -202,7 +202,13 @@
         ,{
             "path" : "pages/friend/friendCircle/friendCircle",
             "style" : {
-				"enablePullDownRefresh" : true
+				"enablePullDownRefresh" : true,
+				"app-plus" : {
+					"titleNView" : {
+						"type" : "transparent"
+					}
+				}
+				
 			}
         }
     ],

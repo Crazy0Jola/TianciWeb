@@ -239,6 +239,9 @@
 								"title":getCodeMsg(data.code),
 								"position":"bottom"
 							})
+							uni.navigateTo({
+								url:"../groupChat/groupChat?gid="+_this.gid+"&gname="+_this.gname
+							})
 						});
 					}).onFail(function(data) {
 						uni.showToast({

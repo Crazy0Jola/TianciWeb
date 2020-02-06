@@ -8,7 +8,7 @@
 		</free-nav-bar>
 		<view class="px-3 py-4 flex flex-column bg-white border-bottom">
 			<view class="flex flex-row align-center justify-between">
-				<free-avater clickType="preview" :src="getPhoto" size="120"></free-avater>
+				<free-avater clickType="preview" :src="photo||'/static/images/userpic.jpg'" size="120"></free-avater>
 				<view class="flex flex-column ml-3 flex-1">
 					<view class="flex align-center justify-between">
 						<text class="font-lg font-weight-bold mb-1">{{userInfo.baseInfo.name}}</text>
@@ -22,7 +22,7 @@
 					</view>
 					<view class="flex align-center justify-between">
 						<text class="font-md text-light-muted mt-1">星座：{{userInfo.baseInfo.constellation||"暂无数据"}}</text>
-						<text class="font-md text-light-muted mt-1" v-if="userInfo.baseInfo.province">省份：{{userInfo.baseInfo.province}}</text>
+						<text class="font-md text-light-muted mt-1" v-if="userInfo.baseInfo.province">{{userInfo.baseInfo.province}}{{userInfo.baseInfo.city}}</text>
 					</view>
 					<text class="font-md text-light-muted mt-1">职位：{{userInfo.baseInfo.post||"暂无数据"}}</text>
 				</view>
@@ -46,14 +46,30 @@
 				<text class="font-md py-2">{{userInfo.baseInfo.interest||"暂无数据"}}</text>
 			</view>
 		</view>
+		<view class="bg-white flex-column" v-if="userInfo.phoneList.length!=0&&!showEye" >
+			<free-divider></free-divider>
+			<view class="px-3 py-2 border-bottom">
+				<text class="text-light-muted font">联系方式：</text>
+				<block v-for="(item,index) in userInfo.phoneList" :key="index" class="py-2" :class="index!=userInfo.phoneList.length-1?'border-bottom':''"> 
+					<view>
+						<text class="font-md">{{item.type}}：{{item.phone_number}}</text>
+					</view>
+				</block>
+			</view>
+		</view>
 		<view class="bg-white flex-column" v-if="userInfo.educationList.length!=0">
 			<free-divider></free-divider>
 			<view class="px-3 py-2 border-bottom">
 				<text class="text-light-muted font">教育经历：</text>
 				<block v-for="(item,index) in userInfo.educationList" :key="index" class="py-2" :class="index!=userInfo.educationList.length-1?'border-bottom':''"> 
-					<view class="flex align-center justify-between">
+					<view>
 						<text class="font-md">学历：{{item.degree}}</text>
-						<text class="font-md">学校专业：{{item.administrative_unit}}</text>
+					</view>
+					<view class="pt-2">
+						<text class="font-md">学校名称：{{item.education_name}}</text>						
+					</view>
+					<view class="pt-2">
+						<text class="font-md">院校专业：{{item.administrative_unit}}</text>						
 					</view>
 					<view class="flex align-center py-2 justify-between">
 						<text class="font-md">就读时间：{{item.admission_date}}——{{item.graduate_date}}</text>
@@ -66,21 +82,23 @@
 			<view class="px-3 py-2 border-bottom">
 				<text class="text-light-muted font">工作经历：</text>
 				<block v-for="(item,index) in userInfo.workList" :key="index" class="py-2" :class="index!=userInfo.workList.length-1?'border-bottom':''"> 
-					<view class="flex align-center  justify-between">
+					<view>
 						<text class="font-md">公司：{{item.company}}</text>
+					</view>
+					<view class="pt-2">
 						<text class="font-md">职位：{{item.post}}</text>
 					</view>
 					<view class="pt-2">
 						<text class="font-md">工作描述：{{item.work_describe}}</text>
 					</view>
-					<view class="flex align-center py-2 justify-between">
+					<view class="py-2 ">
 						<text class="font-md">工作时间：{{item.start_time}}——{{item.end_time}}</text>
 					</view>
 				</block>
 			</view>
 		</view>
 		<free-divider></free-divider>
-		<free-list-item title="朋友圈" @click="goFriendCircle" showRight :showLeftIcon="false">
+		<free-list-item title="人生档案,每天记录一点你的一生" @click="goFriendCircle" showRight :showLeftIcon="false">
 		</free-list-item>
 		<!-- <free-list-item title="更多信息" showRight :showLeftIcon="false"></free-list-item>
 		<free-divider></free-divider> -->
@@ -149,9 +167,6 @@
 			isMine(){
 				return _this.token==_this.myToken
 			},
-			getPhoto(){
-			    return _this.photo
-			},
 			iconClass(){
 				return _this.isFollow? 'text-red':'text-gray';
 			},
@@ -172,7 +187,8 @@
 			_this.myToken = userData.token;
 			_this.vip_active_date=userData.vip_active_date;
 			_this.vip_expire_date=userData.vip_expire_date;
-			
+		},
+		onShow(){
 			uni.request({
 				url:SERVER_API+'appUser/getUserDetailInfo',
 				data:{

@@ -5,7 +5,7 @@
 						<free-icon-button @click="goSetting"
 						:icon="'\ue611'"></free-icon-button>
 					</view></free-nav-bar>
-		<free-list-item @imgClick="changeAvatar" @click="goUserInfo" :cover="avatar||'/static/images/userpic.jpg'" coverSize="120" showRight>
+		<free-list-item @imgClick="changeAvatar" @goClick="goUserInfo" :cover="avatar||'/static/images/userpic.jpg'" coverSize="120" showRight>
 			<view class="flex flex-column" @click="goUserInfo">
 				<text class="text-dark font-lg font-weight-bold">{{name}}</text>
 				<text class="text-light-muted font mt-2">手机号：{{phone}}</text>
@@ -71,6 +71,10 @@
 			}
 		},
 		onLoad(){
+			
+		},
+		onShow(){
+			// this.$forceUpdate();
 			_this = this;
 			uni.request({
 				url:SERVER_API+ "appWeb/getApplications",
@@ -79,11 +83,8 @@
 					_this.appList=res.data;
 				}
 			})
-		},
-		onShow(){
-			this.$forceUpdate();
 			const value = uni.getStorageSync('setUserData');
-			var avatar = value.photo
+			var avatar = uni.getStorageSync("avatar"+value.token)
 			if(avatar){
 				_this.avatar = avatar;
 			}else{
@@ -111,7 +112,7 @@
 			
 			if (value) {
 				//有登录信息
-				console.log("已登录用户：",value);	
+				// console.log("已登录用户：",value);	
 				if(!JIM.isLogin()){
 					_this.login(value.username,value.password)			
 				}
@@ -161,10 +162,14 @@
 			changeAvatar(){
 				uni.chooseImage({
 					count:1,
+					sizeType:['compressed '],
 					success: (res) => {			
 						var images = [];
 						var image_obj = {name:'portrait',uri:res.tempFilePaths[0]};
 						images.push(image_obj);
+						uni.showLoading({
+							"title":"头像上传中..."
+						})
 						uni.uploadFile({
 							url: SERVER_API+'appUser/modifyUserInfo',
 							files:images,
@@ -173,28 +178,23 @@
 							},
 							success: (uploadFileRes) => {
 								console.log(uploadFileRes)
-								var res = JSON.parse(uploadFileRes.data)
-								if(res.code==1){
+								var data = JSON.parse(uploadFileRes.data)
+								if(data.code==1){
+									uni.hideLoading()
 									uni.showToast({
 										"title":"更换头像成功",
 									})
 									var userData = uni.getStorageSync("setUserData");
-									
-									uni.downloadFile({
-										url: res.result.photo,
-										success: (res) => {
-											if (res.statusCode === 200) {	
-												uni.saveFile({
-													tempFilePath: res.tempFilePath,
-													success: function (res) {
-														var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
-														userData.photo =savedFilePath;
-														uni.setStorageSync("setUserData",userData)
-													}
-												});
-											}
+									uni.saveFile({
+										tempFilePath: res.tempFilePaths[0],
+										success: function (res) {
+											var savedFilePath = plus.io.convertLocalFileSystemURL(res.savedFilePath);
+											userData.photo =savedFilePath;
+											_this.avatar = savedFilePath;
+											uni.setStorageSync("avatar"+uni.getStorageSync('setUserData').token,savedFilePath);
+											uni.setStorageSync("setUserData",userData)
 										}
-									}); 
+									});
 								}
 							},
 							fail:(res) =>{

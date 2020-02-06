@@ -48,12 +48,11 @@
 }
 
 #moments .home-pic {
-	width: 100%;
+	width:750upx;
 	/* margin-top: -150upx; */
 	position: relative;
 	height: 500upx;
 	z-index: 1;
-	background-size: cover;
 	margin-bottom: 50upx
 }
 
@@ -112,7 +111,7 @@
 #moments .moments__post .post_right {
 	display: table-cell;
 	padding-left: 20upx;
-	width: 100%;
+	width: 600rpx;
 }
 
 /* #moments .moments__post .post_right .paragraphExtender {

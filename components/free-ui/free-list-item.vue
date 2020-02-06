@@ -2,12 +2,12 @@
 	<view class="bg-white flex align-stretch"
 	@click="$emit('click')">
 		<view class="flex align-center justify-center py-2 pl-3"
-		v-if="showLeftIcon">
+		v-if="showLeftIcon" @click.stop="goUserInfo">
 			<slot name="icon"></slot>
-			<image @longpress="$emit('imgClick')" :src="cover" v-if="cover"
+			<image @click="$emit('imgClick')" :src="cover" v-if="cover"
 			mode="aspectFill" :style="coverStyle"></image>
 		</view>
-		<view class="flex-1 flex align-center  justify-between pr-3 py-3 pl-3" :class="border ? 'border-bottom' : ''">
+		<view class="flex-1 flex align-center justify-between pr-3 py-3 pl-3" @goClick="$emit('goClick')" :class="border ? 'border-bottom' : ''">
 			<slot>
 				<text class="font-md text-dark text-ellipsis" style="width: 530rpx;">{{title}}</text>
 			</slot>

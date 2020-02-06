@@ -233,6 +233,17 @@
 								})
 							}).onFail(function(data) {
 							    console.log('error:' + JSON.stringify(data))
+								uni.request({
+									url:SERVER_API+"appUser/deleteUser",
+									data:{
+										token:res.data.result
+									},
+									method:"POST",
+									success() {
+										
+									}
+								})
+								
 								if(data.code==882002){
 									uni.showToast({
 										icon: 'none',
