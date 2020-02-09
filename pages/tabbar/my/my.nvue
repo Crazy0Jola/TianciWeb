@@ -7,15 +7,19 @@
 					</view></free-nav-bar>
 		<free-list-item @imgClick="changeAvatar" @goClick="goUserInfo" :cover="avatar||'/static/images/userpic.jpg'" coverSize="120" showRight>
 			<view class="flex flex-column" @click="goUserInfo">
-				<text class="text-dark font-lg font-weight-bold">{{name}}</text>
+				<view class="flex flex-row align-center">
+					<text class="text-dark font-lg font-weight-bold">{{name}}</text>
+					<image v-if="level" style="width: 100upx;height:50upx;" mode="aspectFit" :src="getVip"></image>
+					<text  v-if="level" class="text-light-muted font-sm ml-2">{{vip_expire_date}}</text>
+				</view>
 				<text class="text-light-muted font mt-2">手机号：{{phone}}</text>
 			</view>
 			<view slot="right" @click="goUserInfo">
 				<text class="iconfont font-md text-light-muted">&#xe614;</text>
 			</view>
 		</free-list-item>
-		<free-divider></free-divider>
 		
+		<free-divider></free-divider>
 		<block v-for="(item,index) in appList" :key="index">
 			<free-list-item v-for="(item2,index2) in filterList(item.data,item.groupId)" :key="index2" :title="item2.title" showRight @click="openUrl(item2.url)" coverSize="40" :cover="item2.icon">
 			</free-list-item>
@@ -50,9 +54,10 @@
 	import freeDivider from "@/components/free-ui/free-divider.vue"
 	import freeConfirm from "@/components/free-ui/free-confirm.vue"
 	import getCodeMsg from "@/js_sdk/ErrorCode.js"
-	
+	import $T from '@/common/free-lib/time.js';
 	var JIM=getApp().globalData.JIM;	
 	var SERVER_API = getApp().globalData.SERVER_API;
+	var VIP = getApp().globalData.VIP;
 	var _this;
 	export default {
 		components: {
@@ -67,15 +72,17 @@
 				avatar:"",
 				name:"",
 				phone:"",
-				appList:[]
+				appList:[],
+				groupList:[],
+				level:"",
+				vip_expire_date:"",
+				isExpire:false
 			}
 		},
 		onLoad(){
-			
+			_this = this;
 		},
 		onShow(){
-			// this.$forceUpdate();
-			_this = this;
 			uni.request({
 				url:SERVER_API+ "appWeb/getApplications",
 				method:"POST",
@@ -84,6 +91,20 @@
 				}
 			})
 			const value = uni.getStorageSync('setUserData');
+			
+			var level_id = value.vip_level;
+			var vip_expire_date = value.vip_expire_date;
+			var vip_active_date = value.vip_active_date;
+			if(level_id){
+				_this.level = VIP[level_id];
+				if($T.checkTime(vip_active_date,vip_expire_date)){
+					_this.vip_expire_date = "过期时间："+vip_expire_date;
+				}else{
+					_this.isExpire=true
+					_this.vip_expire_date ="VIP已过期"
+				}
+			}
+			
 			var avatar = uni.getStorageSync("avatar"+value.token)
 			if(avatar){
 				_this.avatar = avatar;
@@ -109,7 +130,6 @@
 			
 			_this.name = value.name;
 			_this.phone = value.phone;
-			
 			if (value) {
 				//有登录信息
 				// console.log("已登录用户：",value);	
@@ -123,27 +143,38 @@
 			}
 		},
 		computed:{
-			
+			getVip(){
+				if(_this.isExpire){
+					return '/static/images/vip/'+_this.level+"_expire.png"
+				}else{
+					return '/static/images/vip/'+_this.level+".png"
+				}
+				
+			}
 		},
 		methods: {
 			filterList:function(list,groupId){
 				var num=list.length;
 				return list.filter(function(item){
 					if(item.fixed){
-						uni.setStorageSync("num"+groupId,num)
+						_this.groupList[groupId]=num;
+						// uni.setStorageSync("num"+groupId,num)
 						return true;
 					}else if(item.showDefault){
 						var flag = uni.getStorageSync("application"+item.id);
 						if(flag){
-							uni.setStorageSync("num"+groupId,num)
+							_this.groupList[groupId]=num;
+							// uni.setStorageSync("num"+groupId,num)
 							return true;
 						}else if(!flag){
 							num--;
-							uni.setStorageSync("num"+groupId,num)
+							_this.groupList[groupId]=num;
+							// uni.setStorageSync("num"+groupId,num)
 							return false;
 						}else{
 							uni.setStorageSync("application"+item.id,true);
-							uni.setStorageSync("num"+groupId,num)
+							_this.groupList[groupId]=num;
+							// uni.setStorageSync("num"+groupId,num)
 							return true;
 						}
 					}else{
@@ -151,13 +182,14 @@
 						if(!flag){
 							num--;
 						}
-						uni.setStorageSync("num"+groupId,num)
+						_this.groupList[groupId]=num;
+						// uni.setStorageSync("num"+groupId,num)
 						return flag;
 					}
 				})
 			},
 			showDivider(id){
-				return uni.getStorageSync("num"+id)>0;
+				return _this.groupList[id]>0;
 			},
 			changeAvatar(){
 				uni.chooseImage({

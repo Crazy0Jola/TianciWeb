@@ -8,11 +8,19 @@
 		debug:false
 	})
 	var SERVER_API="http://117.83.152.39:8081/interconnect/";
+	var VIP= {
+		"3f03f224a1764733b475a2f2878b64d6":"vip1",
+		"c465dcc4748a4c3e88996e3916a6bd73":"vip2",
+		"eaaa4e8f7e70435cba27ee06b19cc131":"vip3",
+		"e7849ae542ec419fb81cb9a12d4c5a2a":"vip4",
+		"4076377fc1e846b68fe539e9a0219105":"vip5"
+	}
 	
 	export default {
 		globalData:{
 			JIM:JIM,
-			SERVER_API:SERVER_API
+			SERVER_API:SERVER_API,
+			VIP:VIP
 		},
 		onLaunch: function() {	
 			

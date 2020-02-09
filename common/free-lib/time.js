@@ -161,6 +161,7 @@ export default{
 	},
 	//判断当前时间是否在stime-etime之间
 	checkTime(stime, etime) {
+		console.log(stime+"==="+etime)
 	  //开始时间
 	  var arrs = stime.split("-");
 	  var startTime = new Date(arrs[0], arrs[1], arrs[2]);

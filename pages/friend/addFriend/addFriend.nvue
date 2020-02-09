@@ -59,8 +59,8 @@
 					uni.hideLoading()
 					var data = res.data.result;
 					_this.list = data;
-				
-					uni.setStorageSync("allUser",_this.list);
+					console.log(_this.list.length)
+					// uni.setStorageSync("allUser",_this.list);
 					
 				}
 			})
@@ -74,18 +74,18 @@
 		},
 		methods: {
 			init(){
-				if(_this.keyword==''){
-					var list = uni.getStorageSync("allUser");
-					_this.list = list;
-				}
+				// if(_this.keyword==''){
+				// 	var list = uni.getStorageSync("allUser");
+				// 	_this.list = list;
+				// }
 			},
 			// 搜索结果列表
 			search(){
-				if(_this.keyword==''){
-					var list = uni.getStorageSync("allUser");
-					_this.list = list;
-					return;
-				}
+				// if(_this.keyword==''){
+				// 	var list = uni.getStorageSync("allUser");
+				// 	_this.list = list;
+				// 	return;
+				// }
 				
 				uni.showLoading({
 					"title":"搜索中，请稍候..."
@@ -106,8 +106,7 @@
 						uni.hideLoading()
 						var data = res.data.result;
 						_this.list = data;
-						// uni.setStorageSync("allUser",_this.list);
-						
+						console.log(_this.list.length)
 					}
 				})
 			},

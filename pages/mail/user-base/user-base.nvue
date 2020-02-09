@@ -10,8 +10,9 @@
 			<view class="flex flex-row align-center justify-between">
 				<free-avater clickType="preview" :src="photo||'/static/images/userpic.jpg'" size="120"></free-avater>
 				<view class="flex flex-column ml-3 flex-1">
-					<view class="flex align-center justify-between">
+					<view class="flex align-center flex-row">
 						<text class="font-lg font-weight-bold mb-1">{{userInfo.baseInfo.name}}</text>
+						<image v-if="level" class="ml-2 mb-1" style="width: 100upx;height:50upx;" mode="aspectFit" :src="getVip"></image>
 					</view>
 					<view class="flex align-center justify-between">
 						<text class="font-md text-light-muted">手机号：{{phone||"暂无数据"}}</text><text v-if="showEye" class="iconfont text-gray" @click="viewPhone">&#xe608;</text>
@@ -23,6 +24,7 @@
 					<view class="flex align-center justify-between">
 						<text class="font-md text-light-muted mt-1">星座：{{userInfo.baseInfo.constellation||"暂无数据"}}</text>
 						<text class="font-md text-light-muted mt-1" v-if="userInfo.baseInfo.province">{{userInfo.baseInfo.province}}{{userInfo.baseInfo.city}}</text>
+						<text class="font-md text-light-muted mt-1" v-else>{{userInfo.baseInfo.country}}</text>
 					</view>
 					<text class="font-md text-light-muted mt-1">职位：{{userInfo.baseInfo.post||"暂无数据"}}</text>
 				</view>
@@ -139,6 +141,7 @@
 	import $T from '@/common/free-lib/time.js';
 	var _this;
 	var SERVER_API = getApp().globalData.SERVER_API
+	var VIP = getApp().globalData.VIP
 	export default {
 		mixins:[freeBase],
 		data() {
@@ -153,6 +156,7 @@
 				vip_expire_date:'',
 				showEye:true,
 				photo:'/static/images/userpic.jpg',
+				level:""
 			}
 		},
 		components: {
@@ -164,6 +168,9 @@
 			freeConfirm
 		},
 		computed:{
+			getVip(){
+				return '/static/images/vip/'+_this.level+".png"
+			},
 			isMine(){
 				return _this.token==_this.myToken
 			},
@@ -200,9 +207,18 @@
 				},
 				success(res) {
 					_this.userInfo = res.data.result;
+					console.log(res)
 					_this.phone = _this.userInfo.baseInfo.phone.replace(/^(\d{3})\d{4}(\d+)/,"$1****$2");
 					console.log(JSON.stringify(_this.userInfo))
 					_this.isFollow = _this.userInfo.baseInfo.isFollow; 
+					var level_id = _this.userInfo.baseInfo.vipLevel;
+					if(level_id){
+						console.log($T.checkTime(_this.userInfo.baseInfo.vip_active_date,_this.userInfo.baseInfo.vip_expire_date))
+						if($T.checkTime(_this.userInfo.baseInfo.vip_active_date,_this.userInfo.baseInfo.vip_expire_date)){
+							_this.level = VIP[level_id]
+							console.log(_this.level)
+						}
+					}
 					//更新头像
 					if(_this.userInfo.baseInfo.photo){
 						_this.photo=_this.userInfo.baseInfo.photo
