@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<!-- :class="showEye?'':'text-blue'" -->
 		<!-- 导航栏 -->
 		<free-nav-bar showBack :showRight="isNotMe" bgColor="bg-white">
 			<free-icon-button slot="right"
@@ -15,7 +16,7 @@
 						<image v-if="level" class="ml-2 mb-1" style="width: 100upx;height:50upx;" mode="aspectFit" :src="getVip"></image>
 					</view>
 					<view class="flex align-center justify-between">
-						<text class="font-md text-light-muted">手机号：{{phone||"暂无数据"}}</text><text v-if="showEye" class="iconfont text-gray" @click="viewPhone">&#xe608;</text>
+						<text class="font-md text-light-muted"  :class="showEye?'':'text-blue'" @click="dial(phone)">手机号：{{phone||"暂无数据"}}</text><text class="iconfont text-gray" :class="showEye?'':'text-blue'" @click="viewPhone">{{showEye?'&#xe608;':'&#xe671;'}}</text>
 					</view>
 					<view class="flex align-center justify-between">
 						<text class="font-md text-light-muted mt-1" v-if="userInfo.baseInfo.age">年龄：{{userInfo.baseInfo.age}}</text>
@@ -53,8 +54,9 @@
 			<view class="px-3 py-2 border-bottom">
 				<text class="text-light-muted font">联系方式：</text>
 				<block v-for="(item,index) in userInfo.phoneList" :key="index" class="py-2" :class="index!=userInfo.phoneList.length-1?'border-bottom':''"> 
-					<view>
-						<text class="font-md">{{item.type}}：{{item.phone_number}}</text>
+					<view class="flex flex-row justify-between">
+						<text class="font-md" :class="isPhone(item.phone_number)?'text-blue':''" @click="dial(item.phone_number)">{{item.type}}：{{item.phone_number}}</text>
+						<text v-if="isPhone(item.phone_number)" class="iconfont text-blue" @click="dial(item.phone_number)">&#xe671;</text>
 					</view>
 				</block>
 			</view>
@@ -171,6 +173,11 @@
 			getVip(){
 				return '/static/images/vip/'+_this.level+".png"
 			},
+			isPhone(){
+				return function(phone){
+					return (/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone))
+				}
+			},
 			isMine(){
 				return _this.token==_this.myToken
 			},
@@ -194,8 +201,7 @@
 			_this.myToken = userData.token;
 			_this.vip_active_date=userData.vip_active_date;
 			_this.vip_expire_date=userData.vip_expire_date;
-		},
-		onShow(){
+			
 			uni.request({
 				url:SERVER_API+'appUser/getUserDetailInfo',
 				data:{
@@ -207,7 +213,6 @@
 				},
 				success(res) {
 					_this.userInfo = res.data.result;
-					console.log(res)
 					_this.phone = _this.userInfo.baseInfo.phone.replace(/^(\d{3})\d{4}(\d+)/,"$1****$2");
 					console.log(JSON.stringify(_this.userInfo))
 					_this.isFollow = _this.userInfo.baseInfo.isFollow; 
@@ -238,10 +243,24 @@
 						}); 
 						
 					}else{
-						uni.setStorageSync("avatar"+_this.token,'/static/images/userpic.jpg');
+						console.log(_this.userInfo.baseInfo.sex)
+						if(_this.userInfo.baseInfo.sex=="男"){
+							uni.setStorageSync("avatar"+_this.token,'/static/images/userpic1.png');
+							_this.photo='/static/images/userpic1.png'
+						}else if(_this.userInfo.baseInfo.sex=="女"){
+							uni.setStorageSync("avatar"+_this.token,'/static/images/userpic2.jpg');
+							_this.photo='/static/images/userpic2.jpg'
+						}else{
+							uni.setStorageSync("avatar"+_this.token,'/static/images/userpic.jpg');
+							_this.photo='/static/images/userpic.jpg'
+						}
+						
 					}
 				}
 			})
+		},
+		onShow(){
+			
 		},
 		beforeDestroy() {
 			
@@ -334,6 +353,9 @@
 				if(_this.vip_active_date!=''){
 					if($T.checkTime(_this.vip_active_date,_this.vip_expire_date)){
 						_this.phone=_this.userInfo.baseInfo.phone
+						if(!_this.showEye){
+							_this.dial(_this.phone)
+						}
 						_this.showEye=false
 					}else{
 						_this.$refs.none.show((close)=>{
@@ -345,6 +367,46 @@
 						close()
 					})
 				}
+			},
+			// 拨打电话
+			dial(phone){
+				if(_this.showEye){
+					return;
+				}
+				if(!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone))){
+					return;
+				}
+				uni.makePhoneCall({
+				    phoneNumber: phone
+				});
+				// uni.showActionSheet({
+				//     itemList: ['拨打电话', '添加到通讯录'],
+				//     success: function (res) {
+				//         if(res.tapIndex==0){
+				// 			uni.makePhoneCall({
+				// 			    phoneNumber: phone
+				// 			});
+				// 		}else if(res.tapIndex==1){
+				// 			uni.addPhoneContact({
+				// 			    nickName: '昵称',
+				// 			    lastName: '姓',
+				// 			    firstName: '名',							   
+				// 			    mobilePhoneNumber: phone,					
+				// 			    success: function () {
+				// 			        console.log('success');
+				// 			    },
+				// 			    fail: function () {
+				// 			        console.log('fail');
+				// 			    }
+				// 			});
+				// 		}
+				//     },
+				//     fail: function (res) {
+				        
+				//     }
+				// });
+				
+				
 			}
 		}
 	}

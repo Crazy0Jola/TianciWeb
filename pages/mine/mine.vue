@@ -9,6 +9,10 @@
 				<view class="title">我的职位</view>
 				<input v-model="mPost" placeholder="请输入职位" name="input"></input>
 			</view>
+			<view class="cu-form-group">
+				<view class="title">身份证号</view>
+				<input v-model="idcard" placeholder="请输入身份证号" type="idcard" name="input"></input>
+			</view>
 			<view class="cu-form-group align-start">
 				<view class="title">个人简介</view>
 				<textarea auto-height v-model="mDesc" maxlength="-1"  placeholder="请输入个人简介"></textarea>
@@ -16,6 +20,10 @@
 			<view class="cu-form-group">
 				<view class="title">兴趣爱好</view>
 				<textarea auto-height v-model="interest" maxlength="-1"  placeholder="请输入兴趣爱好"></textarea>
+			</view>
+			<view class="cu-form-group">
+				<view class="title">性别</view>
+				<switch class="switch-sex" @change="SwitchSex" :class="skin?'checked':''" :checked="skin?true:false"></switch>
 			</view>
 			<view class="cu-form-group margin-top">
 				<view class="title">国家</view>
@@ -206,8 +214,10 @@
 				mPost:"",
 				mDesc:"",
 				myToken:"",
+				idcard:"",
 				interest:"",
 				birthday:"",
+				skin: false,//女
 				
 				constellationList: ['白羊座','金牛座','双子座','巨蟹座','狮子座','处女座','天秤座','天蝎座','射手座','摩羯座','水瓶座','双鱼座'],
 				nationList:['汉族','壮族','回族','满族','维吾尔族','苗族','彝族','土家族','藏族','蒙古族','侗族','布依族','瑶族','白族','朝鲜族','哈尼族','黎族','哈萨克族','傣族','畲族','傈僳族','东乡族','仡佬族','拉祜族','佤族','水族','纳西族','羌族','土族','仫佬族','锡伯族','柯尔克孜族','景颇族','达斡尔族','撒拉族','布朗族','毛南族','塔吉克族','普米族','阿昌族','怒族','鄂温克族','京族','基诺族','德昂族','保安族','俄罗斯族','裕固族','乌孜别克族','门巴族','鄂伦春族','独龙族','赫哲族','高山族','珞巴族','塔塔尔族'],
@@ -251,6 +261,9 @@
 			}
 		},
 		methods: {
+			SwitchSex(e) {
+				this.skin = e.detail.value
+			},
 			getBirthday(e){
 				_this.birthday=e;
 			},
@@ -574,11 +587,13 @@
 						mCompany:_this.mCompany,
 						interest:_this.interest,
 						birthday:_this.birthday,
+						idcard:_this.idcard,
 						constellation:_this.constellation,
 						nation:_this.nation,
 						country:_this.country,
 						province:_this.province,
 						city:_this.city,
+						sex:_this.skin?'男':'女',
 						district:_this.district,
 						street:_this.street,
 						commuity:_this.commuity,
@@ -649,6 +664,8 @@
 							_this.mDesc=_this.userInfo.baseInfo.description;
 							_this.interest = _this.userInfo.baseInfo.interest;
 							_this.birthday = _this.userInfo.baseInfo.birthday;
+							_this.idcard = _this.userInfo.baseInfo.idcard;
+							_this.skin = _this.userInfo.baseInfo.sex=="男";
 							_this.constellation = _this.userInfo.baseInfo.constellation;
 							_this.educationList = _this.userInfo.educationList;
 							_this.workList = _this.userInfo.workList;

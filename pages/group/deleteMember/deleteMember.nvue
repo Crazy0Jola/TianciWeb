@@ -18,7 +18,7 @@
 				</view>
 				<free-list-item v-for="(item2,index2) in item.data" 
 				:key="index2" :title="item2.nickName" 
-				:cover="item2.avatar?item2.avatar:'/static/images/userpic.jpg'"
+				:cover="item2.avatar?item2.avatar:'/static/images/userpic2.jpg'"
 				:showRightIcon="false" showRight
 				@click="selectItem(item2)">
 					<view slot="right"

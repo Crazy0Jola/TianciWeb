@@ -5,7 +5,7 @@
 		</view>
 		<view class="home-pic-base">
 			<view class="top-pic" @click="goUserInfo(targetToken)">
-				<image class="header"  mode="aspectFill" :src="targetAvatar||'/static/images/userpic.jpg'"></image>
+				<image class="header"  mode="aspectFill" :src="targetAvatar||'/static/images/userpic2.jpg'"></image>
 			</view>
 			<text class="top-name font-lg">{{targetUsername}}</text>
 		</view>
@@ -101,6 +101,9 @@
 				</view>
 			</view>
 		</free-popup>
+		<view class="top" :style="{'display':(flag===true? 'block':'none')}">
+			<text class="topc text-hover-primary iconfont" @click="top">&#xe78a;</text>
+		</view>
 	</view>
 </template>
 
@@ -165,6 +168,8 @@
 				targetToken:"",
 				
 				showText:[],
+				
+				flag:false
 			}
 		},
 		mounted() {
@@ -233,7 +238,7 @@
 				    },
 				    success: (res) => {
 						if(res.data.code==1){
-							if(res.data.result.length<10){
+							if(res.data.result.length==0){
 							   _this.loadMoreText="暂无更多";
 							   _this.showLoadMore=false
 							}
@@ -285,8 +290,9 @@
 			    },
 			    success: (res) => {
 				   _this.posts=res.data.result;
+				   console.log(JSON.stringify(_this.posts[0]))
 				   var len = res.data.result.length;
-				   if(len<10){
+				   if(len==0){
 					   _this.loadMoreText="暂无更多";
 					   _this.showLoadMore=false
 				   }
@@ -357,7 +363,7 @@
 							});
 							return photo;
 						}else{
-							return '/static/images/userpic.jpg'
+							return '/static/images/userpic2.jpg'
 						}
 					}
 				}
@@ -396,7 +402,11 @@
 			},
 			isMine(){
 				return function(id){
-					return id==_this.myId;
+					if(_this.userData.agent!=""&&_this.userData.agent!=null&&_this.userData.agent!=undefined){
+						return true;
+					}else{
+						return id==_this.myId;
+					}
 				}
 			},
 			getCreateTime(){
@@ -405,7 +415,20 @@
 				}
 			}
 		},
+		onPageScroll(e) {
+			if(e.scrollTop>600){ //当距离大于600时显示回到顶部按钮
+				this.flag=true
+			}else{ //当距离小于600时显示回到顶部按钮
+				this.flag=false
+			}
+		},
 		methods: {
+			top() { //回到顶部
+				uni.pageScrollTo({
+					scrollTop: 0,
+					duration: 300
+				});
+			},
 			isVideo(list){
 				if(list.length!=2){
 					
@@ -776,4 +799,18 @@
 	.paragraph{
 		word-wrap:break-word;
 	}
+	
+	/* 回到顶部 */
+	.top {
+		position: relative;
+		display: none; /* 先将元素隐藏 */
+	}
+ 
+	.topc {
+		position: fixed;
+		right: 20rpx;
+		bottom:60rpx;
+		font-size: 80rpx;
+	}
+	
 </style>

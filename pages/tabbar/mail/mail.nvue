@@ -27,7 +27,7 @@
 					<text class="font-md text-dark">{{item.letter}}</text>
 				</view>
 				<free-list-item  v-for="(item2,index2) in item.data" 
-				:key="index2" :title="item2.name" 
+				:key="index2" :title="item2.name" :post="item2.post" :company="item2.company"
 				:cover="getPhoto(item2.token,item2.photo)" @click="goChat(item2)"></free-list-item>
 			</view>
 		</scroll-view>
@@ -74,6 +74,11 @@
 						cover:"/static/images/mail/group.png",
 						event:"goGroupList"
 					},
+					{
+						title:"在线客服",
+						cover:"/static/images/kefu.jpg",
+						event:"goKefu"
+					},
 					// {
 					// 	title:"标签",
 					// 	cover:"/static/images/mail/tag.png",
@@ -116,7 +121,6 @@
 				},
 				method:"POST",
 				success(res){
-					
 					var result = res.data.result;
 					var len = result.length
 					for(var i=0;i<len;i++){
@@ -155,8 +159,8 @@
 								}
 							}); 
 						}else{
-							uni.setStorageSync("avatar"+token,'/static/images/userpic.jpg')
-							return '/static/images/userpic.jpg';
+							uni.setStorageSync("avatar"+token,'/static/images/userpic2.jpg')
+							return '/static/images/userpic2.jpg';
 						}
 					}
 				}
@@ -178,6 +182,11 @@
 				if(e=="goGroupList"){
 					uni.navigateTo({
 						url:"../../group/groupList/groupList"
+					})
+				}
+				if(e=="goKefu"){
+					uni.navigateTo({
+						url:'../../chat/chat/chat?username=6ed9b92709b84ba3962e560c773c1c1c&nickname=在线客服&avatar=/static/images/kefu.jpg'
 					})
 				}
 			},

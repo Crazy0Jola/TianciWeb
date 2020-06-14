@@ -18,90 +18,95 @@
 				<free-avater size="70" :src="getAvatar"
 				clickType="navigate" :token="item.from_id"></free-avater>
 				
-				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-left-icon">&#xe601;</text>
+				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-left-icon" :class="showName?'mt-2':''">&#xe601;</text>
 			</template>
-			
-			<!-- 个人名片 -->
-			<div v-if="item.msg_body.msg_type=='card'" class=" rounded" :class="isother ? 'p-2 bg-white ml-3' : 'p-2 bg-white mr-3'" style="width:400rpx;" >
-				<view class="flex align-center" @click="openUser">
-					<image :src="item.msg_body.cardAvatar"
-					style="width: 100rpx;height: 100rpx;" 
-					class="mx-1"></image>
-					<view class="flex flex-column flex-3">
-						<text class="font-md text-ellipsis flex-1">{{item.msg_body.cardName}}</text>
-						<text class="font-sm text-gray flex-1 flex-wrap" >个人名片</text>
+			<view class="flex flex-column">
+				<view v-if="isother&&showName">
+					<text class="text-gray font-sm ml-3">{{item.from_name}}</text>
+				</view>
+				<!-- 个人名片 -->
+				<div v-if="item.msg_body.msg_type=='card'" class=" rounded" :class="isother ? 'p-2 bg-white ml-3' : 'p-2 bg-white mr-3'" style="width:400rpx;" >
+					<view class="flex align-center" @click="openUser">
+						<image :src="item.msg_body.cardAvatar"
+						style="width: 100rpx;height: 100rpx;" 
+						class="mx-1"></image>
+						<view class="flex flex-column flex-3">
+							<text class="font-md text-ellipsis flex-1">{{item.msg_body.cardName}}</text>
+							<text class="font-sm text-gray flex-1 flex-wrap" >个人名片</text>
+						</view>
 					</view>
-				</view>
-			</div>
-			
-			<!-- 位置 -->
-			<div v-else-if="item.msg_type=='location'" class=" rounded" :class="isother ? 'p-2 bg-white ml-3' : 'p-2 bg-white mr-3'" style="max-width:500rpx;" >
-				<view class="flex align-center" @click="openLocation">
-					<image src="/static/images/map.png"
-					style="width: 80rpx;height: 80rpx;" 
-					class="mx-1"></image>
-					<view class="flex flex-column flex-3">
-						<text class="font-md text-ellipsis flex-1">{{item.msg_body.extras.title}}</text>
-						<text class="font-sm text-gray flex-1 flex-wrap" >{{item.msg_body.label}}</text>
+				</div>
+				
+				<!-- 位置 -->
+				<div v-else-if="item.msg_type=='location'" class=" rounded" :class="isother ? 'p-2 bg-white ml-3' : 'p-2 bg-white mr-3'" style="max-width:500rpx;" >
+					<view class="flex align-center" @click="openLocation">
+						<image src="/static/images/map.png"
+						style="width: 80rpx;height: 80rpx;" 
+						class="mx-1"></image>
+						<view class="flex flex-column flex-3">
+							<text class="font-md text-ellipsis flex-1">{{item.msg_body.extras.title}}</text>
+							<text class="font-sm text-gray flex-1 flex-wrap" >{{item.msg_body.label}}</text>
+						</view>
 					</view>
-				</view>
-			</div>
-						
-			<div v-else class=" rounded" :class="labelClass" style="max-width:500rpx;" :style="labelStyle">
-				<!-- 表情包  -->
-				<free-image v-if="item.msg_body.extras.isEmotion" :src="item.msg_body.extras.emotion" @click="preview(item.msg_body.extras.emotion)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
-
-				<!-- 文字 -->
+				</div>
+							
+				<div v-else class=" rounded" :class="labelClass" style="max-width:500rpx;" :style="labelStyle">
+					<!-- 表情包  -->
+					<free-image v-if="item.msg_body.extras.isEmotion" :src="item.msg_body.extras.emotion" @click="preview(item.msg_body.extras.emotion)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
 				
-				<text v-else-if="item.msg_type === 'text'" class="font-md">{{item.msg_body.text}}</text>
-				<!--  图片-->							
-				<free-image  v-else-if="item.msg_type === 'image'" :src="item.msg_body.media_id" @click="preview(item.msg_body.media_id)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
-
-				<!-- 音频 -->
-				<view v-else-if="item.msg_body.extras.isAudio" 
-				class="flex align-center"
-				@click="openAudio">
-					<image v-if="!isother" :src=" !audioPlaying ? '/static/audio/audio3.png' : '/static/audio/play.gif'" 
-					style="width: 50rpx;height: 50rpx;" 
-					class="mx-1"></image>
-					<text class="font">{{item.msg_body.extras.time + '"'}}</text>
-					<image v-if="isother" :src=" !audioPlaying ? '/static/audio/audio3.png' : '/static/audio/play.gif'"
-					style="width: 50rpx;height: 50rpx;" 
-					class="mx-1"></image>
-				</view>
+					<!-- 文字 -->
+					
+					<text v-else-if="item.msg_type === 'text'" class="font-md">{{item.msg_body.text}}</text>
+					<!--  图片-->							
+					<free-image  v-else-if="item.msg_type === 'image'" :src="item.msg_body.media_id" @click="preview(item.msg_body.media_id)" imageClass="rounded" :maxWidth="500" :maxHeight="350"></free-image>
 				
-				<!-- 视频 -->
-				<view v-else-if="item.msg_body.extras.isVideo"
-				class="position-relative rounded"
-				@click="openVideo">
-					<free-image :src="item.msg_body.extras.poster" imageClass="rounded" :maxWidth="300" :maxHeight="350" @load="loadPoster"></free-image>
-					<text class="iconfont text-white position-absolute" style="font-size: 80rpx;width: 80rpx;height: 80rpx;" :style="posterIconStyle">&#xe61d;</text>
-				</view>		
+					<!-- 音频 -->
+					<view v-else-if="item.msg_body.extras.isAudio" 
+					class="flex align-center"
+					@click="openAudio">
+						<image v-if="!isother" :src=" !audioPlaying ? '/static/audio/audio3.png' : '/static/audio/play.gif'" 
+						style="width: 50rpx;height: 50rpx;" 
+						class="mx-1"></image>
+						<text class="font">{{item.msg_body.extras.time + '"'}}</text>
+						<image v-if="isother" :src=" !audioPlaying ? '/static/audio/audio3.png' : '/static/audio/play.gif'"
+						style="width: 50rpx;height: 50rpx;" 
+						class="mx-1"></image>
+					</view>
+					
+					<!-- 视频 -->
+					<view v-else-if="item.msg_body.extras.isVideo"
+					class="position-relative rounded"
+					@click="openVideo">
+						<free-image :src="item.msg_body.extras.poster" imageClass="rounded" :maxWidth="300" :maxHeight="350" @load="loadPoster"></free-image>
+						<text class="iconfont text-white position-absolute" style="font-size: 80rpx;width: 80rpx;height: 80rpx;" :style="posterIconStyle">&#xe61d;</text>
+					</view>		
+					
+				</div>
 				
-			</div>
+				
+			</view>
 			
-			
-			
+		
 			<!-- 本人 -->
 			<template v-if="!isother&&item.msg_type!='location'&&item.msg_body.msg_type!='card'">
 				<text v-if="hasLabelClass" class="iconfont text-chat-item font-md position-absolute chat-right-icon">&#xe619;</text>
-				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic.jpg'"
+				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic2.jpg'"
 				clickType="navigate"></free-avater>
 			</template>
-			
 			<!-- 本人 位置-->
 			<template v-if="!isother&&item.msg_type=='location'">
 				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-right-icon">&#xe619;</text>
-				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic.jpg'"
+				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic2.jpg'"
 				clickType="navigate"></free-avater>
 			</template>
 			
 			<!-- 本人 名片-->
 			<template v-if="!isother&&item.msg_body.msg_type=='card'">
 				<text v-if="hasLabelClass" class="iconfont text-white font-md position-absolute chat-right-icon">&#xe619;</text>
-				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic.jpg'"
+				<free-avater size="70" :token="item.from_id" :src="myAvatar||'/static/images/userpic2.jpg'"
 				clickType="navigate"></free-avater>
 			</template>
+			
 			
 			
 		</view>
@@ -131,7 +136,11 @@
 			pretime:[Number,String],
 			avatar:String,
 			myAvatar:String,
-			myUsername:String
+			myUsername:String,
+			showName:{
+				type:Boolean,
+				default:false
+			}
 		},
 		data() {
 			return {
@@ -165,8 +174,8 @@
 						success(res){
 							var resAvatar = res.data.result[token]
 							if(resAvatar==""){
-								uni.setStorageSync("avatar"+token,"/static/images/userpic.jpg")
-								return "/static/images/userpic.jpg"
+								uni.setStorageSync("avatar"+token,"/static/images/userpic2.jpg")
+								return "/static/images/userpic2.jpg"
 							}else{
 								uni.downloadFile({
 									url: resAvatar,

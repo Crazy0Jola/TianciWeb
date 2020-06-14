@@ -114,7 +114,7 @@
 										}
 									}); 
 								}else{
-									userdata.photo='/static/images/userpic.jpg'
+									userdata.photo='/static/images/userpic2.jpg'
 									uni.setStorageSync('setUserData',userdata)
 								}
 							} catch (e) {
@@ -138,7 +138,6 @@
 								"title":"用户名或密码错误",
 								"position":"bottom"
 							})
-							console.log("=======hhh============")
 							_this.isRotate=false;
 						}
 					}

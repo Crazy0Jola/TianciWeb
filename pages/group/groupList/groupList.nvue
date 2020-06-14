@@ -44,7 +44,6 @@
 			_this=this;
 			JIM.getGroups().onSuccess(function(data) {
 				_this.list = data.group_list;
-				console.log(JSON.stringify(_this.list))
 				var len = _this.list.length;
 				for(var i =0;i<len;i++){
 					var avatar = uni.getStorageSync("avatar"+_this.list[i].gid);
@@ -94,6 +93,7 @@
 						}
 					}); 	
 				}).onFail(function(res) {
+					
 					uni.showToast({
 						"title":getCodeMsg(res.code),
 						"position":"bottom"

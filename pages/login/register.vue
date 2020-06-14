@@ -43,7 +43,7 @@
 				<wInput
 					v-model="inviter"
 					type="text"
-					placeholder="邀请人(选填)"
+					placeholder="邀请人手机号(选填)"
 					isShowPass
 				></wInput>
 				
@@ -232,32 +232,49 @@
 									url:"./login"
 								})
 							}).onFail(function(data) {
-							    console.log('error:' + JSON.stringify(data))
-								uni.request({
-									url:SERVER_API+"appUser/deleteUser",
-									data:{
-										token:res.data.result
-									},
-									method:"POST",
-									success() {
+									console.log('error:' + JSON.stringify(data))
+									JIM.register({
+									    'username' : res.data.result,
+										'password': _this.passData,
+										'nickname' : _this.name,
+										"gender":_this.skin?'1':'2'
+									}).onSuccess(function(data) {
+									    console.log('success:' + JSON.stringify(data));		
+										uni.showToast({
+											icon: 'success',
+											position: 'bottom',
+											title: '注册成功！'
+										});
+										_this.isRotate=false;
+										var userLogin = {
+											phone:_this.phoneData,
+											password:_this.passData
+										}
+										uni.setStorageSync("userLogin",userLogin)
+										uni.navigateTo({
+											url:"./login"
+										})
+									}).onFail(function(data) {
 										
-									}
-								})
-								
-								if(data.code==882002){
-									uni.showToast({
-										icon: 'none',
-										position: 'bottom',
-										title: '该手机号已注册！'
+										console.log('error:' + JSON.stringify(data))
+										uni.request({
+											url:SERVER_API+"appUser/deleteUser",
+											data:{
+												token:res.data.result
+											},
+											header:{
+												token:"1111"
+											},
+											method:"POST",
+											success() {
+												uni.showToast({
+													"title":"注册失败！请重试",
+													"position":"bottom"
+												})
+											}
+										})
+										_this.isRotate=false;
 									});
-								}else{
-									uni.showToast({
-										icon: 'none',
-										position: 'bottom',
-										title: getCodeMsg(data.code)
-									});
-								}
-								_this.isRotate=false;
 							});
 						}else{
 							uni.showToast({

@@ -74,53 +74,12 @@
 				})
 			}
 			// #endif
-			
-			uni.getStorage({
-				key: 'BM',
-				success: function (res) {
-					
-				},
-				fail:function(res){
-					uni.setStorageSync("BM",true)
-					uni.setStorageSync("third",4)
-				}
-			});
-			uni.getStorage({
-				key: 'LS',
-				success: function (res) {
-					
-				},
-				fail:function(res){
-					uni.setStorageSync("LS",true)
-					uni.setStorageSync("third",4)
-				}
-			});
-			uni.getStorage({
-				key: 'HY',
-				success: function (res) {
-					
-				},
-				fail:function(res){
-					uni.setStorageSync("HY",true)
-					uni.setStorageSync("third",4)
-				}
-			});
-			uni.getStorage({
-				key: 'XZ',
-				success: function (res) {
-					
-				},
-				fail:function(res){
-					uni.setStorageSync("XZ",true)
-					uni.setStorageSync("third",4)
-				}
-			});
 		
 			// 加载公共图标库
 			const domModule = weex.requireModule('dom')
 			domModule.addRule('fontFace', {
 			    'fontFamily': "iconfont",
-			    'src': "url('https://at.alicdn.com/t/font_1587665_2dfl5ybptuq.ttf')"
+			    'src': "url('https://at.alicdn.com/t/font_1587665_76yvfj3x607.ttf')"
 			});
 			// 初始化录音管理器
 			this.$store.commit('initRECORD')

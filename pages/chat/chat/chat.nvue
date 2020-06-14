@@ -31,15 +31,15 @@
 		<!-- #endif -->
 		
 		<!-- 底部输入框 -->
-		<view class="position-fixed left-0 right-0 border-top flex align-center" style="background-color: #F7F7F6;height: 105rpx;" 
-		:style="'bottom:'+KeyboardHeight+'px;'">
+		<view class="position-fixed left-0 right-0 border-top flex align-center" style="background-color: #F7F7F6;" 
+		:style="getInputStyle">
 			<free-icon-button iconClass="font-vg" :icon="(mode === 'audio') ? '\ue618':'\ue656'" @click="changeVoiceOrText"></free-icon-button>
 			<view class="flex-1">
 				<view v-if="mode === 'audio'" class="rounded flex align-center justify-center" style="height: 80rpx;" :class="isRecording?'bg-hover-light':'bg-white'" @touchstart="voiceTouchStart" @touchend="voiceTouchEnd" @touchcancel="voiceTouchCancel" @touchmove="voiceTouchMove">
 					<text class="font">{{isRecording ? '松开 结束':'按住 说话'}}</text>
 				</view>
 				
-				<textarea v-else fixed class="bg-white rounded p-2 font-md" style="height: 80rpx;" :adjust-position="false" v-model="text" @focus="mode = 'text'"/>
+				<textarea v-else fixed  class="bg-white rounded p-2 font-md" :style="'height:'+inputHeight+'rpx;'" @input="checkInput" :adjust-position="false" v-model="text" @focus="mode = 'text'"/>
 			</view>
 			<!-- 表情 -->
 			<free-icon-button iconClass="font-vg" :icon="'\ue60d'"
@@ -136,10 +136,10 @@
 				tempurl:"",
 				username:"",
 				nickname:"",
-				avatar:"/static/images/userpic.jpg",
+				avatar:"/static/images/userpic2.jpg",
 				myUsername:"",
 				myName:"",
-				myAvatar:"/static/images/userpic.jpg",
+				myAvatar:"/static/images/userpic2.jpg",
 				// 扩展菜单列表
 				actionList:[
 					[{
@@ -209,6 +209,9 @@
 				
 				//视频相关
 				poster:'',//视频封面
+				
+				//输入框
+				inputHeight:80,
 				
 			}
 		},
@@ -443,6 +446,13 @@
 				RECORD:state=>state.audio.RECORD,
 				RecordTime:state=>state.audio.RecordTime
 			}),
+			getInputStyle(){
+				if(this.mode === 'audio'){
+					this.inputHeight=80
+				}
+				var inputH = uni.upx2px(this.inputHeight+25)
+				return `bottom:${this.KeyboardHeight}px;height:${inputH}px;`
+			},
 			// 获取蒙版的位置
 			maskBottom(){
 				return this.KeyboardHeight + uni.upx2px(105)
@@ -545,6 +555,18 @@
 					}
 				}
 				this.emoticonList = arr
+			},
+			checkInput(e){
+				var len = e.detail.value.length
+				if(len<=12){
+					this.inputHeight=80
+				}else if(len<=24){
+					this.inputHeight=120
+				}else if(len<=36){
+					this.inputHeight=160
+				}else if(len<=48){
+					this.inputHeight=200
+				}
 			},
 			async requestAndroidPermission(permisionId) {
 				var result = await permision.requestAndroidPermission(permisionId)				

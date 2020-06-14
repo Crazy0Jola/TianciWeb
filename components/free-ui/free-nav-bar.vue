@@ -11,7 +11,7 @@
 					<free-icon-button v-if="showBack" @click="back"
 					:icon="'\ue645'"></free-icon-button>
 					<!-- 标题 -->
-					<text v-if="title" class="font-md ml-3">{{getTitle}}</text>
+					<text  style="width: 550rpx;" v-if="title" class="font-md ml-3 text-ellipsis">{{getTitle}}</text>
 				</view>
 				<!-- 右边 -->
 				<view class="flex align-center" v-if="showRight">

@@ -5,7 +5,7 @@
 						<free-icon-button @click="goSetting"
 						:icon="'\ue611'"></free-icon-button>
 					</view></free-nav-bar>
-		<free-list-item @imgClick="changeAvatar" @goClick="goUserInfo" :cover="avatar||'/static/images/userpic.jpg'" coverSize="120" showRight>
+		<free-list-item @imgClick="changeAvatar" @goClick="goUserInfo" :cover="avatar||'/static/images/userpic2.jpg'" coverSize="120" showRight>
 			<view class="flex flex-column" @click="goUserInfo">
 				<view class="flex flex-row align-center">
 					<text class="text-dark font-lg font-weight-bold">{{name}}</text>

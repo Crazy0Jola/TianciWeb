@@ -53,8 +53,8 @@
 						success(res){
 							var resAvatar = res.data.result[token]
 							if(resAvatar==""){
-								uni.setStorageSync("avatar"+token,"/static/images/userpic.jpg")
-								return "/static/images/userpic.jpg"
+								uni.setStorageSync("avatar"+token,"/static/images/userpic2.jpg")
+								return "/static/images/userpic2.jpg"
 							}else{
 								uni.downloadFile({
 									url: resAvatar,

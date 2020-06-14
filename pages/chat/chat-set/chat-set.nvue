@@ -5,7 +5,7 @@
 		<view class="flex flex-wrap py-3 bg-white">
 			
 			<view class="flex flex-column align-center justify-center mb-2" style="width: 150rpx;" v-for="(item,index) in memberList" :key="index">
-				<free-avater clickType="navigate" :token="item.username" :src="item.avatar? item.avatar:'/static/images/userpic.jpg'" size="110"></free-avater>
+				<free-avater clickType="navigate" :token="item.username" :src="item.avatar? item.avatar:'/static/images/userpic2.jpg'" size="110"></free-avater>
 				<text class="font text-muted mt-1">{{item.nickName}}</text>
 			</view>
 			
@@ -33,14 +33,21 @@
 				></free-avater>
 			</view>
 		</free-list-item>
-		<free-list-item title="群聊名称" showRight :showLeftIcon="false" @click="goEditName">
-			<text slot="right" class="font text-muted">{{gname}}</text>
-		</free-list-item>
+		<view class="flex-1 flex align-center justify-between pr-3 py-3 pl-3 border-bottom" @click="goEditName">
+			<view>
+				<text class="font-md text-dark text-ellipsis" style="width: 200rpx;">群聊名称</text>
+				<text v-if="gname.length>15" slot="right" class="font text-muted">{{gname}}</text>
+			</view>
+			<view class="flex align-center">
+				<text v-if="gname.length<=15" slot="right" class="font text-muted">{{gname}}</text>
+				<text class="iconfont text-light-muted font-md">&#xe605;</text>
+			</view>
+		</view>
 <!-- 		<free-list-item title="群二维码" showRight :showLeftIcon="false">
 			<text slot="right" class="iconfont font-md text-light-muted">&#xe647;</text>
 		</free-list-item> -->
 		<view class="bg-white flex-column align-stretch" @click="goEditDes">
-			<view class="flex-row align-center  justify-between pr-3 py-3 pl-3" :class="border ? 'border-bottom' : ''">
+			<view class="flex-row align-center  justify-between pr-3 py-3 pl-3">
 				<text class="font-md text-dark">群公告</text>
 				<view class="flex align-center">
 					<!-- 右箭头 -->
@@ -124,13 +131,15 @@
 			}
 		},
 		onShow(){
+			
+			
 			JIM.getGroupInfo({
 				'gid' : _this.gid
 			}).onSuccess(function(data) {
 
 				_this.gdes=data.group_info.desc
 				_this.gname=data.group_info.name
-
+				// console.log(JSON.stringify(data))
 				if(data.group_info.avatar){
 					JIM.getResource({
 						'media_id' : data.group_info.avatar,
@@ -152,14 +161,13 @@
 							}
 						}); 
 					}).onFail(function(data) {
-						uni.showToast({
-							"title":getCodeMsg(data.code),
-							"position":"bottom"
-						})
+						console.log(data.code)
+						_this.gavatar=uni.getStorageSync("avatar"+_this.gid);
 					});
 				}
 				
 			}).onFail(function(data) {
+				console.log(data.code)
 				uni.showToast({
 					"title":getCodeMsg(data.code),
 					"position":"bottom"
@@ -265,6 +273,7 @@
 									
 								})
 							}).onFail(function(data) {
+								console.log(data.code)
 								uni.showToast({
 									"title":getCodeMsg(data.code),
 									"position":"bottom"
@@ -335,6 +344,7 @@
 								url:"../../tabbar/index/index"
 							})
 						}).onFail(function(data) {
+							console.log(data.code)
 							uni.showToast({
 								"title":getCodeMsg(data.code),
 								"position":"bottom"

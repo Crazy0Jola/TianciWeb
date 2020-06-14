@@ -64,7 +64,6 @@
 		},
 		onLoad(){
 			Bmob.initialize("6c6118d83d45988daab23d65cd5652f3", "9fa3739eae864caea501a9fa1621d437");
-			
 		},
 		components:{
 			wInput,

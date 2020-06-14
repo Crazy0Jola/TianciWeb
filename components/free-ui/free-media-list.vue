@@ -3,7 +3,7 @@
 	<div class="flex align-stretch" @tap="onClick"  @longpress="long">
 		<view class="flex align-center justify-center position-relative"
 		style="width: 145rpx;">
-			<free-avater :src="item.avatar?item.avatar: item.type==3? '/static/images/userpic.jpg':'/static/images/grouppic.jpg'" size="92"></free-avater>
+			<free-avater :src="item.avatar?item.avatar: item.type==3? '/static/images/userpic2.jpg':'/static/images/grouppic.jpg'" size="92"></free-avater>
 			<free-badge badgeStyle="top:15rpx;right:15rpx"
 			v-if="item.unread_msg_count" :value="item.unread_msg_count"></free-badge>
 		</view>

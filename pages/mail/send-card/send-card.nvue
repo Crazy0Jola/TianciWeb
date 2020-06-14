@@ -15,7 +15,7 @@
 				</view>
 				<free-list-item  v-for="(item2,index2) in item.data" 
 				:key="index2" :title="item2.name" 
-				:cover="item2.photo?item2.photo:'/static/images/userpic.jpg'" @click="selectItem(item2)"></free-list-item>
+				:cover="item2.photo?item2.photo:'/static/images/userpic2.jpg'" @click="selectItem(item2)"></free-list-item>
 			</view>
 		</scroll-view>
 		
@@ -141,7 +141,7 @@
 				if(item.photo){
 					_this.avatar=item.photo
 				}else{
-					_this.avatar = "/static/images/userpic.jpg"
+					_this.avatar = "/static/images/userpic2.jpg"
 				}
 				
 				this.$refs.confirm.show((close)=>{

@@ -83,7 +83,7 @@
 								"color" : "#696969",
 								"type" : "none",
 								"fontSrc" : "/static/fonts/iconfont.ttf",
-								"text" : "\ue745" //小相机
+								"text" : "\ue745" 
 							}
 						]
             		}
